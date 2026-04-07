@@ -187,7 +187,7 @@ footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 1
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <a class="back-btn" href="datacenter_helper.html">← Back to Dashboard</a>
+  <a class="back-btn" href="index.html">← Back to Dashboard</a>
   <div class="sep"></div>
   <h1>🧭 Setup Guide</h1>
   <div class="sep"></div>
@@ -210,14 +210,59 @@ footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 1
     </div>
 
     <!-- Customer mode -->
-    <div id="mode-customer" class="panel-section-body">
-      <div class="customer-select-wrap">
-        <label style="font-size:0.78rem;color:var(--text3);font-weight:700;">Select your customer:</label>
-        <select id="customerPicker" onchange="onCustomerChange()">
-          <option value="">— Choose a customer —</option>
-        </select>
-        <div id="customerCard" style="display:none;"></div>
+    <div id="mode-customer" style="display:flex;flex-direction:column;">
+
+      <div class="panel-section-body">
+        <div class="customer-select-wrap">
+          <label style="font-size:0.78rem;color:var(--text3);font-weight:700;">Select your customer:</label>
+          <select id="customerPicker" onchange="onCustomerChange()">
+            <option value="">— Choose a customer —</option>
+          </select>
+          <div id="customerCard" style="display:none;"></div>
+        </div>
       </div>
+
+      <!-- Server size preference -->
+      <div class="panel-section">
+        <div class="panel-section-title" onclick="toggleSection('pref-server')">
+          Server preference <span id="pref-server-arrow">▾</span>
+        </div>
+        <div class="panel-section-body" id="pref-server">
+          <div style="font-size:0.78rem;color:var(--text3);margin-bottom:6px;">Which server sizes can you use?</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div class="speed-opt sel" id="srv-pref-smart" onclick="setSrvPref('smart',this)">⚡ 7U preferred</div>
+            <div class="speed-opt" id="srv-pref-3u" onclick="setSrvPref('3u',this)">🟢 3U only</div>
+          </div>
+          <div id="srv-pref-hint" style="font-size:0.72rem;color:var(--text3);margin-top:5px;">
+            Maximises 7U servers first, tops up with 3U
+          </div>
+        </div>
+      </div>
+
+      <!-- Unlocked equipment -->
+      <div class="panel-section">
+        <div class="panel-section-title" onclick="toggleSection('pref-unlocked')">
+          Unlocked switches <span id="pref-unlocked-arrow">▾</span>
+        </div>
+        <div class="panel-section-body" id="pref-unlocked">
+          <div style="font-size:0.78rem;color:var(--text3);margin-bottom:8px;">
+            Tick what you can buy in-game:
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:default;">
+            <input type="checkbox" checked disabled style="accent-color:var(--c-g);"> 16×RJ45 <span style="font-size:0.72rem;color:var(--text3);">(always)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:pointer;">
+            <input type="checkbox" id="unlock-sw4" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 4×SFP+ Switch
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:pointer;">
+            <input type="checkbox" id="unlock-sw4x16" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 4×QSFP+ 16×SFP+ Switch
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);cursor:pointer;">
+            <input type="checkbox" id="unlock-sw32" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 32×QSFP+ Switch
+          </label>
+        </div>
+      </div>
+
     </div>
 
     <!-- Inventory mode -->
@@ -407,6 +452,7 @@ let expertMode = false;
 let maxPortSpeed = 10;
 let selectedCustomer = null;
 let stepsDone = new Set();
+let srvPref = 'smart'; // 'smart' | '3u'
 
 // ===================== THEME / MODE =====================
 function toggleTheme() {
@@ -423,6 +469,50 @@ function toggleMode() {
   b.className = 'mode-badge ' + (expertMode ? 'expert' : 'beginner');
   if (selectedCustomer) renderCustomerGuide(selectedCustomer);
   else if (entryMode === 'inventory') renderInventoryGuide();
+}
+
+// ===================== SERVER PREF =====================
+function setSrvPref(mode, el) {
+  srvPref = mode;
+  document.querySelectorAll('#pref-server .speed-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  const hints = {
+    smart: 'Maximises 7U servers first, tops up with 3U',
+    '3u':  'Early game: uses only 3U servers'
+  };
+  document.getElementById('srv-pref-hint').textContent = hints[mode];
+  if (selectedCustomer) renderCustomerGuide(selectedCustomer);
+}
+
+function getUnlocked() {
+  return {
+    sw16:   true,
+    sw4:    document.getElementById('unlock-sw4')?.checked || false,
+    sw4x16: document.getElementById('unlock-sw4x16')?.checked || false,
+    sw32:   document.getElementById('unlock-sw32')?.checked || false,
+  };
+}
+
+function bestAvailableSwitch(needed, unlocked) {
+  // Returns {name, available, warning}
+  const swMap = {
+    '4 Port':  { key:'sw4',   name:'4×SFP+ Switch' },
+    '4+16':    { key:'sw4x16',name:'4×QSFP+ 16×SFP+ Switch' },
+    '32 Port': { key:'sw32',  name:'32×QSFP+ Switch' },
+  };
+  const target = swMap[needed];
+  if (!target) return { name:'16×RJ45 Switch', available:true, warning:null };
+  if (unlocked[target.key]) return { name:target.name, available:true, warning:null };
+  // Find best available fallback
+  const order = ['sw32','sw4x16','sw4','sw16'];
+  const names  = {sw32:'32×QSFP+ Switch', sw4x16:'4×QSFP+ 16×SFP+ Switch', sw4:'4×SFP+ Switch', sw16:'16×RJ45 Switch'};
+  const fallback = order.find(k => unlocked[k] || k === 'sw16');
+  return {
+    name: target.name,
+    available: false,
+    fallback: names[fallback] || '16×RJ45 Switch',
+    warning: `⚠️ ${target.name} not yet unlocked. Best available: ${names[fallback] || '16×RJ45 Switch'} — note: this may not meet the customer's full speed requirements.`
+  };
 }
 
 // ===================== SECTIONS =====================
@@ -510,16 +600,26 @@ function renderCustomerGuide(c) {
   const typeColors = {sx:'c-hi',ri:'c-g',mf:'c-p',gpu:'c-r'};
   const activeTypes = types.filter(t => c[t] > 0);
 
-  // Calculate server needs
+  // Calculate server needs based on srvPref
   const needs = {};
   let totalServers=0, totalRU=0, totalPorts=0;
   activeTypes.forEach(t => {
-    const res = optimize(c[t]*1000, t);
+    const targetRaw = c[t]*1000;
+    let res;
+    if (srvPref === '3u') {
+      const s3 = Math.ceil(targetRaw / 5000);
+      res = {s7:0, s3, total:s3, iops:s3*5000, ru:s3*3};
+    } else {
+      res = optimize(targetRaw, t);
+    }
     needs[t] = res;
     totalServers += res.total;
     totalRU += res.ru;
     totalPorts += res.total;
   });
+
+  const unlocked = getUnlocked();
+  const switchInfo = bestAvailableSwitch(c.sw, unlocked);
 
   const needsHighSpeed = c.sw !== '4 Port';
   const beg = !expertMode;
@@ -543,14 +643,16 @@ function renderCustomerGuide(c) {
           <div class="step-status">In progress</div>
         </div>
         <div class="step-body">
-          ${beg ? `<div class="explain-box">First things first — you need servers to actually process this customer's data. Different customers need different types. Here's exactly what to buy.</div>` : ''}
+          ${beg ? `<div class="explain-box">First things first — you need servers to process this customer's data. Here's exactly what to buy based on your current preference (${srvPref === '3u' ? '3U only' : '7U preferred'}).</div>` : ''}
           <div class="calc-result-box">
-            <div class="crb-title">What to buy</div>
+            <div class="crb-title">What to buy — ${srvPref === '3u' ? '🟢 3U Only mode' : '⚡ 7U Preferred mode'}</div>
             <div class="crb-grid">
               ${activeTypes.map(t=>`
                 <div class="crb-item">
                   <div class="crb-item-label">${typeNames[t]}</div>
-                  <div class="crb-item-val ${typeColors[t]}">${needs[t].s7>0?needs[t].s7+'× 7U':''}${needs[t].s7>0&&needs[t].s3>0?' + ':''}${needs[t].s3>0?needs[t].s3+'× 3U':''}</div>
+                  <div class="crb-item-val ${typeColors[t]}">
+                    ${needs[t].s7>0?needs[t].s7+'× 7U':''}${needs[t].s7>0&&needs[t].s3>0?' + ':''}${needs[t].s3>0?needs[t].s3+'× 3U':''}
+                  </div>
                   <div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">${needs[t].iops.toLocaleString()} IOPS · ${needs[t].ru}U rack</div>
                 </div>`).join('')}
               <div class="crb-item">
@@ -563,7 +665,8 @@ function renderCustomerGuide(c) {
               </div>
             </div>
           </div>
-          ${beg ? `<div class="info-box">💡 <strong>Why 7U first?</strong> A 7U server gives 12,000 IOPS in 7U of space. A 3U server gives 5,000 IOPS. So 7U servers are more space-efficient — we always fill with those first, then top up with 3U if needed.</div>` : ''}
+          ${srvPref === 'smart' && beg ? `<div class="info-box">💡 <strong>Why 7U first?</strong> A 7U server gives 12,000 IOPS in 7U of space. A 3U gives 5,000 IOPS. 7U is more space-efficient — change to "3U only" on the left if you haven't unlocked 7U yet.</div>` : ''}
+          ${srvPref === '3u' && beg ? `<div class="info-box">💡 <strong>3U only mode:</strong> Each 3U server provides 5,000 IOPS. When you unlock 7U servers, switch to "7U preferred" to save rack space.</div>` : ''}
           <button class="step-btn done-btn" onclick="completeStep(1)">✓ Bought the servers — next step</button>
         </div>
       </div>
@@ -577,12 +680,13 @@ function renderCustomerGuide(c) {
         </div>
         <div class="step-body">
           ${beg ? `<div class="explain-box">The customer connects to your data center through a switch. Think of it as the reception desk — all traffic from this customer goes through it. You also need a patch panel to keep cabling organised.</div>` : ''}
+          ${!switchInfo.available ? `<div class="warn-box">${switchInfo.warning}</div>` : ''}
           <div class="action-list">
             <div class="action-item">
               <div class="icon">🔌</div>
               <div class="action-text">
-                <strong>1× ${c.sw === '4 Port' ? '4×SFP+ Switch' : c.sw === '4+16' ? '4×QSFP+ 16×SFP+ Switch' : '32×QSFP+ Switch'}</strong>
-                <span class="hint">This is the customer's switch. Their cable plugs into this.</span>
+                <strong>1× ${switchInfo.available ? switchInfo.name : switchInfo.fallback}</strong>
+                ${!switchInfo.available ? `<span class="hint" style="color:var(--c-o);">Ideal: ${switchInfo.name} — not yet unlocked, using best available.</span>` : '<span class="hint">This is the customer's switch. Their cable plugs into this.</span>'}
               </div>
             </div>
             <div class="action-item">
