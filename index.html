@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Center – Reference</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0c12; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+/* TOP */
+.topbar { background: #14171f; border-bottom: 1px solid #222; padding: 8px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.topbar h1 { font-size: 0.95em; color: #61dafb; }
+.sep { width: 1px; height: 18px; background: #333; }
+.lang-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid #333; background: #1e2130; color: #aaa; font-size: 0.72em; cursor: pointer; font-weight: 700; }
+.lang-btn.active { background: #1a3a5a; border-color: #3a7aaa; color: #88bbff; }
+
+/* TABS */
+.tabs { display: flex; justify-content: center; gap: 6px; padding: 14px 14px 0; flex-wrap: wrap; }
+.tab { padding: 7px 16px; border-radius: 20px; border: 1px solid #333; background: #14171f; color: #666; font-size: 0.76em; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.tab.active { background: #1a2a4a; border-color: #3a6aaa; color: #88bbff; }
+
+.section { display: none; max-width: 960px; margin: 0 auto; padding: 18px 14px; }
+.section.active { display: block; }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 10px; margin-bottom: 16px; }
+.card { background: #14171f; border: 1px solid #222; border-radius: 8px; padding: 12px; }
+.card-title { font-size: 0.7em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
+.card-val { font-size: 1.1em; font-weight: bold; margin-bottom: 3px; }
+.card-sub { font-size: 0.67em; color: #555; }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 0.71em; margin-bottom: 16px; }
+th { background: #1e2130; color: #777; padding: 7px 9px; text-align: left; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2a2d3a; }
+td { padding: 6px 9px; border-bottom: 1px solid #14161e; color: #ccc; vertical-align: middle; }
+tr:hover td { background: #12141c; }
+.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+.b-grey   { background: #1a1c24; color: #aaa; }
+.b-teal   { background: #0a2828; color: #44ddcc; }
+.b-orange { background: #3a1a00; color: #ffaa44; }
+
+.section-title { font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 9px; padding-bottom: 5px; border-bottom: 1px solid #1e2130; }
+
+.info  { background: #0d1a0d; border: 1px solid #1a3a1a; border-radius: 6px; padding: 8px 12px; font-size: 0.71em; color: #7acc7a; line-height: 1.8; margin-bottom: 12px; }
+.warn2 { background: #1a1200; border: 1px solid #3a3000; border-radius: 6px; padding: 8px 12px; font-size: 0.71em; color: #ccaa44; line-height: 1.8; margin-bottom: 12px; }
+.info b { color: #aaffaa; }
+.warn2 b { color: #ffcc44; }
+
+/* COLORS */
+.c-hi  { color: #61dafb; }
+.c-g   { color: #4cdf9a; }
+.c-o   { color: #ffaa44; }
+.c-r   { color: #ff6666; }
+.c-p   { color: #cc88ff; }
+
+/* REP BAR */
+.rep-bar { height: 5px; border-radius: 3px; background: #1e2130; margin-top: 3px; }
+.rep-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#1a4aaa,#cc44ff); }
+
+/* COMPANY FILTER */
+.filter-row { display: flex; gap: 7px; margin-bottom: 11px; flex-wrap: wrap; align-items: center; }
+.fl { font-size: 0.7em; color: #555; }
+.fbtn { padding: 4px 10px; border-radius: 11px; border: 1px solid #333; background: #14171f; color: #777; font-size: 0.69em; cursor: pointer; }
+.fbtn.on { background: #1a3a5a; border-color: #3a7aaa; color: #88bbff; }
+.sbox { background: #14171f; border: 1px solid #333; border-radius: 6px; color: #ccc; padding: 4px 9px; font-size: 0.72em; width: 170px; outline: none; }
+.sbox:focus { border-color: #3a6aaa; }
+
+/* CALC */
+.calc-input { background: #0a0c12; border: 1px solid #333; color: #fff; padding: 5px 8px; border-radius: 5px; width: 100%; font-size: 1em; outline: none; }
+.calc-select { background: #0a0c12; border: 1px solid #333; color: #ccc; padding: 5px; border-radius: 5px; width: 100%; font-size: 0.83em; outline: none; }
+
+/* ===== CG PLANNER ===== */
+.cg-layout { display: grid; grid-template-columns: 200px 1fr 220px; gap: 12px; min-height: 500px; }
+
+/* customer pool */
+.pool-panel { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel-title { background: #1e2130; padding: 7px 10px; font-size: 0.7em; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+.pool-list { flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 3px; }
+.pool-item { border-radius: 5px; padding: 5px 8px; font-size: 0.67em; cursor: pointer; border: 1px solid #1e2130; background: #0d0f18; display: flex; align-items: center; gap: 5px; transition: all 0.1s; }
+.pool-item:hover { border-color: #3a3d4a; background: #12141e; }
+.pool-item.in-cg { opacity: 0.35; cursor: default; }
+.pool-item.selected-pool { border-color: #61b0ff; background: #0d1a2a; }
+.pool-num { font-size: 0.8em; color: #444; width: 13px; text-align: right; flex-shrink: 0; }
+.pool-sw { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.sw4c { background: #2a3a5a; } .sw4x16c { background: #1a5a3a; } .sw32c { background: #5a3a1a; }
+.pool-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #bbb; }
+.pool-gbps-input { width: 42px; background: #0a0c12; border: 1px solid #2a2d3a; color: #ffaa44; font-size: 0.85em; padding: 1px 3px; border-radius: 3px; text-align: right; outline: none; }
+
+/* CG groups */
+.groups-panel { display: flex; flex-direction: column; gap: 10px; }
+.cg-group { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
+.cg-header { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #1e2130; }
+.cg-header-name { font-size: 0.72em; font-weight: 700; color: #ccc; flex: 1; }
+.cg-gbps-bar-wrap { flex: 1; }
+.cg-gbps-bar { height: 5px; border-radius: 3px; background: #2a2d3a; }
+.cg-gbps-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+.cg-gbps-text { font-size: 0.65em; color: #888; white-space: nowrap; }
+.cg-gbps-text.over { color: #ff6666; font-weight: bold; }
+.cg-body { padding: 5px 8px; display: flex; flex-direction: column; gap: 3px; min-height: 32px; }
+.cg-customer { border-radius: 4px; padding: 4px 7px; font-size: 0.65em; border: 1px solid #1e2130; background: #0d0f18; display: flex; align-items: center; gap: 5px; }
+.cg-cust-name { flex: 1; color: #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cg-cust-gbps { color: #ffaa44; font-size: 0.85em; white-space: nowrap; }
+.cg-remove { color: #2a2d3a; cursor: pointer; font-size: 1.0em; }
+.cg-remove:hover { color: #ff6666; }
+.cg-drop-hint { font-size: 0.62em; color: #2a2d3a; text-align: center; padding: 5px; border: 1px dashed #1e2130; border-radius: 4px; cursor: pointer; }
+.cg-drop-hint:hover { border-color: #3a6aaa; color: #4a7aaa; }
+.add-cg-btn { border: 1px dashed #2a3a5a; border-radius: 7px; padding: 8px; text-align: center; font-size: 0.69em; color: #3a5a7a; cursor: pointer; background: #0d0f18; }
+.add-cg-btn:hover { border-color: #4a7aaa; color: #6a9aaa; }
+
+/* core assignment panel */
+.core-panel { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.core-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 8px; }
+.core-item { background: #0d0f18; border: 1px solid #1e2130; border-radius: 6px; overflow: hidden; }
+.core-item-title { background: #1a1200; border-bottom: 1px solid #3a2a00; padding: 4px 8px; font-size: 0.67em; color: #cc8844; font-weight: 700; display: flex; justify-content: space-between; }
+.core-item-body { padding: 5px; display: flex; flex-direction: column; gap: 3px; }
+.core-cg-tag { border-radius: 4px; padding: 3px 7px; font-size: 0.63em; background: #0a1828; border: 1px solid #1a3a5a; color: #88bbff; display: flex; justify-content: space-between; align-items: center; }
+.core-cg-remove { color: #2a2d3a; cursor: pointer; }
+.core-cg-remove:hover { color: #ff6666; }
+.core-drop { font-size: 0.6em; color: #2a2d3a; text-align: center; padding: 4px; border: 1px dashed #1e2130; border-radius: 3px; cursor: pointer; }
+.core-drop:hover { border-color: #3a6aaa; color: #4a7aaa; }
+.add-core-btn { border: 1px dashed #3a2a00; border-radius: 6px; padding: 6px; text-align: center; font-size: 0.67em; color: #4a3a00; cursor: pointer; background: #0d0a00; }
+.add-core-btn:hover { color: #cc8844; border-color: #7a5a00; }
+
+.cg-name-input { background: transparent; border: none; color: #ccc; font-size: 0.72em; font-weight: 700; outline: none; width: 80px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0a0c12; }
+::-webkit-scrollbar-thumb { background: #2a2d3a; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1 id="appTitle">🖥️ Data Center – Referencia Dashboard</h1>
+  <div class="sep"></div>
+  <button class="lang-btn" onclick="setLang('hu')">🇭🇺 HU</button>
+  <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+  <div class="sep"></div>
+  <span style="font-size:0.67em;color:#444;">v1.0.38</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('eszk',this)" data-hu="🔧 Eszközök" data-en="🔧 Devices">🔧 Eszközök</button>
+  <button class="tab" onclick="show('ugyf',this)" data-hu="👤 Ügyfelek" data-en="👤 Customers">👤 Ügyfelek</button>
+  <button class="tab" onclick="show('kalc',this)" data-hu="🧮 Kalkulátor" data-en="🧮 Calculator">🧮 Kalkulátor</button>
+  <button class="tab" onclick="show('cgpl',this)" data-hu="📊 CG Tervező" data-en="📊 CG Planner">📊 CG Tervező</button>
+</div>
+
+<!-- ===== DEVICES ===== -->
+<div class="section active" id="eszk">
+  <p class="section-title" data-hu="Portok & Modulok" data-en="Ports & Modules">Portok & Modulok</p>
+  <div class="card-grid">
+    <div class="card"><div class="card-title" data-hu="RJ45 Port" data-en="RJ45 Port">RJ45 Port</div><div class="card-val c-hi">10 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
+    <div class="card"><div class="card-title">SFP+ / SFP28</div><div class="card-val c-hi">25 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
+    <div class="card"><div class="card-title">QSFP+ Port</div><div class="card-val c-hi">40 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
+    <div class="card"><div class="card-title" data-hu="Rack méret" data-en="Rack size">Rack méret</div><div class="card-val c-hi">47U</div><div class="card-sub" data-hu="Slot / rack" data-en="Slot / rack">Slot / rack</div></div>
+  </div>
+
+  <p class="section-title" data-hu="SFP Modulok" data-en="SFP Modules">SFP Modulok</p>
+  <table>
+    <tr><th data-hu="Modul" data-en="Module">Modul</th><th data-hu="Sebesség" data-en="Speed">Sebesség</th><th data-hu="Kábel" data-en="Cable">Kábel</th><th data-hu="Port típus" data-en="Port type">Port típus</th><th data-hu="Ár" data-en="Price">Ár</th></tr>
+    <tr><td><span class="badge b-grey">SFP+ RJ45</span></td><td class="c-g">10 Gbps</td><td>CAT6</td><td>SFP+/SFP28</td><td class="c-o">$50</td></tr>
+    <tr><td><span class="badge b-grey">SFP+ Fiber 10G</span></td><td class="c-g">10 Gbps</td><td>Fiber 1 lane</td><td>SFP+/SFP28</td><td class="c-o">$70</td></tr>
+    <tr><td><span class="badge b-teal">SFP28 Fiber 25G</span></td><td class="c-hi">25 Gbps</td><td>Fiber 1 lane</td><td>SFP+/SFP28</td><td class="c-o">$180</td></tr>
+    <tr><td><span class="badge b-orange">QSFP+ Fiber 40G</span></td><td class="c-p">40 Gbps</td><td>Fiber 4 lane</td><td>QSFP+</td><td class="c-r">$300</td></tr>
+  </table>
+
+  <p class="section-title" data-hu="Switchek" data-en="Switches">Switchek</p>
+  <table>
+    <tr><th data-hu="Switch" data-en="Switch">Switch</th><th>RJ45</th><th>SFP+/SFP28</th><th>QSFP+</th><th data-hu="Max sávszélesség" data-en="Max bandwidth">Max sávszélesség</th><th data-hu="Megjegyzés" data-en="Note">Megjegyzés</th></tr>
+    <tr><td><span class="badge b-grey">16 Port</span></td><td class="c-g">16</td><td>–</td><td>–</td><td>16×10 = <b>160 Gbps</b></td><td data-hu="Kis ügyfelek" data-en="Small customers">Kis ügyfelek</td></tr>
+    <tr><td><span class="badge b-grey">4×SFP+</span></td><td>–</td><td class="c-g">4</td><td>–</td><td>4×25 = <b>100 Gbps</b></td><td data-hu="Kis uplink" data-en="Small uplink">Kis uplink</td></tr>
+    <tr><td><span class="badge b-teal">4×QSFP+ 16×SFP+</span></td><td>–</td><td class="c-hi">16</td><td class="c-hi">4</td><td>4×40+16×25 = <b>560 Gbps</b></td><td data-hu="⭐ Core / Row!" data-en="⭐ Core / Row!">⭐ Core / Row!</td></tr>
+    <tr><td><span class="badge b-orange">32×QSFP+</span></td><td>–</td><td>–</td><td class="c-p">32</td><td>32×40 = <b>1280 Gbps</b></td><td data-hu="Nagy backbone" data-en="Large backbone">Nagy backbone</td></tr>
+  </table>
+
+  <p class="section-title" data-hu="Szerverek" data-en="Servers">Szerverek</p>
+  <table>
+    <tr><th data-hu="Típus" data-en="Type">Típus</th><th data-hu="Méret" data-en="Size">Méret</th><th>IOPS (k)</th><th data-hu="Sebesség" data-en="Speed">Sebesség</th><th data-hu="Élettartam" data-en="Lifetime">Élettartam</th><th data-hu="Ár" data-en="Price">Ár</th><th>IOPS/$</th></tr>
+    <tr><td>System X 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-r">4h</td><td class="c-o">$400</td><td>12.5</td></tr>
+    <tr><td>System X 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-r">4h</td><td class="c-o">$1600</td><td class="c-g">7.5</td></tr>
+    <tr><td>RISC 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-hi">5h</td><td class="c-o">$450</td><td>11.1</td></tr>
+    <tr><td>RISC 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-o">$1750</td><td>6.9</td></tr>
+    <tr><td>Mainframe 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-g">7h</td><td class="c-r">$850</td><td>5.9</td></tr>
+    <tr><td>Mainframe 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-r">$2000</td><td>6.0</td></tr>
+    <tr><td>GPU 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-r">3h</td><td class="c-o">$550</td><td>9.1</td></tr>
+    <tr><td>GPU 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-r">3h</td><td class="c-r">$2200</td><td>5.5</td></tr>
+  </table>
+</div>
+
+<!-- ===== CUSTOMERS ===== -->
+<div class="section" id="ugyf">
+  <div class="filter-row">
+    <span class="fl" data-hu="Szűrő:" data-en="Filter:">Szűrő:</span>
+    <input class="sbox" type="text" id="searchBox" oninput="filterC()" data-placeholder-hu="Ügyfél neve..." data-placeholder-en="Customer name..." placeholder="Ügyfél neve...">
+    <button class="fbtn on" onclick="toggleF('all',this)" data-hu="Mind" data-en="All">Mind</button>
+    <button class="fbtn" onclick="toggleF('4 Port',this)" data-hu="4 Port" data-en="4 Port">4 Port</button>
+    <button class="fbtn" onclick="toggleF('4+16',this)" data-hu="4+16 Port" data-en="4+16 Port">4+16 Port</button>
+    <button class="fbtn" onclick="toggleF('32 Port',this)" data-hu="32 Port" data-en="32 Port">32 Port</button>
+  </div>
+  <table id="companyTable">
+    <tr><th>#</th><th data-hu="Név" data-en="Name">Név</th><th data-hu="Reputáció" data-en="Reputation">Reputáció</th><th data-hu="Switch" data-en="Switch">Switch</th><th>Total IOPS</th><th>System X</th><th>RISC</th><th>Mainframe</th><th>GPU</th><th>IPs</th></tr>
+  </table>
+</div>
+
+<!-- ===== CALCULATOR ===== -->
+<div class="section" id="kalc">
+  <p class="section-title" data-hu="Szerver igény kalkulátor" data-en="Server requirement calculator">Szerver igény kalkulátor</p>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title" data-hu="Szükséges IOPS" data-en="Required IOPS">Required IOPS</div>
+      <input type="number" id="iops" value="80000" min="1" class="calc-input" oninput="calc()">
+      <div style="font-size:0.62em;color:#555;margin-top:3px;" id="iopsNote">= 80k IOPS</div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-hu="Szerver típus" data-en="Server type">Szerver típus</div>
+      <select id="srv" class="calc-select" onchange="calc()">
+        <option value="3" data-hu="3U szerver (5k IOPS)" data-en="3U server (5k IOPS)">3U szerver (5k IOPS)</option>
+        <option value="7" selected data-hu="7U szerver (12k IOPS)" data-en="7U server (12k IOPS)">7U szerver (12k IOPS)</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-title" data-hu="N+1 redundancia" data-en="N+1 redundancy">N+1 redundancia</div>
+      <select id="redund" class="calc-select" onchange="calc()">
+        <option value="0" data-hu="Nem kell" data-en="Not needed">Nem kell</option>
+        <option value="1" selected data-hu="+1 tartalék" data-en="+1 spare">+1 tartalék</option>
+        <option value="2" data-hu="+2 tartalék" data-en="+2 spare">+2 tartalék</option>
+      </select>
+    </div>
+  </div>
+  <div id="calcResult" class="card-grid"></div>
+</div>
+
+<!-- ===== CG PLANNER ===== -->
+<div class="section" id="cgpl">
+  <div style="margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span class="section-title" style="margin:0;border:none;" data-hu="CG / Core kapacitás tervező" data-en="CG / Core capacity planner">CG / Core kapacitás tervező</span>
+    <span style="font-size:0.68em;color:#555;" data-hu="Kattints egy ügyfélre, majd egy CG csoportra a hozzáadáshoz" data-en="Click a customer then a CG group to assign">Kattints egy ügyfélre, majd egy CG csoportra a hozzáadáshoz</span>
+  </div>
+
+  <div class="warn2" id="cgInfo">
+    <b data-hu="Core limit: állítsd be a maximumot jobb oldalt" data-en="Core limit: set your limit on the right">Core limit: set your limit on the right</b><br>
+    <span data-hu="Add meg az ügyfelek Gbps igényét a pool listában (narancssárga mező), majd rendeld hozzá őket CG csoportokhoz. A CG csoportokat Core-okba rendezheted." data-en="Set each customer's Gbps requirement in the pool list (orange field), then assign them to CG groups. CG groups can be assigned to Cores.">Set each customer's Gbps requirement in the pool list (orange field), then assign them to CG groups. CG groups can be assigned to Cores.</span>
+  </div>
+
+  <div class="cg-layout">
+
+    <!-- POOL -->
+    <div class="pool-panel">
+      <div class="panel-title" data-hu="Ügyfelek (kattints a kiválasztáshoz)" data-en="Customers (click to select)">Ügyfelek</div>
+      <div class="pool-list" id="poolList"></div>
+    </div>
+
+    <!-- CG GROUPS -->
+    <div class="groups-panel" id="cgGroups"></div>
+
+    <!-- CORE ASSIGNMENT -->
+    <div class="core-panel">
+      <div class="panel-title" data-hu="Core csoportok" data-en="Core groups">Core csoportok</div>
+      <div style="padding:6px 8px;border-bottom:1px solid #1e2130;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <span style="font-size:0.63em;color:#666;" data-hu="Max Gbps/Core:" data-en="Max Gbps/Core:">Max Gbps/Core:</span>
+        <input type="number" min="1" value="0" id="coreLimitInput" style="width:65px;background:#0a0c12;border:1px solid #3a2a00;color:#ffaa44;padding:2px 5px;border-radius:4px;font-size:0.7em;outline:none;"
+          oninput="coreLimit=parseFloat(this.value)||0;renderCGGroups();renderCores();">
+      </div>
+      <div class="core-list" id="coreList"></div>
+      <div style="padding:5px;">
+        <div class="add-core-btn" onclick="addCore()" data-hu="+ Új Core" data-en="+ New Core">+ Új Core</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== LANG =====
+let lang = 'en';
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  applyLang();
+}
+function applyLang() {
+  document.querySelectorAll('[data-hu]').forEach(el=>{
+    if(el.tagName==='INPUT' && el.dataset[lang+'placeholder'] !== undefined) {
+      el.placeholder = el.dataset[(lang==='hu'?'placeholder-hu':'placeholder-en')] || el.placeholder;
+    } else {
+      const txt = el.dataset[lang];
+      if(txt !== undefined) el.textContent = txt;
+    }
+  });
+  document.querySelectorAll('option[data-hu]').forEach(el=>{
+    const txt = el.dataset[lang];
+    if(txt) el.textContent = txt;
+  });
+  document.getElementById('appTitle').textContent = lang==='hu'
+    ? '🖥️ Data Center – Referencia Dashboard'
+    : '🖥️ Data Center – Reference Dashboard';
+  document.querySelectorAll('.tab').forEach(t=>{
+    const txt=t.dataset[lang]; if(txt) t.textContent=txt;
+  });
+  // searchbox placeholder
+  const sb = document.getElementById('searchBox');
+  sb.placeholder = lang==='hu'?'Ügyfél neve...':'Customer name...';
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+// ===== TABS =====
+function show(id,btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='kalc') calc();
+}
+
+// ===== DATA =====
+const CUSTOMERS = [
+  {n:1,  name:'Bermuda Triangle Backup', sw:'4 Port', iops:40,   sx:40,  ri:0,   mf:0,   gpu:0,   ip:13,  rep:0},
+  {n:2,  name:'Dad Joke Database',       sw:'4 Port', iops:80,   sx:80,  ri:0,   mf:0,   gpu:0,   ip:29,  rep:10},
+  {n:3,  name:'UFO Download Station',    sw:'4 Port', iops:100,  sx:100, ri:0,   mf:0,   gpu:0,   ip:29,  rep:20},
+  {n:4,  name:'TaxHaven Holdings',       sw:'4 Port', iops:120,  sx:120, ri:0,   mf:0,   gpu:0,   ip:29,  rep:30},
+  {n:5,  name:'FakeNews Daily',          sw:'4 Port', iops:150,  sx:100, ri:50,  mf:0,   gpu:0,   ip:42,  rep:40},
+  {n:6,  name:'Pollution Plus',          sw:'4 Port', iops:170,  sx:100, ri:70,  mf:0,   gpu:0,   ip:58,  rep:50},
+  {n:7,  name:'ClimateChange Industries',sw:'4 Port', iops:190,  sx:100, ri:90,  mf:0,   gpu:0,   ip:58,  rep:60},
+  {n:8,  name:'Honest Politicians',      sw:'4 Port', iops:220,  sx:100, ri:120, mf:0,   gpu:0,   ip:58,  rep:80},
+  {n:9,  name:'Vaporware Corp',          sw:'4 Port', iops:240,  sx:100, ri:140, mf:0,   gpu:0,   ip:58,  rep:100},
+  {n:10, name:'Maybe Finance',           sw:'4 Port', iops:260,  sx:100, ri:90,  mf:70,  gpu:0,   ip:87,  rep:130},
+  {n:11, name:'Organised Chaos',         sw:'4 Port', iops:290,  sx:100, ri:90,  mf:100, gpu:0,   ip:87,  rep:170},
+  {n:12, name:'Not Hackers',             sw:'4 Port', iops:310,  sx:100, ri:90,  mf:120, gpu:0,   ip:87,  rep:220},
+  {n:13, name:'CryptoMine Inc',          sw:'4 Port', iops:340,  sx:100, ri:90,  mf:150, gpu:0,   ip:87,  rep:280},
+  {n:14, name:'The Invisible Hand',      sw:'4 Port', iops:370,  sx:100, ri:90,  mf:80,  gpu:100, ip:116, rep:360},
+  {n:15, name:'AnonMask',               sw:'4 Port', iops:400,  sx:100, ri:90,  mf:80,  gpu:130, ip:116, rep:460},
+  {n:16, name:'Global Megacorp',         sw:'4+16',   iops:480,  sx:120, ri:120, mf:120, gpu:120, ip:252, rep:580},
+  {n:17, name:'Doomscroll Media',        sw:'4+16',   iops:600,  sx:150, ri:150, mf:150, gpu:150, ip:252, rep:720},
+  {n:18, name:'Subscription Hell',       sw:'4+16',   iops:720,  sx:180, ri:180, mf:180, gpu:180, ip:252, rep:880},
+  {n:19, name:'Greed is Good',           sw:'4+16',   iops:840,  sx:210, ri:210, mf:210, gpu:210, ip:252, rep:1060},
+  {n:20, name:'Too Big To Fail',         sw:'4+16',   iops:1000, sx:250, ri:250, mf:250, gpu:250, ip:500, rep:1060},
+  {n:21, name:'Mega International',      sw:'4+16',   iops:1100, sx:275, ri:275, mf:275, gpu:275, ip:500, rep:1060},
+  {n:22, name:'Oligarch Online',         sw:'4+16',   iops:1200, sx:300, ri:300, mf:300, gpu:300, ip:500, rep:1060},
+  {n:23, name:'Moon Launches',           sw:'4+16',   iops:1400, sx:360, ri:360, mf:360, gpu:320, ip:500, rep:1060},
+  {n:24, name:'Make Mie',               sw:'32 Port', iops:1490, sx:140, ri:670, mf:340, gpu:340, ip:532, rep:1320},
+  {n:25, name:'Aero Dynasty',           sw:'32 Port', iops:1590, sx:250, ri:350, mf:640, gpu:350, ip:564, rep:1560},
+  {n:26, name:'Standard',               sw:'32 Port', iops:1560, sx:200, ri:300, mf:400, gpu:660, ip:564, rep:1840},
+  {n:27, name:'Richards and Richards',   sw:'32 Port', iops:1600, sx:700, ri:300, mf:300, gpu:300, ip:628, rep:2180},
+  {n:28, name:'Dewey Chaeatm',           sw:'32 Port', iops:1800, sx:300, ri:900, mf:300, gpu:300, ip:503, rep:2580},
+  {n:29, name:'AeroSpace',              sw:'32 Port', iops:1820, sx:240, ri:240, mf:1040,gpu:300, ip:500, rep:3050},
+  {n:30, name:'Bull and Bearly',         sw:'32 Port', iops:1700, sx:300, ri:300, mf:300, gpu:800, ip:628, rep:3600},
+  {n:31, name:'Waseku 🎮',              sw:'32 Port', iops:1820, sx:500, ri:440, mf:440, gpu:440, ip:500, rep:4250},
+  {n:32, name:'Sweatshop Effieciency',   sw:'32 Port', iops:1860, sx:360, ri:1000,mf:140, gpu:360, ip:532, rep:5020},
+  {n:33, name:'Pyramid Power',           sw:'32 Port', iops:1940, sx:240, ri:300, mf:1000,gpu:400, ip:564, rep:5930},
+  {n:34, name:'EvilCorp 😈',            sw:'32 Port', iops:1980, sx:200, ri:200, mf:300, gpu:1280,ip:500, rep:7000},
+];
+
+// ===== CUSTOMER TABLE =====
+let activeFilter = 'all';
+function buildCompanyTable() {
+  const tb = document.getElementById('companyTable');
+  // clear rows except header
+  while(tb.rows.length > 1) tb.deleteRow(1);
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  CUSTOMERS.forEach(c => {
+    const swKey = c.sw === '4 Port' ? '4 Port' : c.sw === '4+16' ? '4+16' : '32 Port';
+    if(activeFilter !== 'all' && swKey !== activeFilter) return;
+    if(!c.name.toLowerCase().includes(search)) return;
+    const swBadge = c.sw==='4 Port'?'b-grey':c.sw==='4+16'?'b-teal':'b-orange';
+    const pct = Math.min(100,(c.rep/7000)*100).toFixed(0);
+    const tr = tb.insertRow();
+    tr.innerHTML = `
+      <td>${c.n}</td>
+      <td>${c.name}</td>
+      <td><div>${c.rep}</div><div class="rep-bar"><div class="rep-fill" style="width:${pct}%"></div></div></td>
+      <td><span class="badge ${swBadge}">${c.sw}</span></td>
+      <td class="${c.iops>=1000?'c-r':c.iops>=400?'c-o':'c-g'}">${c.iops}k</td>
+      <td>${c.sx||'–'}${c.sx?'k':''}</td>
+      <td>${c.ri||'–'}${c.ri?'k':''}</td>
+      <td>${c.mf||'–'}${c.mf?'k':''}</td>
+      <td>${c.gpu||'–'}${c.gpu?'k':''}</td>
+      <td>${c.ip}</td>`;
+  });
+}
+function filterC() { buildCompanyTable(); }
+function toggleF(val,btn) {
+  activeFilter = val;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildCompanyTable();
+}
+
+// ===== CALCULATOR =====
+function calc() {
+  const iopsRaw = parseInt(document.getElementById('iops').value)||0;
+  const iops = iopsRaw / 1000;
+  const note = document.getElementById('iopsNote');
+  if(note) note.textContent = '= ' + (iops>=1?iops.toFixed(1)+'k':iopsRaw) + ' IOPS';
+  const sz = parseInt(document.getElementById('srv').value);
+  const red = parseInt(document.getElementById('redund').value);
+  const iopsPS = sz===3?5:12;
+  const ru = sz;
+  const gbps = sz===3?0.25:0.6;
+  const prices = {sx:sz===3?400:1600,ri:sz===3?450:1750,mf:sz===3?850:2000,gpu:sz===3?550:2200};
+  const eols = {sx:4,ri:5,mf:sz===3?7:5,gpu:3};
+  const needed = Math.ceil(iops/iopsPS);
+  const total = needed+red;
+  const res = document.getElementById('calcResult');
+  const hu = lang==='hu';
+  res.innerHTML = `
+    <div class="card"><div class="card-title">${hu?'Szükséges szerverek':'Required servers'}</div><div class="card-val c-hi">${needed} ${hu?'db':'pcs'}</div><div class="card-sub">+ ${red} ${hu?'tartalék':'spare'} = <b>${total} ${hu?'összesen':'total'}</b></div></div>
+    <div class="card"><div class="card-title">${hu?'Rack foglalás':'Rack space'}</div><div class="card-val c-o">${total*ru}U</div><div class="card-sub">${Math.ceil(total*ru/47)} rack (47U)</div></div>
+    <div class="card"><div class="card-title">${hu?'Sávszélesség':'Bandwidth'}</div><div class="card-val c-g">${(total*gbps).toFixed(1)} Gbps</div></div>
+    <div class="card" style="grid-column:1/-1;">
+      <div class="card-title">${hu?'Árak típusonként':'Prices by type'}</div>
+      <table style="margin:0;"><tr><th>${hu?'Típus':'Type'}</th><th>${hu?'Db ár':'Unit price'}</th><th>${hu?'Össz':'Total'}</th><th>${hu?'Élett.':'Lifetime'}</th></tr>
+      ${Object.entries(prices).map(([k,p])=>`<tr><td>${{sx:'System X',ri:'RISC',mf:'Mainframe',gpu:'GPU'}[k]} ${sz}U</td><td>$${p}</td><td class="c-o">$${total*p}</td><td class="${eols[k]<=3?'c-r':'c-g'}">${eols[k]}h</td></tr>`).join('')}
+      </table>
+    </div>`;
+}
+
+// ===== CG PLANNER =====
+let custGbps = {}; // n → Gbps
+CUSTOMERS.forEach(c => { custGbps[c.n] = 10; });
+
+let cgGroups = []; // [{id, name, members:[n,...]}]
+let coreGroups = []; // [{id, name, cgIds:[...]}]
+let selectedPool = null;
+let selectedCG = null;
+
+let coreCounter = 1;
+let coreLimit = 0; // configurable
+
+function nextCGNum() {
+  const used = new Set(cgGroups.map(g => parseInt(g.name.replace(/\D/g,''))).filter(n=>!isNaN(n)));
+  let n = 1;
+  while(used.has(n)) n++;
+  return n;
+}
+
+function addCG() {
+  const n = nextCGNum();
+  cgGroups.push({id: Date.now(), name:`CG${String(n).padStart(2,'0')}`, members:[]});
+  renderCGGroups(); renderCores(); renderPool();
+}
+function addCore() {
+  coreGroups.push({id: Date.now(), name:`Core${String(coreCounter).padStart(2,'0')}A`, cgIds:[]});
+  coreCounter++;
+  renderCores();
+}
+
+function cgTotalGbps(cg) {
+  return cg.members.reduce((s,n)=>(s+(custGbps[n]||0)),0);
+}
+function coreTotalGbps(core) {
+  return core.cgIds.reduce((s,cgId)=>{
+    const cg=cgGroups.find(g=>g.id===cgId);
+    return s+(cg?cgTotalGbps(cg):0);
+  },0);
+}
+
+function renderPool() {
+  const container = document.getElementById('poolList');
+  const assignedNs = new Set();
+  cgGroups.forEach(cg=>cg.members.forEach(n=>assignedNs.add(n)));
+
+  container.innerHTML = CUSTOMERS.map(c=>{
+    const swCls = c.sw==='4 Port'?'sw4c':c.sw==='4+16'?'sw4x16c':'sw32c';
+    const inCg = assignedNs.has(c.n);
+    return `<div class="pool-item ${inCg?'in-cg':''} ${selectedPool===c.n&&!inCg?'selected-pool':''}"
+      onclick="${inCg?'':` selectPool(${c.n})`}">
+      <span class="pool-num">${c.n}</span>
+      <span class="pool-sw ${swCls}"></span>
+      <span class="pool-name">${c.name}</span>
+      <input class="pool-gbps-input" type="number" min="0.1" step="0.5" value="${custGbps[c.n]}"
+        onclick="event.stopPropagation()"
+        oninput="setCustGbps(${c.n},this.value)"> Gbps
+    </div>`;
+  }).join('');
+}
+
+function setCustGbps(n, val) {
+  custGbps[n] = parseFloat(val)||0;
+  renderCGGroups(); renderCores();
+}
+
+function selectPool(n) {
+  selectedPool = selectedPool===n?null:n;
+  renderPool();
+}
+
+function renderCGGroups() {
+  const container = document.getElementById('cgGroups');
+  const hu = lang==='hu';
+  let html = cgGroups.map(cg=>{
+    const total = cgTotalGbps(cg);
+    const pct = coreLimit > 0 ? Math.min(100,(total/coreLimit)*100) : 0;
+    const over = coreLimit > 0 && total > coreLimit;
+    const fillColor = over ? '#ff4444' : pct>80 ? '#ffaa44' : '#2a7aff';
+    const membersHtml = cg.members.map(n=>{
+      const c=CUSTOMERS.find(x=>x.n===n);
+      return `<div class="cg-customer">
+        <span class="pool-sw ${c.sw==='4 Port'?'sw4c':c.sw==='4+16'?'sw4x16c':'sw32c'}"></span>
+        <span class="cg-cust-name">#${n} ${c?c.name:''}</span>
+        <span class="cg-cust-gbps">${custGbps[n]} Gbps</span>
+        <span class="cg-remove" onclick="removeCGMember(${cg.id},${n})">✕</span>
+      </div>`;
+    }).join('');
+    return `<div class="cg-group">
+      <div class="cg-header">
+        <input class="cg-name-input" value="${cg.name}" oninput="renameCG(${cg.id},this.value)">
+        <div class="cg-gbps-bar-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <span class="cg-gbps-text ${over?'over':''}">${total.toFixed(1)} Gbps${coreLimit > 0 ? " / "+coreLimit+" Gbps" : ""}</span>
+            ${over?`<span style="font-size:0.6em;color:#ff4444;font-weight:bold;">⚠️ ${hu?'TÚLLÉPÉS!':'OVERFLOW!'}</span>`:''}
+          </div>
+          <div class="cg-gbps-bar"><div class="cg-gbps-fill" style="width:${pct}%;background:${fillColor};"></div></div>
+        </div>
+        <span style="font-size:0.65em;color:#ff6666;cursor:pointer;margin-left:6px;" onclick="removeCG(${cg.id})">✕</span>
+      </div>
+      <div class="cg-body">
+        ${membersHtml}
+        <div class="cg-drop-hint" onclick="assignToGroup(${cg.id})">
+          ${selectedPool ? `➕ #${selectedPool} ${CUSTOMERS.find(x=>x.n===selectedPool)?.name||''} ${hu?'hozzáadása':'add here'}` : (hu?'← Válassz ügyfelet a listából':'← Select customer from list')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  html += `<div class="add-cg-btn" onclick="addCG()">${hu?'+ Új CG csoport':'+ New CG group'}</div>`;
+  container.innerHTML = html;
+}
+
+function renameCG(id, val) {
+  const cg=cgGroups.find(g=>g.id===id);
+  if(cg) cg.name=val;
+  renderCores();
+}
+
+function assignToGroup(cgId) {
+  if(!selectedPool) return;
+  const cg = cgGroups.find(g=>g.id===cgId);
+  if(!cg) return;
+  if(!cg.members.includes(selectedPool)) cg.members.push(selectedPool);
+  selectedPool = null;
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function removeCGMember(cgId, n) {
+  const cg=cgGroups.find(g=>g.id===cgId);
+  if(cg) cg.members=cg.members.filter(x=>x!==n);
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function removeCG(id) {
+  cgGroups=cgGroups.filter(g=>g.id!==id);
+  coreGroups.forEach(c=>c.cgIds=c.cgIds.filter(x=>x!==id));
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function renderCores() {
+  const container = document.getElementById('coreList');
+  const hu = lang==='hu';
+  const unassignedCGs = cgGroups.filter(cg=>!coreGroups.some(co=>co.cgIds.includes(cg.id)));
+
+  container.innerHTML = coreGroups.map(core=>{
+    const total = coreTotalGbps(core);
+    const over = coreLimit > 0 && total > coreLimit;
+    const pct = coreLimit > 0 ? Math.min(100,(total/coreLimit)*100) : 0;
+    const fc = over?'#ff4444':pct>80?'#ffaa44':'#cc7722';
+    const tagsHtml = core.cgIds.map(cgId=>{
+      const cg=cgGroups.find(g=>g.id===cgId);
+      if(!cg) return '';
+      return `<div class="core-cg-tag">
+        <span>${cg.name} (${cgTotalGbps(cg).toFixed(1)} Gbps)</span>
+        <span class="core-cg-remove" onclick="removeCoreAssign(${core.id},${cgId})">✕</span>
+      </div>`;
+    }).join('');
+    return `<div class="core-item">
+      <div class="core-item-title">
+        <span>${core.name} – ${total.toFixed(1)} Gbps</span>
+        <span style="cursor:pointer;color:#555;" onclick="removeCore(${core.id})">✕</span>
+      </div>
+      <div style="padding:4px 6px;">
+        <div class="cg-gbps-bar" style="margin-bottom:4px;"><div class="cg-gbps-fill" style="width:${pct}%;background:${fc};"></div></div>
+        ${over?`<div style="font-size:0.6em;color:#ff4444;font-weight:bold;margin-bottom:3px;">⚠️ ${hu?`${coreLimit} Gbps felett!`:`Over ${coreLimit} Gbps!`}</div>`:''}
+      </div>
+      <div class="core-item-body">
+        ${tagsHtml}
+        ${unassignedCGs.length?`<select class="calc-select" style="font-size:0.62em;" onchange="assignCGtoCore(${core.id},this.value);this.value=''">
+          <option value="">${hu?'CG csoport hozzárendelése...':'Assign CG group...'}</option>
+          ${unassignedCGs.map(cg=>`<option value="${cg.id}">${cg.name} (${cgTotalGbps(cg).toFixed(1)} Gbps)</option>`).join('')}
+        </select>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function assignCGtoCore(coreId, cgId) {
+  cgId = parseInt(cgId);
+  const core=coreGroups.find(c=>c.id===coreId);
+  if(core && !core.cgIds.includes(cgId)) core.cgIds.push(cgId);
+  renderCores();
+}
+function removeCoreAssign(coreId, cgId) {
+  const core=coreGroups.find(c=>c.id===coreId);
+  if(core) core.cgIds=core.cgIds.filter(x=>x!==cgId);
+  renderCores();
+}
+function removeCore(id) {
+  coreGroups=coreGroups.filter(c=>c.id!==id);
+  renderCores();
+}
+
+// ===== INIT =====
+applyLang();
+buildCompanyTable();
+renderPool();
+renderCGGroups();
+renderCores();
+calc();
+</script>
+</body>
+</html>
