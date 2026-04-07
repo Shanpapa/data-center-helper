@@ -702,6 +702,40 @@ footer {
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
+
+/* ===================== SAVE MODAL ===================== */
+.save-modal-grid { display: flex; flex-direction: column; gap: 8px; }
+.save-profile-card {
+  background: var(--pool-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.spc-info { flex: 1; min-width: 0; }
+.spc-name { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spc-date { font-size: 0.74rem; color: var(--text3); margin-top: 1px; }
+.spc-meta { font-size: 0.72rem; color: var(--text4); margin-top: 2px; }
+.spc-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.spc-btn { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 0.75rem; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.15s; }
+.spc-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.spc-btn.danger { border-color: #3a1a1a; background: #1a0a0a; color: #ff8888; }
+.spc-btn.danger:hover { background: #2a0a0a; }
+.save-name-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.save-name-row input { flex: 1; background: var(--input-bg); border: 1px solid var(--border2); color: var(--text); padding: 7px 10px; border-radius: 7px; font-size: 0.88rem; outline: none; }
+.save-name-row input:focus { border-color: var(--tab-bord); }
+.save-empty { font-size: 0.85rem; color: var(--text4); text-align: center; padding: 20px; }
+.save-section-title { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+.import-area { display: flex; flex-direction: column; gap: 8px; }
+.import-area textarea { background: var(--input-bg); border: 1px solid var(--border2); color: var(--text); padding: 8px; border-radius: 7px; font-size: 0.78rem; font-family: monospace; outline: none; resize: vertical; min-height: 80px; }
+.import-area textarea:focus { border-color: var(--tab-bord); }
+.error-msg { font-size: 0.78rem; color: var(--c-r); padding: 6px 10px; background: #1a0a0a; border: 1px solid #3a1a1a; border-radius: 6px; }
+.success-msg { font-size: 0.78rem; color: var(--c-g); padding: 6px 10px; background: #0a1a0a; border: 1px solid #1a3a1a; border-radius: 6px; }
+.modal-inner-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+.mit { padding: 7px 14px; font-size: 0.8rem; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; }
+.mit.active { color: var(--tab-col); border-bottom-color: var(--tab-bord); }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 /* Hide number input spinners */
 input[type=number]::-webkit-inner-spin-button,
@@ -814,7 +848,13 @@ input[type=number] { -moz-appearance: textfield; }
     <!-- LEFT -->
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div class="calc-panel">
-        <div class="calc-panel-title">Add Requirement</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="calc-panel-title" style="margin:0;border:0;padding:0;">Add Requirement</div>
+          <div style="display:flex;gap:5px;">
+            <button class="spc-btn" onclick="openCalcSaveModal()">💾 Save</button>
+            <button class="spc-btn" onclick="openCalcLoadModal()">📂 Load</button>
+          </div>
+        </div>
         <div class="calc-field">
           <label>Server size preference</label>
           <div style="display:flex;gap:6px;flex-wrap:wrap;" id="srvModeBtns">
@@ -889,8 +929,14 @@ input[type=number] { -moz-appearance: textfield; }
 
       <!-- CG GROUPS -->
       <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
-        <div style="font-size:0.78rem;color:var(--text3);padding:2px 0;">
-          Click a customer on the left, then click a CG group below to assign.
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0;">
+          <span style="font-size:0.78rem;color:var(--text3);">Click a customer on the left, then click a CG group below to assign.</span>
+          <span style="margin-left:auto;display:flex;gap:5px;flex-shrink:0;">
+            <button class="spc-btn" onclick="openCGSaveModal()">💾 Save</button>
+            <button class="spc-btn" onclick="openCGLoadModal()">📂 Load</button>
+            <button class="spc-btn" onclick="exportCGPlan()">📤 Export</button>
+            <button class="spc-btn" onclick="openCGImportModal()">📥 Import</button>
+          </span>
         </div>
         <div class="groups-wrap" id="cgGroups"></div>
         <div class="add-cg-btn" onclick="addCG()">+ New CG Group</div>
@@ -902,10 +948,21 @@ input[type=number] { -moz-appearance: textfield; }
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
-  <span class="footer-note">🎮 Fan-made helper for the <strong>Data Center</strong> game (Waseku)</span>
-  <span class="footer-credit">Built by Claude (Anthropic) · Not affiliated with Waseku</span>
+  <span class="footer-note">🎮 Fan-made helper for the <strong>Data Center</strong> game</span>
+  <span class="footer-credit">Created by <strong>Shanpapa</strong> · Built with the help of Claude (Anthropic) · Not affiliated with Waseku</span>
 </footer>
 
+
+<!-- ===================== SAVE MODALS ===================== -->
+<div class="modal-overlay" id="saveModal" onclick="closeSaveModal(event)">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <span class="modal-title" id="saveModalTitle">💾 Save</span>
+      <span class="modal-close" onclick="closeSaveModal(null)">×</span>
+    </div>
+    <div class="modal-body" id="saveModalBody" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+</div>
 <!-- ===================== CHANGELOG MODAL ===================== -->
 <style>
 .modal-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -954,6 +1011,243 @@ input[type=number] { -moz-appearance: textfield; }
 </div>
 
 <script>
+// === SAVES (inlined from saves.js) ===
+// Data Center Helper — Save System
+// Calculator: localStorage only
+// CG Planner: localStorage + JSON export/import with security validation
+
+// ===================== SECURITY =====================
+
+const ALLOWED_TYPES = ['System X', 'RISC', 'Mainframe', 'GPU'];
+const ALLOWED_SRV_MODES = ['smart', '3u', 'both'];
+const ALLOWED_REDUND = [0, 1, 2];
+
+function sanitizeString(val, maxLen = 50) {
+  if (typeof val !== 'string') return '';
+  return val
+    .replace(/</g, '').replace(/>/g, '')
+    .replace(/"/g, '').replace(/'/g, '')
+    .replace(/\u0060/g, '').replace(/\//g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .trim()
+    .slice(0, maxLen);
+}
+
+function isInt(val, min, max) {
+  return Number.isInteger(val) && val >= min && val <= max;
+}
+
+function isPositiveNumber(val) {
+  return typeof val === 'number' && isFinite(val) && val >= 0;
+}
+
+// ===================== STORAGE KEYS =====================
+
+const CALC_KEY   = 'dch_calculator_saves';
+const CG_KEY     = 'dch_cgplanner_saves';
+
+// ===================== GENERIC HELPERS =====================
+
+function loadStore(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveStore(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function nowLabel() {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})
+    + ' ' + d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ===================== CALCULATOR SAVES =====================
+
+window.CalcSaves = {
+  list() { return loadStore(CALC_KEY); },
+
+  save(name, state) {
+    const clean = sanitizeString(name || 'Unnamed', 40) || 'Unnamed';
+    const store = this.list();
+    store.unshift({
+      id:   generateId(),
+      name: clean,
+      date: nowLabel(),
+      state: {
+        requirements: (state.requirements || []).map(r => ({
+          id:     generateId(),
+          type:   ALLOWED_TYPES.includes(r.type) ? r.type : 'System X',
+          raw:    isPositiveNumber(r.raw) ? Math.round(r.raw) : 0,
+          redund: ALLOWED_REDUND.includes(r.redund) ? r.redund : 0,
+        })),
+        srvMode: ALLOWED_SRV_MODES.includes(state.srvMode) ? state.srvMode : 'smart',
+      }
+    });
+    return saveStore(CALC_KEY, store.slice(0, 20)); // max 20 saves
+  },
+
+  delete(id) {
+    const store = this.list().filter(s => s.id !== id);
+    saveStore(CALC_KEY, store);
+  },
+
+  get(id) {
+    return this.list().find(s => s.id === id) || null;
+  }
+};
+
+// ===================== CG PLANNER SAVES =====================
+
+window.CGSaves = {
+  list() { return loadStore(CG_KEY); },
+
+  save(name, state) {
+    const clean = sanitizeString(name || 'Unnamed', 40) || 'Unnamed';
+    const store = this.list();
+    store.unshift({
+      id:   generateId(),
+      name: clean,
+      date: nowLabel(),
+      state: CGSaves._sanitizeState(state),
+    });
+    return saveStore(CG_KEY, store.slice(0, 20));
+  },
+
+  delete(id) {
+    const store = this.list().filter(s => s.id !== id);
+    saveStore(CG_KEY, store);
+  },
+
+  get(id) {
+    return this.list().find(s => s.id === id) || null;
+  },
+
+  // Validate + sanitize CG state before saving or importing
+  _sanitizeState(state) {
+    if (!state || typeof state !== 'object') return { cgGroups: [], coreGroups: [] };
+
+    const cgGroups = (Array.isArray(state.cgGroups) ? state.cgGroups : []).map(cg => ({
+      id:      generateId(),
+      name:    sanitizeString(cg.name || 'CG', 20),
+      members: (Array.isArray(cg.members) ? cg.members : [])
+        .filter(m => isInt(m.n, 1, 34))
+        .map(m => ({
+          n:    m.n,
+          gbps: isPositiveNumber(m.gbps) ? Math.round(m.gbps * 100) / 100 : 0,
+        }))
+    }));
+
+    // Build a set of valid CG ids for cross-reference
+    const cgIdMap = {};
+    cgGroups.forEach((cg, i) => cgIdMap[cg.id] = true);
+
+    const coreGroups = (Array.isArray(state.coreGroups) ? state.coreGroups : []).map(co => ({
+      id:       generateId(),
+      name:     sanitizeString(co.name || 'Core', 20),
+      maxGbps:  isPositiveNumber(co.maxGbps) ? Math.round(co.maxGbps * 100) / 100 : 0,
+      cgIds:    [], // will be resolved after mapping
+    }));
+
+    // cgIds stored as indices for portability
+    (Array.isArray(state.coreGroups) ? state.coreGroups : []).forEach((co, ci) => {
+      if (Array.isArray(co.cgIdxs)) {
+        coreGroups[ci].cgIds = co.cgIdxs
+          .filter(idx => isInt(idx, 0, cgGroups.length - 1))
+          .map(idx => cgGroups[idx].id);
+      }
+    });
+
+    return { cgGroups, coreGroups };
+  },
+
+  // Export: convert live state to portable JSON
+  exportState(state) {
+    const sanitized = CGSaves._sanitizeState(CGSaves._prepareForExport(state));
+    return JSON.stringify({
+      dch_version: 1,
+      exported: nowLabel(),
+      ...CGSaves._prepareForExport(state)
+    }, null, 2);
+  },
+
+  _prepareForExport(state) {
+    // Replace live IDs with stable indices for portability
+    const cgGroups = (state.cgGroups || []).map(cg => ({
+      name:    sanitizeString(cg.name || 'CG', 20),
+      members: (cg.members || [])
+        .filter(m => isInt(m.n, 1, 34))
+        .map(m => ({ n: m.n, gbps: isPositiveNumber(m.gbps) ? m.gbps : 0 }))
+    }));
+
+    const cgIdToIdx = {};
+    (state.cgGroups || []).forEach((cg, i) => cgIdToIdx[cg.id] = i);
+
+    const coreGroups = (state.coreGroups || []).map(co => ({
+      name:    sanitizeString(co.name || 'Core', 20),
+      maxGbps: isPositiveNumber(co.maxGbps) ? co.maxGbps : 0,
+      cgIdxs:  (co.cgIds || [])
+        .map(id => cgIdToIdx[id])
+        .filter(idx => idx !== undefined),
+    }));
+
+    return { cgGroups, coreGroups };
+  },
+
+  // Import: validate JSON string, return sanitized state or throw
+  importFromJSON(jsonStr) {
+    let raw;
+    try {
+      raw = JSON.parse(jsonStr);
+    } catch {
+      throw new Error('Invalid JSON — could not parse the file.');
+    }
+
+    if (!raw || typeof raw !== 'object') throw new Error('Invalid format — expected an object.');
+    if (raw.dch_version !== 1) throw new Error('Unknown version — this file may be from a different app.');
+    if (!Array.isArray(raw.cgGroups)) throw new Error('Missing cgGroups array.');
+    if (!Array.isArray(raw.coreGroups)) throw new Error('Missing coreGroups array.');
+    if (raw.cgGroups.length > 50) throw new Error('Too many CG groups (max 50).');
+    if (raw.coreGroups.length > 20) throw new Error('Too many Core groups (max 20).');
+
+    // Validate each CG group
+    raw.cgGroups.forEach((cg, i) => {
+      if (typeof cg.name !== 'string') throw new Error('CG group ' + i + ': name must be a string.');
+      if (!Array.isArray(cg.members)) throw new Error('CG group ' + i + ': members must be an array.');
+      cg.members.forEach((m, j) => {
+        if (!isInt(m.n, 1, 34)) throw new Error('CG group ' + i + ', member ' + j + ': customer ID must be 1-34.');
+        if (!isPositiveNumber(m.gbps)) throw new Error('CG group ' + i + ', member ' + j + ': gbps must be a positive number.');
+      });
+    });
+
+    // Validate each Core group
+    raw.coreGroups.forEach((co, i) => {
+      if (typeof co.name !== 'string') throw new Error('Core group ' + i + ': name must be a string.');
+      if (!isPositiveNumber(co.maxGbps)) throw new Error('Core group ' + i + ': maxGbps must be a positive number.');
+      if (!Array.isArray(co.cgIdxs)) throw new Error('Core group ' + i + ': cgIdxs must be an array.');
+      co.cgIdxs.forEach((idx, j) => {
+        if (!isInt(idx, 0, raw.cgGroups.length - 1)) throw new Error('Core group ' + i + ': invalid CG index ' + idx + '.');
+      });
+    });
+
+    return CGSaves._sanitizeState(raw);
+  }
+};
+
 // ===================== THEME =====================
 function toggleTheme() {
   const html = document.documentElement;
@@ -1513,6 +1807,242 @@ async function loadSteamNews() {
   }
 }
 
+
+// ===================== SAVE MODAL HELPERS =====================
+
+function closeSaveModal(e) {
+  if (!e || e.target === document.getElementById('saveModal'))
+    document.getElementById('saveModal').classList.remove('open');
+}
+function openSaveModal(title, bodyHTML) {
+  document.getElementById('saveModalTitle').textContent = title;
+  document.getElementById('saveModalBody').innerHTML = bodyHTML;
+  document.getElementById('saveModal').classList.add('open');
+}
+
+function saveMsg(id, msg, isError) {
+  const el = document.getElementById(id);
+  if (el) { el.className = isError ? 'error-msg' : 'success-msg'; el.textContent = msg; el.style.display = 'block'; }
+}
+
+// ===================== CALCULATOR SAVE / LOAD =====================
+
+function getCalcState() {
+  return { requirements: requirements.map(r => ({...r})), srvMode };
+}
+
+function openCalcSaveModal() {
+  openSaveModal('💾 Save Calculator', `
+    <div class="save-section-title">Save current requirements</div>
+    <div class="save-name-row">
+      <input id="calcSaveName" placeholder="Profile name…" maxlength="40">
+      <button class="btn btn-primary" onclick="doCalcSave()">Save</button>
+    </div>
+    <div id="calcSaveMsg" style="display:none;"></div>
+    <div class="save-section-title" style="margin-top:4px;">Saved profiles</div>
+    <div class="save-modal-grid" id="calcProfileList"></div>
+  `);
+  renderCalcProfiles();
+}
+
+function openCalcLoadModal() {
+  openSaveModal('📂 Load Calculator', `
+    <div class="save-section-title">Saved profiles</div>
+    <div class="save-modal-grid" id="calcProfileList"></div>
+  `);
+  renderCalcProfiles();
+}
+
+function renderCalcProfiles() {
+  const el = document.getElementById('calcProfileList');
+  if (!el) return;
+  const saves = CalcSaves.list();
+  if (!saves.length) { el.innerHTML = '<div class="save-empty">No saved profiles yet.</div>'; return; }
+  el.innerHTML = saves.map(s => {
+    const reqCount = s.state?.requirements?.length || 0;
+    return '<div class="save-profile-card">'
+      + '<div class="spc-info">'
+      + '<div class="spc-name">' + s.name + '</div>'
+      + '<div class="spc-date">' + s.date + '</div>'
+      + '<div class="spc-meta">' + reqCount + ' requirement' + (reqCount!==1?'s':'') + ' · ' + (s.state?.srvMode||'smart') + ' mode</div>'
+      + '</div>'
+      + '<div class="spc-actions">'
+      + '<button class="spc-btn" onclick="doCalcLoad(\'' + s.id + '\')">Load</button>'
+      + '<button class="spc-btn danger" onclick="doCalcDelete(\'' + s.id + '\')">Delete</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function doCalcSave() {
+  const name = document.getElementById('calcSaveName')?.value?.trim();
+  if (!name) { saveMsg('calcSaveMsg', 'Please enter a profile name.', true); return; }
+  const ok = CalcSaves.save(name, getCalcState());
+  if (ok) { saveMsg('calcSaveMsg', 'Saved: ' + name, false); renderCalcProfiles(); }
+  else saveMsg('calcSaveMsg', 'Save failed — localStorage may be full.', true);
+}
+
+function doCalcLoad(id) {
+  const save = CalcSaves.get(id);
+  if (!save?.state) return;
+  requirements = (save.state.requirements || []).map(r => ({...r, id: Date.now()+Math.random()}));
+  srvMode = save.state.srvMode || 'smart';
+  // Update mode buttons
+  document.querySelectorAll('#srvModeBtns .btn').forEach(b => b.classList.remove('btn-primary'));
+  const modeMap = {smart:0, '3u':1, both:2};
+  const btns = document.querySelectorAll('#srvModeBtns .btn');
+  if (btns[modeMap[srvMode]]) btns[modeMap[srvMode]].classList.add('btn-primary');
+  renderReqList(); resetResults();
+  closeSaveModal(null);
+}
+
+function doCalcDelete(id) {
+  CalcSaves.delete(id);
+  renderCalcProfiles();
+}
+
+// ===================== CG PLANNER SAVE / LOAD =====================
+
+function getCGState() {
+  return {
+    cgGroups: cgGroups.map(cg => ({
+      id: cg.id,
+      name: cg.name,
+      members: cg.members.map(m => ({...m})),
+    })),
+    coreGroups: coreGroups.map(co => ({
+      id: co.id,
+      name: co.name,
+      maxGbps: co.maxGbps || 0,
+      cgIds: [...(co.cgIds||[])],
+    })),
+  };
+}
+
+function applyCGState(state) {
+  cgGroups   = (state.cgGroups   || []).map(cg => ({...cg, members: (cg.members||[]).map(m=>({...m}))}));
+  coreGroups = (state.coreGroups || []).map(co => ({...co, cgIds: [...(co.cgIds||[])]}));
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function openCGSaveModal() {
+  openSaveModal('💾 Save CG Planner', `
+    <div class="save-section-title">Save current plan</div>
+    <div class="save-name-row">
+      <input id="cgSaveName" placeholder="Plan name…" maxlength="40">
+      <button class="btn btn-primary" onclick="doCGSave()">Save</button>
+    </div>
+    <div id="cgSaveMsg" style="display:none;"></div>
+    <div class="save-section-title" style="margin-top:4px;">Saved plans</div>
+    <div class="save-modal-grid" id="cgProfileList"></div>
+  `);
+  renderCGProfiles();
+}
+
+function openCGLoadModal() {
+  openSaveModal('📂 Load CG Planner', `
+    <div class="save-section-title">Saved plans</div>
+    <div class="save-modal-grid" id="cgProfileList"></div>
+  `);
+  renderCGProfiles();
+}
+
+function renderCGProfiles() {
+  const el = document.getElementById('cgProfileList');
+  if (!el) return;
+  const saves = CGSaves.list();
+  if (!saves.length) { el.innerHTML = '<div class="save-empty">No saved plans yet.</div>'; return; }
+  el.innerHTML = saves.map(s => {
+    const cgCount = s.state?.cgGroups?.length || 0;
+    const coCount = s.state?.coreGroups?.length || 0;
+    return '<div class="save-profile-card">'
+      + '<div class="spc-info">'
+      + '<div class="spc-name">' + s.name + '</div>'
+      + '<div class="spc-date">' + s.date + '</div>'
+      + '<div class="spc-meta">' + cgCount + ' CG group' + (cgCount!==1?'s':'') + ' · ' + coCount + ' Core' + (coCount!==1?'s':'') + '</div>'
+      + '</div>'
+      + '<div class="spc-actions">'
+      + '<button class="spc-btn" onclick="doCGLoad(\'' + s.id + '\')">Load</button>'
+      + '<button class="spc-btn danger" onclick="doCGDelete(\'' + s.id + '\')">Delete</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function doCGSave() {
+  const name = document.getElementById('cgSaveName')?.value?.trim();
+  if (!name) { saveMsg('cgSaveMsg', 'Please enter a plan name.', true); return; }
+  const ok = CGSaves.save(name, CGSaves._prepareForExport(getCGState()));
+  if (ok) { saveMsg('cgSaveMsg', 'Saved: ' + name, false); renderCGProfiles(); }
+  else saveMsg('cgSaveMsg', 'Save failed — localStorage may be full.', true);
+}
+
+function doCGLoad(id) {
+  const save = CGSaves.get(id);
+  if (!save?.state) return;
+  applyCGState(save.state);
+  closeSaveModal(null);
+}
+
+function doCGDelete(id) {
+  CGSaves.delete(id);
+  renderCGProfiles();
+}
+
+// ===================== CG EXPORT / IMPORT =====================
+
+function exportCGPlan() {
+  const json = CGSaves.exportState(getCGState());
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cg_plan_' + Date.now() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function openCGImportModal() {
+  openSaveModal('📥 Import CG Plan', `
+    <div class="save-section-title">Paste JSON or load from file</div>
+    <div class="import-area">
+      <textarea id="importTextarea" placeholder="Paste exported JSON here…"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importFileChosen()">
+        <button class="btn" onclick="document.getElementById('importFile').click()">📁 Choose file</button>
+        <span id="importFileName" style="font-size:0.78rem;color:var(--text3);"></span>
+      </div>
+      <div id="importMsg" style="display:none;"></div>
+      <button class="btn btn-success" onclick="doImport()">📥 Import & apply</button>
+      <div style="font-size:0.75rem;color:var(--text4);line-height:1.6;">
+        Only files exported from this app are accepted. All data is validated before import. No code is executed from imported files.
+      </div>
+    </div>
+  `);
+}
+
+function importFileChosen() {
+  const file = document.getElementById('importFile')?.files?.[0];
+  if (!file) return;
+  document.getElementById('importFileName').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const ta = document.getElementById('importTextarea');
+    if (ta) ta.value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function doImport() {
+  const json = document.getElementById('importTextarea')?.value?.trim();
+  if (!json) { saveMsg('importMsg', 'Nothing to import — paste JSON or choose a file.', true); return; }
+  try {
+    const state = CGSaves.importFromJSON(json);
+    applyCGState(state);
+    saveMsg('importMsg', 'Imported successfully! Plan applied.', false);
+    setTimeout(() => closeSaveModal(null), 1200);
+  } catch (e) {
+    saveMsg('importMsg', 'Import failed: ' + e.message, true);
+  }
+}
 // ===================== INIT =====================
 buildCustomerTable();
 renderPool();
