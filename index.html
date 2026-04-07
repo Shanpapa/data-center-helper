@@ -3,411 +3,973 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setup Guide – Data Center Helper</title>
+<title>Data Center Helper</title>
+<script src="changelog.js"></script>
 <style>
-/* ===================== THEMES ===================== */
+/* =====================
+   CSS VARIABLES / THEMES
+   ===================== */
 :root {
-  --bg:       #0a0c12; --bg2: #14171f; --bg3: #1e2130; --bg4: #0d0f18;
-  --border:   #222;    --border2: #2a2d3a;
-  --text:     #e0e0e0; --text2: #aaa; --text3: #666; --text4: #3a3d4a;
-  --c-hi:     #61dafb; --c-g: #4cdf9a; --c-o: #ffaa44; --c-r: #ff6666; --c-p: #cc88ff;
-  --tab-bg:   #14171f; --tab-act: #1a2a4a; --tab-bord: #3a6aaa; --tab-col: #88bbff;
-  --input-bg: #0a0c12; --hover: #12141c; --card-bg: #14171f; --shadow: rgba(0,0,0,0.4);
-  --step-done: #0a2a1a; --step-done-b: #1a5a3a; --step-act: #0d1a30; --step-act-b: #2a4a7a;
+  --bg:        #0a0c12;
+  --bg2:       #14171f;
+  --bg3:       #1e2130;
+  --bg4:       #0d0f18;
+  --border:    #222;
+  --border2:   #2a2d3a;
+  --text:      #e0e0e0;
+  --text2:     #aaa;
+  --text3:     #666;
+  --text4:     #444;
+  --c-hi:      #61dafb;
+  --c-g:       #4cdf9a;
+  --c-o:       #ffaa44;
+  --c-r:       #ff6666;
+  --c-p:       #cc88ff;
+  --tab-bg:    #14171f;
+  --tab-act:   #1a2a4a;
+  --tab-bord:  #3a6aaa;
+  --tab-col:   #88bbff;
+  --input-bg:  #0a0c12;
+  --hover:     #12141c;
+  --rep-bg:    #1e2130;
+  --card-bg:   #14171f;
+  --badge-g:   #1a1c24;
+  --badge-t:   #0a2828;
+  --badge-o:   #3a1a00;
+  --badge-tc:  #44ddcc;
+  --badge-oc:  #ffaa44;
+  --info-bg:   #0d1a0d;
+  --info-bord: #1a3a1a;
+  --info-col:  #7acc7a;
+  --warn-bg:   #1a1200;
+  --warn-bord: #3a3000;
+  --warn-col:  #ccaa44;
+  --pool-bg:   #0d0f18;
+  --shadow:    rgba(0,0,0,0.4);
 }
+
 [data-theme="light"] {
-  --bg: #f0f2f5; --bg2: #fff; --bg3: #e8eaf0; --bg4: #f8f9fb;
-  --border: #d0d4dc; --border2: #c0c4cc;
-  --text: #1a1d27; --text2: #555; --text3: #888; --text4: #bbb;
-  --c-hi: #0066cc; --c-g: #1a8a5a; --c-o: #cc6600; --c-r: #cc2222; --c-p: #7722cc;
-  --tab-bg: #fff; --tab-act: #ddeeff; --tab-bord: #4488cc; --tab-col: #1155aa;
-  --input-bg: #fff; --hover: #f0f4f8; --card-bg: #fff; --shadow: rgba(0,0,0,0.1);
-  --step-done: #e8f8e8; --step-done-b: #88cc88; --step-act: #e8f0ff; --step-act-b: #4488cc;
+  --bg:        #f0f2f5;
+  --bg2:       #ffffff;
+  --bg3:       #e8eaf0;
+  --bg4:       #f8f9fb;
+  --border:    #d0d4dc;
+  --border2:   #c0c4cc;
+  --text:      #1a1d27;
+  --text2:     #555;
+  --text3:     #888;
+  --text4:     #aaa;
+  --c-hi:      #0066cc;
+  --c-g:       #1a8a5a;
+  --c-o:       #cc6600;
+  --c-r:       #cc2222;
+  --c-p:       #7722cc;
+  --tab-bg:    #ffffff;
+  --tab-act:   #ddeeff;
+  --tab-bord:  #4488cc;
+  --tab-col:   #1155aa;
+  --input-bg:  #ffffff;
+  --hover:     #f0f4f8;
+  --rep-bg:    #e0e4f0;
+  --card-bg:   #ffffff;
+  --badge-g:   #e8e8f0;
+  --badge-t:   #e0f4f0;
+  --badge-o:   #fff4e0;
+  --badge-tc:  #117766;
+  --badge-oc:  #885500;
+  --info-bg:   #e8f8e8;
+  --info-bord: #88cc88;
+  --info-col:  #226622;
+  --warn-bg:   #fff8e0;
+  --warn-bord: #ccaa44;
+  --warn-col:  #886600;
+  --pool-bg:   #f8f9fb;
+  --shadow:    rgba(0,0,0,0.1);
 }
 
-/* ===================== BASE ===================== */
+/* =====================
+   RESET & BASE
+   ===================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
 
-/* ===================== TOPBAR ===================== */
-.topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 100; }
-.topbar h1 { font-size: 1.05rem; color: var(--c-hi); font-weight: 700; }
-.back-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 0.82rem; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
-.back-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
-.sep { width: 1px; height: 22px; background: var(--border2); }
-.theme-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 0.82rem; cursor: pointer; font-weight: 600; }
-.mode-badge { padding: 4px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: 1px solid var(--border2); transition: all 0.2s; }
-.mode-badge.beginner { background: #0a2a0a; border-color: #2a6a2a; color: #4cdf9a; }
-.mode-badge.expert { background: #1a1a2a; border-color: #4a4a8a; color: #8888ff; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s, color 0.2s;
+}
 
-/* ===================== LAYOUT ===================== */
-.main { display: grid; grid-template-columns: 300px 1fr; gap: 0; flex: 1; overflow: hidden; max-height: calc(100vh - 57px); }
-@media (max-width: 800px) { .main { grid-template-columns: 1fr; max-height: none; overflow: auto; } }
+/* =====================
+   TOPBAR
+   ===================== */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-/* ===================== LEFT PANEL – INVENTORY ===================== */
-.left-panel { background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
-.panel-section { border-bottom: 1px solid var(--border); }
-.panel-section-title { padding: 10px 14px; font-size: 0.75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; background: var(--bg3); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-.panel-section-title:hover { color: var(--text2); }
-.panel-section-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.topbar h1 {
+  font-size: 1.1rem;
+  color: var(--c-hi);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
 
-.inventory-row { display: flex; align-items: center; gap: 8px; }
-.inv-label { font-size: 0.82rem; color: var(--text2); flex: 1; }
-.inv-hint { font-size: 0.72rem; color: var(--text3); }
-.inv-counter { display: flex; align-items: center; gap: 0; border: 1px solid var(--border2); border-radius: 7px; overflow: hidden; }
-.inv-btn { width: 28px; height: 28px; background: var(--bg3); border: none; color: var(--text2); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
-.inv-btn:hover { background: var(--border2); color: var(--text); }
-.inv-val { width: 36px; text-align: center; background: var(--input-bg); font-size: 0.88rem; font-weight: 700; color: var(--text); border: none; outline: none; padding: 4px 0; }
+.sep { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
 
-.customer-select-wrap { display: flex; flex-direction: column; gap: 6px; }
-.customer-select-wrap select { background: var(--input-bg); border: 1px solid var(--border2); color: var(--text); padding: 7px 10px; border-radius: 7px; font-size: 0.85rem; outline: none; width: 100%; }
-.customer-select-wrap select:focus { border-color: var(--tab-bord); }
-.selected-customer-card { background: var(--bg4); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; }
-.scc-name { font-size: 0.88rem; font-weight: 700; color: var(--c-hi); margin-bottom: 6px; }
-.scc-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text2); padding: 2px 0; }
-.scc-row span:last-child { font-weight: 600; color: var(--text); }
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text2);
+  font-weight: 600;
+  transition: all 0.2s;
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--tab-bord); color: var(--tab-col); }
 
-.entry-mode-tabs { display: flex; border-bottom: 1px solid var(--border); }
-.entry-tab { flex: 1; padding: 8px; text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
-.entry-tab.active { color: var(--tab-col); border-bottom-color: var(--tab-bord); }
+.version-badge {
+  font-size: 0.75rem;
+  color: var(--text4);
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+}
 
-.reset-btn { margin: 10px 12px; padding: 8px; border-radius: 7px; border: 1px solid #3a1a1a; background: #1a0a0a; color: #ff8888; font-size: 0.8rem; cursor: pointer; font-weight: 600; width: calc(100% - 24px); transition: all 0.15s; }
-.reset-btn:hover { background: #2a0a0a; }
+/* =====================
+   TABS
+   ===================== */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 20px 0;
+  flex-wrap: wrap;
+}
 
-/* ===================== RIGHT PANEL – GUIDE ===================== */
-.right-panel { overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.tab {
+  padding: 9px 20px;
+  border-radius: 22px;
+  border: 1px solid var(--border2);
+  background: var(--tab-bg);
+  color: var(--text3);
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.tab:hover { border-color: var(--tab-bord); color: var(--text2); }
+.tab.active {
+  background: var(--tab-act);
+  border-color: var(--tab-bord);
+  color: var(--tab-col);
+}
 
-/* Entry point cards */
-.entry-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 600px) { .entry-cards { grid-template-columns: 1fr; } }
-.entry-card { background: var(--card-bg); border: 2px solid var(--border2); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.2s; }
-.entry-card:hover { border-color: var(--tab-bord); background: var(--tab-act); }
-.entry-card.selected { border-color: var(--tab-bord); background: var(--tab-act); }
-.entry-card-icon { font-size: 2rem; margin-bottom: 8px; }
-.entry-card-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.entry-card-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+/* =====================
+   SECTIONS
+   ===================== */
+.section { display: none; max-width: 1000px; margin: 0 auto; padding: 24px 20px; flex: 1; }
+#cgplanner { max-width: none; padding-left: 20px; padding-right: 20px; }
+.section.active { display: block; }
 
-/* Step system */
-.guide-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.guide-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
-.guide-subtitle { font-size: 0.82rem; color: var(--text3); }
+.section-title {
+  font-size: 0.8rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border2);
+  font-weight: 700;
+}
 
-.steps { display: flex; flex-direction: column; gap: 10px; }
+/* =====================
+   CARDS
+   ===================== */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
 
-.step { border-radius: 10px; border: 1px solid var(--border); overflow: hidden; transition: all 0.2s; }
-.step.done { border-color: var(--step-done-b); background: var(--step-done); }
-.step.active { border-color: var(--step-act-b); background: var(--step-act); }
-.step.locked { opacity: 0.45; }
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.card-title { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+.card-val { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+.card-sub { font-size: 0.78rem; color: var(--text3); }
 
-.step-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
-.step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
-.step.done .step-num { background: var(--c-g); color: #000; }
-.step.active .step-num { background: var(--c-hi); color: #000; }
-.step.locked .step-num { background: var(--border2); color: var(--text3); }
-.step-title { font-size: 0.92rem; font-weight: 700; flex: 1; }
-.step-status { font-size: 0.75rem; color: var(--text3); }
-.step.done .step-status { color: var(--c-g); }
-.step.active .step-status { color: var(--c-hi); }
+/* =====================
+   TABLES
+   ===================== */
+.table-wrap { overflow-x: auto; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 4px var(--shadow); }
 
-.step-body { padding: 0 14px 14px; display: none; }
-.step.active .step-body { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+th {
+  background: var(--bg3);
+  color: var(--text3);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--hover); }
 
-/* Step content components */
-.explain-box { background: var(--bg3); border-radius: 8px; padding: 12px 14px; font-size: 0.85rem; color: var(--text2); line-height: 1.7; margin-bottom: 12px; border-left: 3px solid var(--c-hi); }
-.explain-box.beginner-only { display: none; }
-body.mode-beginner .explain-box.beginner-only { display: block; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; }
+.b-grey   { background: var(--badge-g); color: var(--text2); }
+.b-teal   { background: var(--badge-t); color: var(--badge-tc); }
+.b-orange { background: var(--badge-o); color: var(--badge-oc); }
 
-.action-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-.action-item { display: flex; align-items: flex-start; gap: 10px; background: var(--bg4); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; }
-.action-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-.action-item .action-text { flex: 1; line-height: 1.5; }
-.action-item .action-text strong { color: var(--text); }
-.action-item .action-text .hint { font-size: 0.78rem; color: var(--text3); margin-top: 3px; display: block; }
-body.mode-beginner .action-item .hint { display: block !important; }
+/* =====================
+   COLOR UTILITIES
+   ===================== */
+.c-hi { color: var(--c-hi); }
+.c-g  { color: var(--c-g); }
+.c-o  { color: var(--c-o); }
+.c-r  { color: var(--c-r); }
+.c-p  { color: var(--c-p); }
 
-.calc-result-box { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
-.crb-title { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
-.crb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; }
-.crb-item { background: var(--bg4); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; }
-.crb-item-label { font-size: 0.7rem; color: var(--text3); margin-bottom: 3px; }
-.crb-item-val { font-size: 1rem; font-weight: 800; }
+/* =====================
+   INFO / WARN BOXES
+   ===================== */
+.info-box {
+  background: var(--info-bg);
+  border: 1px solid var(--info-bord);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--info-col);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.warn-box {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-bord);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--warn-col);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
 
-.warn-box { background: #1a1200; border: 1px solid #3a3000; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #ccaa44; margin-bottom: 10px; }
-.info-box { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #5acc5a; margin-bottom: 10px; }
-[data-theme="light"] .warn-box { background: #fff8e0; border-color: #ccaa44; color: #886600; }
-[data-theme="light"] .info-box { background: #e8f8e8; border-color: #88cc88; color: #226622; }
+/* =====================
+   FORM ELEMENTS
+   ===================== */
+input[type=text], input[type=number], select {
+  background: var(--input-bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input[type=text]:focus, input[type=number]:focus, select:focus {
+  border-color: var(--tab-bord);
+}
+input[type=number].small {
+  width: 65px;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+}
 
-.step-btn { padding: 9px 18px; border-radius: 8px; border: none; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-.step-btn.primary { background: var(--tab-act); border: 1px solid var(--tab-bord); color: var(--tab-col); }
-.step-btn.primary:hover { filter: brightness(1.15); }
-.step-btn.done-btn { background: var(--step-done); border: 1px solid var(--step-done-b); color: var(--c-g); }
-.step-btn.done-btn:hover { filter: brightness(1.1); }
+/* =====================
+   BUTTONS
+   ===================== */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn:hover { border-color: var(--tab-bord); color: var(--text); }
+.btn-primary { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-success { background: var(--info-bg); border-color: var(--info-bord); color: var(--info-col); }
+.btn-success:hover { filter: brightness(1.1); }
+.btn-danger  { background: #2a0a0a; border-color: #7a2a2a; color: #ff8888; }
+.btn-danger:hover { filter: brightness(1.15); }
+.btn-full { width: 100%; }
 
-/* Cable diagram */
-.cable-diagram { background: var(--bg4); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; font-family: monospace; font-size: 0.78rem; }
-.cable-diagram .cd-title { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif; }
-.cd-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--text2); }
-.cd-box { padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
-.cd-line { flex: 1; height: 2px; border-radius: 1px; }
-.cd-arrow { color: var(--text3); font-size: 0.7rem; }
-/* cable colors */
-.bg-blue   { background: #0d2040; color: #61b0ff; border: 1px solid #1a4a80; }
-.bg-purple { background: #1a0a2a; color: #cc88ff; border: 1px solid #5a2a8a; }
-.bg-green  { background: #0a1a0a; color: #4cdf9a; border: 1px solid #1a5a2a; }
-.bg-orange { background: #1a0a00; color: #ffaa44; border: 1px solid #5a3a00; }
-.bg-yellow { background: #1a1500; color: #eecc44; border: 1px solid #5a5000; }
-.bg-grey   { background: #1a1a1a; color: #aaa;    border: 1px solid #444; }
-.line-blue   { background: #1a4a80; }
-.line-purple { background: #5a2a8a; }
-.line-green  { background: #1a5a2a; }
-.line-orange { background: #5a3a00; }
-.line-yellow { background: #5a5000; }
-.line-grey   { background: #444; }
+/* =====================
+   CUSTOMERS TAB
+   ===================== */
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 0.85rem; color: var(--text3); }
+.fbtn { padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border2); background: var(--bg2); color: var(--text3); font-size: 0.8rem; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+.fbtn:hover { border-color: var(--tab-bord); }
+.fbtn.on { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
 
-/* Port speed selector */
-.speed-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.speed-opt { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg4); color: var(--text2); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-.speed-opt:hover { border-color: var(--tab-bord); }
-.speed-opt.sel { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
+.search-input { max-width: 220px; }
 
-/* tooltip */
-.tooltip-wrap { position: relative; display: inline-block; }
-.tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--border2); color: var(--text3); font-size: 0.65rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: help; margin-left: 4px; vertical-align: middle; }
-.tooltip-text { display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 12px; font-size: 0.78rem; color: var(--text2); width: 220px; z-index: 50; box-shadow: 0 4px 12px var(--shadow); line-height: 1.5; }
-.tooltip-wrap:hover .tooltip-text { display: block; }
+.rep-bar { height: 5px; border-radius: 3px; background: var(--rep-bg); margin-top: 4px; }
+.rep-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c-hi), var(--c-p)); }
 
-/* scrollbar */
-::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+/* =====================
+   CALCULATOR TAB
+   ===================== */
+.calc-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 700px) { .calc-layout { grid-template-columns: 1fr; } }
 
-/* footer */
-footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text4); flex-shrink: 0; }
+.calc-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.calc-panel-title { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.calc-field { display: flex; flex-direction: column; gap: 4px; }
+.calc-field label { font-size: 0.82rem; color: var(--text3); font-weight: 600; }
+.iops-hint { font-size: 0.78rem; color: var(--c-o); margin-top: 2px; }
+.req-list { display: flex; flex-direction: column; gap: 6px; }
+.req-item {
+  background: var(--pool-bg);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.req-type { font-weight: 700; min-width: 90px; }
+.req-iops { flex: 1; color: var(--c-o); }
+.req-spare { color: var(--text3); font-size: 0.8rem; }
+.req-del { color: var(--text4); cursor: pointer; font-size: 1.1rem; margin-left: auto; }
+.req-del:hover { color: var(--c-r); }
+.req-empty { font-size: 0.85rem; color: var(--text4); text-align: center; padding: 12px; }
+
+.result-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.result-header {
+  padding: 10px 14px;
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.result-title { font-size: 0.95rem; font-weight: 700; }
+.result-target { font-size: 0.8rem; color: var(--text3); flex: 1; }
+.match-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
+.match-exact { background: var(--info-bg); color: var(--info-col); border: 1px solid var(--info-bord); }
+.match-over  { background: var(--warn-bg); color: var(--warn-col); border: 1px solid var(--warn-bord); }
+.result-grid { display: grid; grid-template-columns: repeat(4,1fr); border-top: 1px solid var(--border); }
+@media (max-width: 600px) { .result-grid { grid-template-columns: repeat(2,1fr); } }
+.result-cell {
+  padding: 10px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.result-cell:last-child { border-right: none; }
+.result-cell-label { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.result-cell-val { font-size: 1rem; font-weight: 700; }
+.result-sub { font-size: 0.75rem; color: var(--text4); margin-top: 1px; }
+.summary-card { background: var(--tab-act); border: 1px solid var(--tab-bord); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px var(--shadow); }
+.summary-grid { display: grid; grid-template-columns: repeat(5,1fr); border-top: 1px solid var(--tab-bord); }
+@media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
+.summary-cell { padding: 10px 14px; border-right: 1px solid var(--tab-bord); border-bottom: 1px solid var(--tab-bord); }
+.summary-cell:last-child { border-right: none; }
+.calc-results { display: flex; flex-direction: column; gap: 12px; }
+.calc-placeholder { font-size: 0.9rem; color: var(--text4); text-align: center; padding: 40px; }
+
+/* =====================
+   CG PLANNER
+   ===================== */
+.cg-layout { display: grid; grid-template-columns: 200px 1fr; gap: 14px; min-height: 520px; }
+@media (max-width: 700px) { .cg-layout { grid-template-columns: 1fr; } }
+
+.panel-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.panel-header {
+  background: var(--bg3);
+  padding: 9px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-sub {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-sub label { font-size: 0.8rem; color: var(--text3); white-space: nowrap; }
+.panel-scroll { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.panel-footer { padding: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.pool-item {
+  border-radius: 7px;
+  padding: 6px 9px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--pool-bg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.1s;
+}
+.pool-item:hover { border-color: var(--border2); background: var(--hover); }
+.pool-item.in-cg { opacity: 0.35; cursor: default; }
+.pool-item.selected-pool { border-color: var(--tab-bord); background: var(--tab-act); }
+.pool-num { font-size: 0.75rem; color: var(--text4); width: 16px; text-align: right; flex-shrink: 0; }
+.pool-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.d-4 { background: #4488cc; } .d-4x16 { background: #44aa88; } .d-32 { background: #cc8844; }
+.pool-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gbps-input {
+  width: 72px;
+  background: var(--input-bg);
+  border: 1px solid var(--border2);
+  color: var(--c-o);
+  font-size: 0.78rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  text-align: right;
+  outline: none;
+}
+
+.cg-group {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.cg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.cg-name-input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  outline: none;
+  width: 120px;
+  min-width: 0;
+  border-bottom: 1px solid transparent;
+}
+.cg-name-input:focus { border-bottom-color: var(--tab-bord); }
+.cg-bar-wrap { flex: 1; }
+.cg-bar { height: 6px; border-radius: 3px; background: var(--rep-bg); }
+.cg-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+.cg-bar-text { font-size: 0.72rem; color: var(--text3); display: flex; justify-content: space-between; margin-bottom: 2px; }
+.cg-bar-text.over { color: var(--c-r); font-weight: 700; }
+.cg-del { color: var(--text4); cursor: pointer; font-size: 1.1rem; flex-shrink: 0; }
+.cg-del:hover { color: var(--c-r); }
+.cg-body { padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; min-height: 36px; }
+.cg-member {
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--pool-bg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cg-member-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text2); }
+.cg-member-gbps { color: var(--c-o); font-size: 0.8rem; white-space: nowrap; font-weight: 600; }
+.cg-member-del { color: var(--text4); cursor: pointer; }
+.cg-member-del:hover { color: var(--c-r); }
+.cg-drop {
+  font-size: 0.78rem;
+  color: var(--text4);
+  text-align: center;
+  padding: 6px;
+  border: 1px dashed var(--border2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cg-drop:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.add-cg-btn {
+  border: 1.5px dashed var(--border2);
+  border-radius: 9px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text3);
+  cursor: pointer;
+  background: var(--pool-bg);
+  transition: all 0.15s;
+}
+.add-cg-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.groups-wrap { display: flex; flex-direction: column; gap: 10px; }
+
+.core-item {
+  background: var(--pool-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.core-item-head {
+  background: var(--warn-bg);
+  border-bottom: 1px solid var(--warn-bord);
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--warn-col);
+  font-weight: 700;
+}
+.core-item-del { cursor: pointer; color: var(--text4); }
+.core-item-del:hover { color: var(--c-r); }
+.core-item-body { padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; }
+.core-bar { height: 5px; border-radius: 3px; background: var(--rep-bg); margin-bottom: 4px; }
+.core-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+.core-cg-tag {
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  background: var(--tab-act);
+  border: 1px solid var(--tab-bord);
+  color: var(--tab-col);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.core-tag-del { color: var(--text4); cursor: pointer; }
+.core-tag-del:hover { color: var(--c-r); }
+.add-core-btn {
+  border: 1.5px dashed var(--warn-bord);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--warn-col);
+  cursor: pointer;
+  background: var(--warn-bg);
+  transition: all 0.15s;
+}
+.add-core-btn:hover { filter: brightness(1.1); }
+
+/* =====================
+   FOOTER
+   ===================== */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.footer-note { font-size: 0.82rem; color: var(--text3); }
+.footer-credit { font-size: 0.8rem; color: var(--text4); }
+.changelog-btn {
+  padding: 5px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text3);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.changelog-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+
+/* =====================
+   CHANGELOG MODAL
+   ===================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.modal-title { font-size: 1.05rem; font-weight: 700; color: var(--c-hi); }
+.modal-close { font-size: 1.4rem; color: var(--text3); cursor: pointer; line-height: 1; }
+.modal-close:hover { color: var(--c-r); }
+.modal-body { overflow-y: auto; padding: 16px 20px; }
+.cl-entry { margin-bottom: 20px; }
+.cl-version { font-size: 0.88rem; font-weight: 700; color: var(--c-hi); margin-bottom: 2px; }
+.cl-date { font-size: 0.78rem; color: var(--text4); margin-bottom: 8px; }
+.cl-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.cl-item { font-size: 0.875rem; color: var(--text2); padding-left: 16px; position: relative; }
+.cl-item::before { content: ''; position: absolute; left: 4px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
+.cl-item.feat::before { background: var(--c-g); }
+.cl-item.change::before { background: var(--c-hi); }
+.cl-item.fix::before { background: var(--c-o); }
+.cl-type { font-size: 0.72rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+.cl-type.feat   { background: var(--info-bg); color: var(--info-col); }
+.cl-type.change { background: var(--tab-act); color: var(--tab-col); }
+.cl-type.fix    { background: var(--warn-bg); color: var(--warn-col); }
+
+/* =====================
+   SCROLLBAR
+   ===================== */
+/* Hide number input spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Hide number input spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* =====================
+   RESPONSIVE
+   ===================== */
+@media (max-width: 600px) {
+  .topbar h1 { font-size: 0.95rem; }
+  .tabs { gap: 6px; padding: 14px 12px 0; }
+  .tab { padding: 7px 14px; font-size: 0.82rem; }
+  .section { padding: 16px 12px; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
+}
 </style>
 </head>
-<body class="mode-beginner">
+<body>
 
-<!-- TOPBAR -->
+<!-- ===================== TOPBAR ===================== -->
 <div class="topbar">
-  <a class="back-btn" href="index.html">← Back to Dashboard</a>
+  <h1>🖥️ Data Center Helper</h1>
   <div class="sep"></div>
-  <h1>🧭 Setup Guide</h1>
+  <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</div>
   <div class="sep"></div>
-  <div class="mode-badge beginner" id="modeBadge" onclick="toggleMode()">👶 Beginner mode</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <div class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark</div>
+    <span class="version-badge">Game v1.0.38</span>
+    <button class="changelog-btn" onclick="openChangelog()" style="margin:0;">📋 Changelog</button>
   </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<!-- ===================== TABS ===================== -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('devices',this)">🔧 Devices</button>
+  <button class="tab" onclick="showTab('customers',this)">👤 Customers</button>
+  <button class="tab" onclick="showTab('calculator',this)">🧮 Calculator</button>
+  <button class="tab" onclick="showTab('cgplanner',this)">📊 CG Planner</button>
+  <a href="setup_guide.html" style="text-decoration:none;">
+    <button class="tab" style="background:var(--info-bg);border-color:var(--info-bord);color:var(--info-col);">🧭 Setup Guide ↗</button>
+  </a>
+</div>
 
-  <!-- LEFT: INVENTORY & CUSTOMER -->
-  <div class="left-panel">
+<!-- ===================== DEVICES ===================== -->
+<div class="section active" id="devices">
 
-    <!-- Mode selector -->
-    <div class="entry-mode-tabs">
-      <div class="entry-tab active" id="tab-customer" onclick="setEntryMode('customer')">👤 I have a customer</div>
-      <div class="entry-tab" id="tab-inventory" onclick="setEntryMode('inventory')">🗄️ I have gear</div>
-    </div>
+  <p class="section-title">Ports & Modules</p>
+  <div class="card-grid">
+    <div class="card"><div class="card-title">RJ45 Port</div><div class="card-val c-hi">10 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">SFP+ / SFP28 Port</div><div class="card-val c-hi">25 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">QSFP+ Port</div><div class="card-val c-hi">40 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">Rack Size</div><div class="card-val c-hi">47U</div><div class="card-sub">Slots per rack</div></div>
+  </div>
 
-    <!-- Customer mode -->
-    <div id="mode-customer" style="display:flex;flex-direction:column;">
+  <p class="section-title">SFP Modules</p>
+  <div class="table-wrap"><table>
+    <tr><th>Module</th><th>Speed</th><th>Cable</th><th>Port Type</th><th>Price</th></tr>
+    <tr><td><span class="badge b-grey">SFP+ RJ45</span></td><td class="c-g">10 Gbps</td><td>CAT6</td><td>SFP+ / SFP28</td><td class="c-o">$50</td></tr>
+    <tr><td><span class="badge b-grey">SFP+ Fiber 10G</span></td><td class="c-g">10 Gbps</td><td>Fiber 1 lane</td><td>SFP+ / SFP28</td><td class="c-o">$70</td></tr>
+    <tr><td><span class="badge b-teal">SFP28 Fiber 25G</span></td><td class="c-hi">25 Gbps</td><td>Fiber 1 lane</td><td>SFP+ / SFP28</td><td class="c-o">$180</td></tr>
+    <tr><td><span class="badge b-orange">QSFP+ Fiber 40G</span></td><td class="c-p">40 Gbps</td><td>Fiber 4 lane (QSFP)</td><td>QSFP+</td><td class="c-r">$300</td></tr>
+  </table></div>
 
-      <div class="panel-section-body">
-        <div class="customer-select-wrap">
-          <label style="font-size:0.78rem;color:var(--text3);font-weight:700;">Select your customer:</label>
-          <select id="customerPicker" onchange="onCustomerChange()">
-            <option value="">— Choose a customer —</option>
+  <p class="section-title">Switches</p>
+  <div class="table-wrap"><table>
+    <tr><th>Switch</th><th>RJ45</th><th>SFP+/SFP28</th><th>QSFP+</th><th>Max Bandwidth</th><th>Best For</th></tr>
+    <tr><td><span class="badge b-grey">16 Port</span></td><td class="c-g">16</td><td>–</td><td>–</td><td>16×10 = <strong>160 Gbps</strong></td><td>Small customers</td></tr>
+    <tr><td><span class="badge b-grey">4×SFP+</span></td><td>–</td><td class="c-g">4</td><td>–</td><td>4×25 = <strong>100 Gbps</strong></td><td>Small uplink</td></tr>
+    <tr><td><span class="badge b-teal">4×QSFP+ 16×SFP+</span></td><td>–</td><td class="c-hi">16</td><td class="c-hi">4</td><td>4×40+16×25 = <strong>560 Gbps</strong></td><td>⭐ Core / Row switch</td></tr>
+    <tr><td><span class="badge b-orange">32×QSFP+</span></td><td>–</td><td>–</td><td class="c-p">32</td><td>32×40 = <strong>1,280 Gbps</strong></td><td>Large backbone</td></tr>
+  </table></div>
+
+  <p class="section-title">Servers</p>
+  <div class="table-wrap"><table>
+    <tr><th>Type</th><th>Size</th><th>IOPS</th><th>Bandwidth</th><th>Lifetime</th><th>Price</th><th>IOPS/$</th></tr>
+    <tr><td>System X 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-r">4h</td><td class="c-o">$400</td><td class="c-g">12.5</td></tr>
+    <tr><td>System X 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-r">4h</td><td class="c-o">$1,600</td><td>7.5</td></tr>
+    <tr><td>RISC 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-hi">5h</td><td class="c-o">$450</td><td>11.1</td></tr>
+    <tr><td>RISC 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-o">$1,750</td><td>6.9</td></tr>
+    <tr><td>Mainframe 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-g">7h</td><td class="c-r">$850</td><td>5.9</td></tr>
+    <tr><td>Mainframe 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-r">$2,000</td><td>6.0</td></tr>
+    <tr><td>GPU 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-r">3h</td><td class="c-o">$550</td><td>9.1</td></tr>
+    <tr><td>GPU 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-r">3h</td><td class="c-r">$2,200</td><td>5.5</td></tr>
+  </table></div>
+
+  <div class="info-box"><strong>Best value:</strong> System X 3U has the best IOPS/$ ratio (12.5). RISC lasts longer (5h). Mainframe 3U has the longest lifetime (7h) but costs most. GPU servers expire fastest — only provision when a customer specifically requires them.</div>
+</div>
+
+<!-- ===================== CUSTOMERS ===================== -->
+<div class="section" id="customers">
+  <div class="filter-row">
+    <span class="filter-label">Filter:</span>
+    <input type="text" class="search-input" id="searchBox" placeholder="Search customer name…" oninput="filterCustomers()">
+    <button class="fbtn on" onclick="setFilter('all',this)">All</button>
+    <button class="fbtn" onclick="setFilter('4 Port',this)">4 Port</button>
+    <button class="fbtn" onclick="setFilter('4+16',this)">4+16 Port</button>
+    <button class="fbtn" onclick="setFilter('32 Port',this)">32 Port</button>
+  </div>
+  <div class="table-wrap"><table id="customerTable">
+    <tr><th>#</th><th>Name</th><th>Reputation</th><th>Switch</th><th>Total IOPS</th><th>System X</th><th>RISC</th><th>Mainframe</th><th>GPU</th><th>IPs</th></tr>
+  </table></div>
+</div>
+
+<!-- ===================== CALCULATOR ===================== -->
+<div class="section" id="calculator">
+  <div class="calc-layout">
+
+    <!-- LEFT -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="calc-panel">
+        <div class="calc-panel-title">Add Requirement</div>
+        <div class="calc-field">
+          <label>Server size preference</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="srvModeBtns">
+            <button class="btn btn-primary" onclick="setSrvMode('smart',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">⚡ 7U preferred</button>
+            <button class="btn" onclick="setSrvMode('3u',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">🟢 3U only</button>
+            <button class="btn" onclick="setSrvMode('both',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">📊 Show both</button>
+          </div>
+          <div id="srvModeHint" style="font-size:0.75rem;color:var(--text3);margin-top:3px;">Space-efficient: fills 7U first, tops up with 3U</div>
+        </div>
+        <div class="calc-field">
+          <label>Server Type</label>
+          <select id="newType">
+            <option>System X</option><option>RISC</option>
+            <option>Mainframe</option><option>GPU</option>
           </select>
-          <div id="customerCard" style="display:none;"></div>
+        </div>
+        <div class="calc-field">
+          <label>Target IOPS (raw, e.g. 80000)</label>
+          <input type="number" id="newIops" placeholder="e.g. 80000" min="1" oninput="updateIopsHint()">
+          <div class="iops-hint" id="iopsHint"></div>
+        </div>
+        <div class="calc-field">
+          <label>N+1 Redundancy</label>
+          <select id="newRedund">
+            <option value="0">None</option>
+            <option value="1" selected>+1 spare server</option>
+            <option value="2">+2 spare servers</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addRequirement()">+ Add Requirement</button>
+      </div>
+
+      <div class="calc-panel">
+        <div class="calc-panel-title">Requirements List</div>
+        <div class="req-list" id="reqList">
+          <div class="req-empty">No requirements added yet.</div>
         </div>
       </div>
 
-      <!-- Server size preference -->
-      <div class="panel-section">
-        <div class="panel-section-title" onclick="toggleSection('pref-server')">
-          Server preference <span id="pref-server-arrow">▾</span>
-        </div>
-        <div class="panel-section-body" id="pref-server">
-          <div style="font-size:0.78rem;color:var(--text3);margin-bottom:6px;">Which server sizes can you use?</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <div class="speed-opt sel" id="srv-pref-smart" onclick="setSrvPref('smart',this)">⚡ 7U preferred</div>
-            <div class="speed-opt" id="srv-pref-3u" onclick="setSrvPref('3u',this)">🟢 3U only</div>
-          </div>
-          <div id="srv-pref-hint" style="font-size:0.72rem;color:var(--text3);margin-top:5px;">
-            Maximises 7U servers first, tops up with 3U
-          </div>
-        </div>
-      </div>
-
-      <!-- Unlocked equipment -->
-      <div class="panel-section">
-        <div class="panel-section-title" onclick="toggleSection('pref-unlocked')">
-          Unlocked switches <span id="pref-unlocked-arrow">▾</span>
-        </div>
-        <div class="panel-section-body" id="pref-unlocked">
-          <div style="font-size:0.78rem;color:var(--text3);margin-bottom:8px;">
-            Tick what you can buy in-game:
-          </div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:default;">
-            <input type="checkbox" checked disabled style="accent-color:var(--c-g);"> 16×RJ45 <span style="font-size:0.72rem;color:var(--text3);">(always)</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:pointer;">
-            <input type="checkbox" id="unlock-sw4" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 4×SFP+ Switch
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);margin-bottom:6px;cursor:pointer;">
-            <input type="checkbox" id="unlock-sw4x16" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 4×QSFP+ 16×SFP+ Switch
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);cursor:pointer;">
-            <input type="checkbox" id="unlock-sw32" onchange="onCustomerChange()" style="accent-color:var(--c-g);"> 32×QSFP+ Switch
-          </label>
-        </div>
-      </div>
-
+      <button class="btn btn-success btn-full" onclick="calculateAll()" style="padding:12px;font-size:1rem;">⚡ Calculate All</button>
+      <button class="btn btn-danger btn-full" onclick="clearRequirements()">🗑️ Clear All</button>
     </div>
 
-    <!-- Inventory mode -->
-    <div id="mode-inventory" style="display:none;">
-      <div class="panel-section">
-        <div class="panel-section-title" onclick="toggleSection('inv-switches')">
-          Switches <span id="inv-switches-arrow">▾</span>
-        </div>
-        <div class="panel-section-body" id="inv-switches">
-          <div class="inventory-row">
-            <span class="inv-label">16×RJ45 Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Basic switch. Each port handles up to 10 Gbps. Good for early game customers.</span></span></span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('sw16',-1)">−</button>
-              <input class="inv-val" id="sw16" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('sw16',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">4×SFP+ Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Small fiber switch. 25 Gbps per port. Good for uplinks between switches.</span></span></span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('sw4',-1)">−</button>
-              <input class="inv-val" id="sw4" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('sw4',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">4×QSFP+ 16×SFP+ <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Powerful mixed switch. 560 Gbps total. The backbone of any serious setup.</span></span></span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('sw4x16',-1)">−</button>
-              <input class="inv-val" id="sw4x16" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('sw4x16',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">32×QSFP+ Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Maximum capacity switch. 1280 Gbps. Only needed for large customer groups.</span></span></span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('sw32',-1)">−</button>
-              <input class="inv-val" id="sw32" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('sw32',1)">+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-section-title" onclick="toggleSection('inv-infra')">
-          Infrastructure <span id="inv-infra-arrow">▾</span>
-        </div>
-        <div class="panel-section-body" id="inv-infra">
-          <div class="inventory-row">
-            <span class="inv-label">Patch Panels</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('pp',-1)">−</button>
-              <input class="inv-val" id="pp" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('pp',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">Racks</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('racks',-1)">−</button>
-              <input class="inv-val" id="racks" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('racks',1)">+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-section-title" onclick="toggleSection('inv-servers')">
-          Servers <span id="inv-servers-arrow">▾</span>
-        </div>
-        <div class="panel-section-body" id="inv-servers">
-          <div class="inventory-row">
-            <span class="inv-label">System X 3U</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('srvx3',-1)">−</button>
-              <input class="inv-val" id="srvx3" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('srvx3',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">System X 7U</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('srvx7',-1)">−</button>
-              <input class="inv-val" id="srvx7" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('srvx7',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">RISC 3U</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('srvr3',-1)">−</button>
-              <input class="inv-val" id="srvr3" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('srvr3',1)">+</button>
-            </div>
-          </div>
-          <div class="inventory-row">
-            <span class="inv-label">RISC 7U</span>
-            <div class="inv-counter">
-              <button class="inv-btn" onclick="adj('srvr7',-1)">−</button>
-              <input class="inv-val" id="srvr7" type="number" value="0" min="0" onchange="onInventoryChange()">
-              <button class="inv-btn" onclick="adj('srvr7',1)">+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-section-title" style="font-size:0.75rem;">Port speed available</div>
-        <div class="panel-section-body">
-          <div class="speed-selector">
-            <div class="speed-opt sel" onclick="setSpeed(10,this)">10 Gbps</div>
-            <div class="speed-opt" onclick="setSpeed(25,this)">25 Gbps</div>
-            <div class="speed-opt" onclick="setSpeed(40,this)">40 Gbps</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button class="reset-btn" onclick="resetAll()">⚠️ Reset everything</button>
-  </div>
-
-  <!-- RIGHT: GUIDE CONTENT -->
-  <div class="right-panel" id="rightPanel">
-    <!-- Default state -->
-    <div style="text-align:center;padding:40px 20px;color:var(--text3);">
-      <div style="font-size:3rem;margin-bottom:12px;">🧭</div>
-      <div style="font-size:1.1rem;font-weight:700;color:var(--text2);margin-bottom:8px;">Welcome to the Setup Guide</div>
-      <div style="font-size:0.88rem;line-height:1.7;">
-        Choose a starting point on the left:<br>
-        <strong style="color:var(--c-hi);">👤 I have a customer</strong> — pick your customer and get a step-by-step shopping & wiring guide.<br><br>
-        <strong style="color:var(--c-g);">🗄️ I have gear</strong> — tell us what you own and find out how to connect it.
-      </div>
+    <!-- RIGHT -->
+    <div class="calc-results" id="calcResults">
+      <div class="calc-placeholder">Add requirements on the left, then click <strong>Calculate All</strong>.</div>
     </div>
   </div>
-
 </div>
 
+<!-- ===================== CG PLANNER ===================== -->
+<div class="section" id="cgplanner">
+  <div class="cg-layout">
+
+    <!-- LEFT: POOL -->
+    <div class="panel-box">
+      <div class="panel-header">Customers</div>
+      <div class="panel-scroll" id="poolList"></div>
+    </div>
+
+    <!-- RIGHT: Core on top, CG below -->
+    <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-height:0;">
+
+      <!-- CORE GROUPS -->
+      <div class="panel-box" style="flex-shrink:0;">
+        <div class="panel-header">Core Groups</div>
+        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:6px;" id="coreList"></div>
+        <div class="panel-footer">
+          <div class="add-core-btn" onclick="addCore()">+ New Core</div>
+        </div>
+      </div>
+
+      <!-- CG GROUPS -->
+      <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+        <div style="font-size:0.78rem;color:var(--text3);padding:2px 0;">
+          Click a customer on the left, then click a CG group below to assign.
+        </div>
+        <div class="groups-wrap" id="cgGroups"></div>
+        <div class="add-cg-btn" onclick="addCG()">+ New CG Group</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
 <footer>
-  <span>🎮 Data Center Helper · Setup Guide</span>
-  <span>Built by Claude (Anthropic) · Fan-made, not affiliated with Waseku</span>
+  <span class="footer-note">🎮 Fan-made helper for the <strong>Data Center</strong> game (Waseku)</span>
+  <span class="footer-credit">Built by Claude (Anthropic) · Not affiliated with Waseku</span>
 </footer>
 
+<!-- ===================== CHANGELOG MODAL ===================== -->
+<style>
+.modal-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); flex-shrink:0; }
+.modal-tab { padding:10px 18px; font-size:0.85rem; font-weight:600; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; }
+.modal-tab:hover { color:var(--text); }
+.modal-tab.active { color:var(--tab-col); border-bottom-color:var(--tab-bord); }
+.modal-tab-content { display:none; overflow-y:auto; flex:1; padding:16px 20px; }
+.modal-tab-content.active { display:block; }
+.steam-item { background:var(--pool-bg); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+.steam-item-title { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+.steam-item-date { font-size:0.75rem; color:var(--text4); margin-bottom:8px; }
+.steam-item-body { font-size:0.82rem; color:var(--text2); line-height:1.6; }
+.steam-loading { text-align:center; padding:30px; font-size:0.9rem; color:var(--text3); }
+.steam-link { display:inline-block; margin-top:12px; padding:7px 16px; border-radius:8px; background:var(--tab-act); border:1px solid var(--tab-bord); color:var(--tab-col); font-size:0.82rem; font-weight:600; text-decoration:none; }
+.steam-link:hover { filter:brightness(1.15); }
+</style>
+<div class="modal-overlay" id="changelogModal" onclick="closeChangelog(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📋 Changelog</span>
+      <span class="modal-close" onclick="closeChangelog(null)">×</span>
+    </div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchModalTab('cl-app',this)">App Updates</div>
+      <div class="modal-tab" onclick="switchModalTab('cl-steam',this);loadSteamNews()">Steam Patch Notes</div>
+    </div>
+    <div class="modal-tab-content active" id="cl-app">
+      <div id="cl-app-content"><div style="text-align:center;padding:20px;color:var(--text3);">Loading...</div></div>
+    </div><!-- end cl-app -->
+
+    <div class="modal-tab-content" id="cl-steam">
+      <div class="steam-loading" id="steamLoading">
+        ⏳ Loading Steam patch notes…
+      </div>
+      <div id="steamNews" style="display:none;"></div>
+      <div id="steamFallback" style="display:none;" class="steam-loading">
+        ⚠️ Could not load Steam patch notes directly (browser CORS restriction).<br><br>
+        You can view the full update history here:<br>
+        <a class="steam-link" href="https://store.steampowered.com/news/app/4170200" target="_blank">
+          🎮 Open on Steam
+        </a>
+      </div>
+    </div><!-- end cl-steam -->
+
+  </div>
+</div>
+
 <script>
+// ===================== THEME =====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('themeBtn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
+}
+
+// ===================== TABS =====================
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
 // ===================== DATA =====================
 const CUSTOMERS = [
   {n:1,  name:'Bermuda Triangle Backup', sw:'4 Port',  iops:40,   sx:40,  ri:0,   mf:0,    gpu:0,    ip:13,  rep:0},
@@ -446,491 +1008,516 @@ const CUSTOMERS = [
   {n:34, name:'EvilCorp 😈',            sw:'32 Port', iops:1980, sx:200, ri:200, mf:300,  gpu:1280, ip:500, rep:7000},
 ];
 
-// ===================== STATE =====================
-let entryMode = 'customer';
-let expertMode = false;
-let maxPortSpeed = 10;
-let selectedCustomer = null;
-let stepsDone = new Set();
-let srvPref = 'smart'; // 'smart' | '3u'
+// ===================== CUSTOMERS TAB =====================
+let activeFilter = 'all';
 
-// ===================== THEME / MODE =====================
-function toggleTheme() {
-  const html = document.documentElement;
-  const dark = html.dataset.theme === 'dark';
-  html.dataset.theme = dark ? 'light' : 'dark';
-  document.getElementById('themeBtn').textContent = dark ? '🌙 Dark' : '☀️ Light';
-}
-function toggleMode() {
-  expertMode = !expertMode;
-  document.body.classList.toggle('mode-beginner', !expertMode);
-  const b = document.getElementById('modeBadge');
-  b.textContent = expertMode ? '🧠 Expert mode' : '👶 Beginner mode';
-  b.className = 'mode-badge ' + (expertMode ? 'expert' : 'beginner');
-  if (selectedCustomer) renderCustomerGuide(selectedCustomer);
-  else if (entryMode === 'inventory') renderInventoryGuide();
-}
-
-// ===================== SERVER PREF =====================
-function setSrvPref(mode, el) {
-  srvPref = mode;
-  document.querySelectorAll('#pref-server .speed-opt').forEach(e => e.classList.remove('sel'));
-  el.classList.add('sel');
-  const hints = {
-    smart: 'Maximises 7U servers first, tops up with 3U',
-    '3u':  'Early game: uses only 3U servers'
-  };
-  document.getElementById('srv-pref-hint').textContent = hints[mode];
-  if (selectedCustomer) renderCustomerGuide(selectedCustomer);
-}
-
-function getUnlocked() {
-  return {
-    sw16:   true,
-    sw4:    document.getElementById('unlock-sw4')?.checked || false,
-    sw4x16: document.getElementById('unlock-sw4x16')?.checked || false,
-    sw32:   document.getElementById('unlock-sw32')?.checked || false,
-  };
-}
-
-function bestAvailableSwitch(needed, unlocked) {
-  const swMap = {
-    '4 Port':  { key:'sw4',   name:'4x SFP+ Switch' },
-    '4+16':    { key:'sw4x16',name:'4x QSFP+ 16x SFP+ Switch' },
-    '32 Port': { key:'sw32',  name:'32x QSFP+ Switch' },
-  };
-  const target = swMap[needed];
-  if (!target) return { name:'16x RJ45 Switch', available:true, warning:null };
-  if (unlocked[target.key]) return { name:target.name, available:true, warning:null };
-  const order = ['sw32','sw4x16','sw4','sw16'];
-  const names  = {sw32:'32x QSFP+ Switch', sw4x16:'4x QSFP+ 16x SFP+ Switch', sw4:'4x SFP+ Switch', sw16:'16x RJ45 Switch'};
-  const fallback = order.find(k => unlocked[k] || k === 'sw16');
-  const fallbackName = names[fallback] || '16x RJ45 Switch';
-  return {
-    name: target.name,
-    available: false,
-    fallback: fallbackName,
-    warning: 'Not yet unlocked: ' + target.name + '. Best available: ' + fallbackName + ' — may not meet full speed requirements.'
-  };
-}
-
-// ===================== SECTIONS =====================
-function toggleSection(id) {
-  const el = document.getElementById(id);
-  const arrow = document.getElementById(id+'-arrow');
-  const hidden = el.style.display === 'none';
-  el.style.display = hidden ? 'flex' : 'none';
-  if (arrow) arrow.textContent = hidden ? '▾' : '▸';
-}
-
-// ===================== ENTRY MODE =====================
-function setEntryMode(mode) {
-  entryMode = mode;
-  document.getElementById('tab-customer').classList.toggle('active', mode==='customer');
-  document.getElementById('tab-inventory').classList.toggle('active', mode==='inventory');
-  document.getElementById('mode-customer').style.display = mode==='customer' ? 'flex' : 'none';
-  document.getElementById('mode-inventory').style.display = mode==='inventory' ? 'block' : 'none';
-  if (mode === 'inventory') renderInventoryGuide();
-  else renderWelcome();
-}
-
-// ===================== SPEED =====================
-function setSpeed(val, el) {
-  maxPortSpeed = val;
-  document.querySelectorAll('.speed-opt').forEach(e => e.classList.remove('sel'));
-  el.classList.add('sel');
-  renderInventoryGuide();
-}
-
-// ===================== INVENTORY ADJUSTMENTS =====================
-function adj(id, delta) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.value = Math.max(0, (parseInt(el.value)||0) + delta);
-  onInventoryChange();
-}
-function onInventoryChange() { if (entryMode === 'inventory') renderInventoryGuide(); }
-function getInv(id) { return parseInt(document.getElementById(id)?.value)||0; }
-
-// ===================== CUSTOMER PICKER =====================
-function buildCustomerPicker() {
-  const sel = document.getElementById('customerPicker');
+function buildCustomerTable() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const tb = document.getElementById('customerTable');
+  while (tb.rows.length > 1) tb.deleteRow(1);
   CUSTOMERS.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.n;
-    opt.textContent = `#${c.n} ${c.name}`;
-    sel.appendChild(opt);
+    const swKey = c.sw === '4 Port' ? '4 Port' : c.sw === '4+16' ? '4+16' : '32 Port';
+    if (activeFilter !== 'all' && swKey !== activeFilter) return;
+    if (!c.name.toLowerCase().includes(search)) return;
+    const badge = c.sw === '4 Port' ? 'b-grey' : c.sw === '4+16' ? 'b-teal' : 'b-orange';
+    const pct = Math.min(100, (c.rep / 7000) * 100).toFixed(1);
+    const iopsColor = c.iops >= 1000 ? 'c-r' : c.iops >= 400 ? 'c-o' : 'c-g';
+    const tr = tb.insertRow();
+    tr.innerHTML = `
+      <td>${c.n}</td>
+      <td><strong>${c.name}</strong></td>
+      <td><div style="font-size:0.8rem;">${c.rep.toLocaleString()}</div>
+          <div class="rep-bar"><div class="rep-fill" style="width:${pct}%"></div></div></td>
+      <td><span class="badge ${badge}">${c.sw}</span></td>
+      <td class="${iopsColor}" style="font-weight:700;">${c.iops.toLocaleString()}k</td>
+      <td>${c.sx ? c.sx+'k' : '–'}</td>
+      <td>${c.ri ? c.ri+'k' : '–'}</td>
+      <td>${c.mf ? c.mf+'k' : '–'}</td>
+      <td>${c.gpu ? c.gpu+'k' : '–'}</td>
+      <td>${c.ip}</td>`;
   });
 }
 
-function onCustomerChange() {
-  const n = parseInt(document.getElementById('customerPicker').value);
-  selectedCustomer = CUSTOMERS.find(c => c.n === n) || null;
-  const card = document.getElementById('customerCard');
-  if (!selectedCustomer) { card.style.display='none'; renderWelcome(); return; }
-
-  const types = ['sx','ri','mf','gpu'].filter(t => selectedCustomer[t] > 0);
-  const typeNames = {sx:'System X', ri:'RISC', mf:'Mainframe', gpu:'GPU'};
-  card.style.display = 'block';
-  card.innerHTML = `<div class="scc-name">${selectedCustomer.name}</div>
-    ${types.map(t=>`<div class="scc-row"><span>${typeNames[t]}</span><span>${(selectedCustomer[t]*1000).toLocaleString()} IOPS</span></div>`).join('')}
-    <div class="scc-row"><span>Switch type</span><span>${selectedCustomer.sw}</span></div>
-    <div class="scc-row"><span>IP addresses</span><span>${selectedCustomer.ip}</span></div>`;
-
-  stepsDone.clear();
-  renderCustomerGuide(selectedCustomer);
+function filterCustomers() { buildCustomerTable(); }
+function setFilter(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  buildCustomerTable();
 }
 
-// ===================== OPTIMIZE SERVERS =====================
-function optimize(targetRaw, type) {
-  const i7=12000, i3=5000;
-  if (targetRaw <= 0) return {s7:0,s3:0,total:0,iops:0,ru:0};
-  let s7, s3;
-  if (targetRaw < i7) { s7=0; s3=Math.ceil(targetRaw/i3); }
-  else { s7=Math.floor(targetRaw/i7); const rem=targetRaw-s7*i7; s3=rem>0?Math.ceil(rem/i3):0; }
-  const total=s7+s3;
-  return {s7,s3,total,iops:s7*i7+s3*i3,ru:s7*7+s3*3};
+// ===================== CALCULATOR =====================
+let requirements = [];
+let srvMode = 'smart'; // 'smart' | '3u' | 'both'
+
+function updateIopsHint() {
+  const v = parseInt(document.getElementById('newIops').value) || 0;
+  document.getElementById('iopsHint').textContent = v > 0 ? `= ${(v/1000).toFixed(1)}k IOPS` : '';
 }
 
-// ===================== CUSTOMER GUIDE =====================
-function renderCustomerGuide(c) {
-  const types = ['sx','ri','mf','gpu'];
-  const typeNames = {sx:'System X',ri:'RISC',mf:'Mainframe',gpu:'GPU'};
-  const typeColors = {sx:'c-hi',ri:'c-g',mf:'c-p',gpu:'c-r'};
-  const activeTypes = types.filter(t => c[t] > 0);
-  const beg = !expertMode;
-
-  // Calculate server needs
-  const needs = {};
-  let totalServers=0, totalRU=0, totalPorts=0;
-  activeTypes.forEach(t => {
-    const targetRaw = c[t]*1000;
-    let res;
-    if (srvPref === '3u') {
-      const s3 = Math.ceil(targetRaw / 5000);
-      res = {s7:0, s3, total:s3, iops:s3*5000, ru:s3*3};
-    } else {
-      res = optimize(targetRaw, t);
-    }
-    needs[t] = res;
-    totalServers += res.total;
-    totalRU += res.ru;
-    totalPorts += res.total;
-  });
-
-  const unlocked = getUnlocked();
-  const switchInfo = bestAvailableSwitch(c.sw, unlocked);
-  const needsHighSpeed = c.sw !== '4 Port';
-
-  // ---- Pre-build all conditional HTML blocks ----
-  const prefLabel = srvPref === '3u' ? '3U Only mode' : '7U Preferred mode';
-  const prefIcon  = srvPref === '3u' ? 'green' : 'blue';
-
-  const serverRows = activeTypes.map(t => {
-    const n = needs[t];
-    const parts = [];
-    if (n.s7 > 0) parts.push(n.s7 + 'x 7U');
-    if (n.s3 > 0) parts.push(n.s3 + 'x 3U');
-    return '<div class="crb-item">'
-      + '<div class="crb-item-label">' + typeNames[t] + '</div>'
-      + '<div class="crb-item-val ' + typeColors[t] + '">' + parts.join(' + ') + '</div>'
-      + '<div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">' + n.iops.toLocaleString() + ' IOPS - ' + n.ru + 'U rack</div>'
-      + '</div>';
-  }).join('');
-
-  const step1Explain = beg
-    ? '<div class="explain-box">First things first — you need servers to process this customer data. Here is exactly what to buy based on your current preference (' + prefLabel + ').</div>'
-    : '';
-
-  const step1Info = beg && srvPref === 'smart'
-    ? '<div class="info-box">Why 7U first? A 7U server gives 12,000 IOPS in 7U of space. A 3U gives 5,000 IOPS. 7U is more space-efficient. Change to 3U only on the left if you have not unlocked 7U yet.</div>'
-    : (beg && srvPref === '3u' ? '<div class="info-box">3U only mode: Each 3U server provides 5,000 IOPS. When you unlock 7U servers, switch to 7U preferred to save rack space.</div>' : '');
-
-  const switchName = switchInfo.available ? switchInfo.name : switchInfo.fallback;
-  const switchHint = switchInfo.available
-    ? 'This is the customer switch. Their cable plugs into this.'
-    : 'Ideal: ' + switchInfo.name + ' not yet unlocked. Using best available.';
-  const switchWarning = !switchInfo.available
-    ? '<div class="warn-box">' + switchInfo.warning + '</div>'
-    : '';
-
-  const step2Explain = beg
-    ? '<div class="explain-box">The customer connects to your data center through a switch. Think of it as the reception desk — all traffic from this customer goes through it. You also need a patch panel to keep cabling organised.</div>'
-    : '';
-
-  const fiberNote = needsHighSpeed
-    ? '<div class="action-item"><div class="icon">💡</div><div class="action-text"><strong>Fiber modules needed</strong> — this customer requires high-speed connections<span class="hint">You will need SFP28 (25 Gbps) or QSFP+ (40 Gbps) modules. Check your switch port types.</span></div></div>'
-    : '';
-
-  const step3Explain = beg
-    ? '<div class="explain-box">Now place your equipment in racks. You will want two racks: one for the network gear (switch + patch panel) and one for the servers. Keep them separate — it stays organised as you grow.</div>'
-    : '';
-
-  const step4Explain = beg
-    ? '<div class="explain-box">This is the part that looks scary but follows a simple pattern. Data travels: Customer to Patch Panel to Switch to Servers. Every cable just connects one step to the next.</div>'
-    : '';
-
-  const patchWarn = beg
-    ? '<div class="warn-box">Do not skip the patch panel! You could wire directly, but patch panels let you reorganise without re-cabling everything later.</div>'
-    : '';
-
-  const lacpStep = c.iops > 100 ? (
-    '<div class="step locked" id="step-5">'
-    + '<div class="step-header" onclick="toggleStep(5)">'
-    + '<div class="step-num">5</div>'
-    + '<div class="step-title">Set up LACP if needed</div>'
-    + '<div class="step-status">Waiting...</div>'
-    + '</div>'
-    + '<div class="step-body">'
-    + (beg ? '<div class="explain-box">LACP lets you bundle multiple cables together so the game treats them as one big pipe. If one cable cannot carry enough traffic alone, you add more and group them.</div>' : '')
-    + '<div class="calc-result-box"><div class="crb-title">Do you need LACP?</div><div class="crb-grid">'
-    + '<div class="crb-item"><div class="crb-item-label">Customer total IOPS</div><div class="crb-item-val c-o">' + (c.iops*1000).toLocaleString() + '</div></div>'
-    + '<div class="crb-item"><div class="crb-item-label">Single port max</div><div class="crb-item-val c-hi">' + maxPortSpeed + ' Gbps</div></div>'
-    + '<div class="crb-item"><div class="crb-item-label">Servers needing ports</div><div class="crb-item-val c-g">' + totalPorts + '</div></div>'
-    + '</div></div>'
-    + (beg ? '<div class="info-box">In-game: select multiple cables between the same two switches, then right-click and choose Group as LACP. The game combines their bandwidth automatically.</div>' : '')
-    + '<button class="step-btn done-btn" onclick="completeStep(5)">Done — finish</button>'
-    + '</div></div>'
-  ) : '';
-
-  const sPlural = totalServers !== 1 ? 's' : '';
-  const pPlural = totalPorts !== 1 ? 's' : '';
-
-  // ---- Render ----
-  const panel = document.getElementById('rightPanel');
-  panel.innerHTML =
-    '<div class="guide-header">'
-    + '<div>'
-    + '<div class="guide-title">Setup guide for: ' + c.name + '</div>'
-    + '<div class="guide-subtitle">Follow these steps in order - check them off as you go</div>'
-    + '</div></div>'
-
-    + '<div class="steps" id="stepsContainer">'
-
-    // STEP 1
-    + '<div class="step active" id="step-1">'
-    + '<div class="step-header" onclick="toggleStep(1)">'
-    + '<div class="step-num">1</div><div class="step-title">Buy the servers</div><div class="step-status">In progress</div>'
-    + '</div>'
-    + '<div class="step-body">'
-    + step1Explain
-    + '<div class="calc-result-box"><div class="crb-title">What to buy — ' + prefLabel + '</div>'
-    + '<div class="crb-grid">'
-    + serverRows
-    + '<div class="crb-item"><div class="crb-item-label">Total servers</div><div class="crb-item-val c-o">' + totalServers + '</div></div>'
-    + '<div class="crb-item"><div class="crb-item-label">Total rack space</div><div class="crb-item-val c-o">' + totalRU + 'U</div></div>'
-    + '</div></div>'
-    + step1Info
-    + '<button class="step-btn done-btn" onclick="completeStep(1)">Bought the servers — next step</button>'
-    + '</div></div>'
-
-    // STEP 2
-    + '<div class="step locked" id="step-2">'
-    + '<div class="step-header" onclick="toggleStep(2)">'
-    + '<div class="step-num">2</div><div class="step-title">Buy the network gear</div><div class="step-status">Waiting...</div>'
-    + '</div>'
-    + '<div class="step-body">'
-    + step2Explain
-    + switchWarning
-    + '<div class="action-list">'
-    + '<div class="action-item"><div class="icon">🔌</div><div class="action-text"><strong>1x ' + switchName + '</strong><span class="hint">' + switchHint + '</span></div></div>'
-    + '<div class="action-item"><div class="icon">📌</div><div class="action-text"><strong>1x Patch Panel</strong><span class="hint">Keeps your cabling tidy. All cables go through here before the switch.</span></div></div>'
-    + fiberNote
-    + '</div>'
-    + '<button class="step-btn done-btn" onclick="completeStep(2)">Bought — next step</button>'
-    + '</div></div>'
-
-    // STEP 3
-    + '<div class="step locked" id="step-3">'
-    + '<div class="step-header" onclick="toggleStep(3)">'
-    + '<div class="step-num">3</div><div class="step-title">Place everything in racks</div><div class="step-status">Waiting...</div>'
-    + '</div>'
-    + '<div class="step-body">'
-    + step3Explain
-    + '<div class="action-list">'
-    + '<div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Network rack</strong> — place patch panel at top, switch below it<span class="hint">Top = where cables come in. Bottom = switch that handles them.</span></div></div>'
-    + '<div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Server rack</strong> — place all your servers here<span class="hint">Add a patch panel at the top of this rack too — it makes cabling easier.</span></div></div>'
-    + '</div>'
-    + '<button class="step-btn done-btn" onclick="completeStep(3)">Placed — next step</button>'
-    + '</div></div>'
-
-    // STEP 4
-    + '<div class="step locked" id="step-4">'
-    + '<div class="step-header" onclick="toggleStep(4)">'
-    + '<div class="step-num">4</div><div class="step-title">Connect the cables</div><div class="step-status">Waiting...</div>'
-    + '</div>'
-    + '<div class="step-body">'
-    + step4Explain
-    + '<div class="cable-diagram"><div class="cd-title">Cable routing — follow this order</div>'
-    + '<div class="cd-row"><span class="cd-box bg-blue">Customer</span><div class="cd-line line-blue"></div><span class="cd-arrow">→</span><span class="cd-box bg-blue">Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">blue cable</span></div>'
-    + '<div class="cd-row"><span class="cd-box bg-blue">Patch Panel</span><div class="cd-line line-green"></div><span class="cd-arrow">→</span><span class="cd-box bg-green">Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">green cable</span></div>'
-    + '<div class="cd-row"><span class="cd-box bg-green">Switch</span><div class="cd-line line-orange"></div><span class="cd-arrow">→</span><span class="cd-box bg-orange">Server Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">orange cable</span></div>'
-    + '<div class="cd-row"><span class="cd-box bg-orange">Server Patch Panel</span><div class="cd-line line-yellow"></div><span class="cd-arrow">→</span><span class="cd-box bg-yellow">Servers</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">yellow cable</span></div>'
-    + '</div>'
-    + '<div class="action-list">'
-    + '<div class="action-item"><div class="icon">1️⃣</div><div class="action-text"><strong>Customer cable to Patch Panel (top)</strong><span class="hint">The customer main cable goes into the first free port on the patch panel.</span></div></div>'
-    + '<div class="action-item"><div class="icon">2️⃣</div><div class="action-text"><strong>Patch Panel to Switch</strong><span class="hint">Connect each patch panel port to the corresponding switch port.</span></div></div>'
-    + '<div class="action-item"><div class="icon">3️⃣</div><div class="action-text"><strong>Switch to Server Rack Patch Panel</strong><span class="hint">Run cables from the switch uplink ports to the patch panel in your server rack.</span></div></div>'
-    + '<div class="action-item"><div class="icon">4️⃣</div><div class="action-text"><strong>Server Patch Panel to each Server</strong><span class="hint">One cable per server. Each server gets its own dedicated port.</span></div></div>'
-    + '</div>'
-    + patchWarn
-    + '<button class="step-btn done-btn" onclick="completeStep(4)">Cabled up — next step</button>'
-    + '</div></div>'
-
-    // STEP 5 (conditional)
-    + lacpStep
-
-    // FINAL
-    + '<div class="step locked" id="step-final">'
-    + '<div class="step-header"><div class="step-num">🎉</div><div class="step-title">You are done!</div><div class="step-status"></div></div>'
-    + '<div class="step-body">'
-    + '<div class="info-box">Connected and ready to serve: ' + c.name + '<br><br>' + totalServers + ' server' + sPlural + ' - ' + totalRU + 'U rack space - ' + totalPorts + ' switch port' + pPlural + '</div>'
-    + '<div class="action-list">'
-    + '<div class="action-item"><div class="icon">💰</div><div class="action-text"><strong>Check the customer panel in-game</strong> — confirm requirements are met and traffic is flowing.<span class="hint">Look for green indicators. Red means something is not connected properly.</span></div></div>'
-    + '<div class="action-item"><div class="icon">📈</div><div class="action-text"><strong>Ready for the next customer?</strong> Pick them from the list on the left and repeat!<span class="hint">Each customer gets their own switch. They all share the same servers.</span></div></div>'
-    + '</div></div></div>'
-
-    + '</div>';
+function setSrvMode(mode, btn) {
+  srvMode = mode;
+  document.querySelectorAll('#srvModeBtns .btn').forEach(b => b.classList.remove('btn-primary'));
+  btn.classList.add('btn-primary');
+  const hints = {
+    smart: 'Space-efficient: fills 7U first, tops up with 3U',
+    '3u':  'Early game mode: uses only 3U servers',
+    both:  'Shows both options side by side'
+  };
+  document.getElementById('srvModeHint').textContent = hints[mode];
 }
 
-// ===================== STEP CONTROL =====================
-function toggleStep(n) {
-  // only allow toggling active or done steps
-  const step = document.getElementById('step-'+n);
-  if (!step || step.classList.contains('locked')) return;
+function addRequirement() {
+  const type   = document.getElementById('newType').value;
+  const raw    = parseInt(document.getElementById('newIops').value) || 0;
+  const redund = parseInt(document.getElementById('newRedund').value) || 0;
+  if (!raw) return;
+  requirements.push({ id: Date.now(), type, raw, redund });
+  document.getElementById('newIops').value = '';
+  document.getElementById('iopsHint').textContent = '';
+  renderReqList();
 }
 
-function completeStep(n) {
-  stepsDone.add(n);
-  const step = document.getElementById('step-'+n);
-  if (step) {
-    step.classList.remove('active');
-    step.classList.add('done');
-    step.querySelector('.step-status').textContent = '✓ Done';
-    step.querySelector('.step-body').style.display = 'none';
-  }
-
-  // unlock next step
-  const maxSteps = selectedCustomer?.iops > 100 ? 5 : 4;
-  const next = n + 1;
-  if (next <= maxSteps) {
-    const nextStep = document.getElementById('step-'+next);
-    if (nextStep) {
-      nextStep.classList.remove('locked');
-      nextStep.classList.add('active');
-      nextStep.querySelector('.step-status').textContent = 'In progress';
-      nextStep.querySelector('.step-body').style.display = 'block';
-      nextStep.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-  } else {
-    // unlock final
-    const fin = document.getElementById('step-final');
-    if (fin) {
-      fin.classList.remove('locked');
-      fin.classList.add('active');
-      fin.querySelector('.step-body').style.display = 'block';
-      fin.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-  }
+function removeRequirement(id) {
+  requirements = requirements.filter(r => r.id !== id);
+  renderReqList();
+  resetResults();
 }
 
-// ===================== INVENTORY GUIDE =====================
-function renderInventoryGuide() {
-  const sw16 = getInv('sw16'), sw4 = getInv('sw4'), sw4x16 = getInv('sw4x16'), sw32 = getInv('sw32');
-  const pp = getInv('pp'), racks = getInv('racks');
-  const srvx3 = getInv('srvx3'), srvx7 = getInv('srvx7'), srvr3 = getInv('srvr3'), srvr7 = getInv('srvr7');
-  const totalSwitches = sw16+sw4+sw4x16+sw32;
-  const totalServers = srvx3+srvx7+srvr3+srvr7;
-  const totalIops = srvx3*5000+srvx7*12000+srvr3*5000+srvr7*12000;
-  const beg = !expertMode;
+function clearRequirements() {
+  requirements = [];
+  renderReqList();
+  resetResults();
+}
 
-  if (totalSwitches === 0 && totalServers === 0) {
-    renderWelcome();
+function resetResults() {
+  document.getElementById('calcResults').innerHTML =
+    '<div class="calc-placeholder">Add requirements on the left, then click <strong>Calculate All</strong>.</div>';
+}
+
+function renderReqList() {
+  const el = document.getElementById('reqList');
+  if (!requirements.length) {
+    el.innerHTML = '<div class="req-empty">No requirements added yet.</div>';
     return;
   }
-
-  // Advice logic
-  const tips = [];
-  const issues = [];
-
-  if (totalServers > 0 && pp === 0) issues.push({ icon:'⚠️', text:'No patch panels — add at least one per rack to keep cabling manageable.', fix:'Buy patch panels' });
-  if (totalServers > 0 && racks < 2) issues.push({ icon:'⚠️', text:'You need at least 2 racks — one for network gear, one for servers.', fix:'Buy more racks' });
-  if (sw16 > 0 && totalServers > 0) tips.push({ icon:'🔵', text:`You have ${sw16}× 16-port RJ45 switch${sw16>1?'es':''}. Connect customer cables → patch panel → this switch → server patch panel → servers.` });
-  if (sw4x16 > 0) tips.push({ icon:'🟢', text:`You have ${sw4x16}× 4×QSFP+ 16×SFP+ switch${sw4x16>1?'es':''}. This is a core/backbone switch — use it to connect your customer switches to your server infrastructure.` });
-  if (sw32 > 0) tips.push({ icon:'🟠', text:`You have ${sw32}× 32-port QSFP+ switch${sw32>1?'es':''}. This is a large customer group switch — ideal for grouping multiple customers into one uplink.` });
-  if (sw16 > 1) tips.push({ icon:'🔗', text:`Multiple switches? Connect them with a cross-link cable (one port each) so traffic can flow between them if one gets overloaded.` });
-  if (sw4x16 >= 2) tips.push({ icon:'💡', text:`With ${sw4x16} backbone switches, set up LACP between them to combine their uplink bandwidth (${sw4x16*160} Gbps combined QSFP+ throughput).` });
-
-  const maxCapacity = sw4x16 * 560 + sw32 * 1280 + sw16 * 160 + sw4 * 100;
-
-  const panel = document.getElementById('rightPanel');
-  panel.innerHTML = `
-    <div class="guide-header">
-      <div class="guide-title">🗄️ Your gear — here's what to do</div>
-      <div class="guide-subtitle">Based on what you've told us you own</div>
-    </div>
-
-    <div class="calc-result-box">
-      <div class="crb-title">Summary</div>
-      <div class="crb-grid">
-        <div class="crb-item"><div class="crb-item-label">Total switches</div><div class="crb-item-val c-hi">${totalSwitches}</div></div>
-        <div class="crb-item"><div class="crb-item-label">Total servers</div><div class="crb-item-val c-g">${totalServers}</div></div>
-        <div class="crb-item"><div class="crb-item-label">Server IOPS capacity</div><div class="crb-item-val c-o">${totalIops.toLocaleString()}</div></div>
-        <div class="crb-item"><div class="crb-item-label">Max network throughput</div><div class="crb-item-val c-p">${maxCapacity} Gbps</div></div>
-      </div>
-    </div>
-
-    ${issues.length ? `
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="font-size:0.8rem;font-weight:700;color:var(--c-r);text-transform:uppercase;letter-spacing:1px;">⚠️ Issues to fix first</div>
-      ${issues.map(i=>`<div class="warn-box">${i.icon} ${i.text}</div>`).join('')}
-    </div>` : ''}
-
-    ${tips.length ? `
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="font-size:0.8rem;font-weight:700;color:var(--c-g);text-transform:uppercase;letter-spacing:1px;">💡 How to connect this</div>
-      ${tips.map(t=>`<div class="action-item"><div class="icon">${t.icon}</div><div class="action-text">${t.text}</div></div>`).join('')}
-    </div>` : ''}
-
-    <div class="cable-diagram">
-      <div class="cd-title">General wiring principle</div>
-      <div class="cd-row"><span class="cd-box bg-blue">Customer</span><div class="cd-line line-blue"></div><span class="cd-arrow">→</span><span class="cd-box bg-blue">Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🔵 blue</span></div>
-      <div class="cd-row"><span class="cd-box bg-blue">Patch Panel</span><div class="cd-line line-green"></div><span class="cd-arrow">→</span><span class="cd-box bg-green">Customer Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟢 green</span></div>
-      ${sw4x16>0||sw32>0 ? `<div class="cd-row"><span class="cd-box bg-green">Customer Switch</span><div class="cd-line line-orange"></div><span class="cd-arrow">→</span><span class="cd-box bg-orange">Core Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟠 orange</span></div>` : ''}
-      <div class="cd-row"><span class="cd-box bg-orange">${sw4x16>0||sw32>0?'Core Switch':'Customer Switch'}</span><div class="cd-line line-yellow"></div><span class="cd-arrow">→</span><span class="cd-box bg-yellow">Server Patch Panel → Servers</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟡 yellow</span></div>
-    </div>
-    `;
+  const colors = {'System X':'c-hi','RISC':'c-g','Mainframe':'c-p','GPU':'c-r'};
+  el.innerHTML = requirements.map(r => `
+    <div class="req-item">
+      <span class="req-type ${colors[r.type]||''}">${r.type}</span>
+      <span class="req-iops">${r.raw.toLocaleString()} IOPS <span style="opacity:0.6;font-size:0.85em;">(${(r.raw/1000).toFixed(1)}k)</span></span>
+      ${r.redund > 0 ? `<span class="req-spare">+${r.redund} spare</span>` : ''}
+      <span class="req-del" onclick="removeRequirement(${r.id})">✕</span>
+    </div>`).join('');
 }
 
-// ===================== WELCOME =====================
-function renderWelcome() {
-  document.getElementById('rightPanel').innerHTML = `
-    <div style="text-align:center;padding:40px 20px;color:var(--text3);">
-      <div style="font-size:3rem;margin-bottom:12px;">🧭</div>
-      <div style="font-size:1.1rem;font-weight:700;color:var(--text2);margin-bottom:8px;">Welcome to the Setup Guide</div>
-      <div style="font-size:0.88rem;line-height:1.7;">
-        Choose a starting point on the left:<br><br>
-        <strong style="color:var(--c-hi);">👤 I have a customer</strong><br>
-        Pick your customer → get a step-by-step guide for exactly what to buy and how to wire it.<br><br>
-        <strong style="color:var(--c-g);">🗄️ I have gear</strong><br>
-        Tell us what you own → find out how to connect it and what's missing.
+function optimizeSmart(targetRaw) {
+  const i7 = 12000, i3 = 5000;
+  if (targetRaw <= 0) return {s7:0, s3:0};
+  if (targetRaw < i7) return {s7:0, s3:Math.ceil(targetRaw/i3)};
+  const s7 = Math.floor(targetRaw/i7);
+  const rem = targetRaw - s7*i7;
+  return {s7, s3: rem>0 ? Math.ceil(rem/i3) : 0};
+}
+function optimize3U(targetRaw) {
+  return {s7:0, s3:Math.ceil((targetRaw||0)/5000)};
+}
+function optimize(targetRaw) { return optimizeSmart(targetRaw); }
+function calcResult(s7, s3, redund, req, pr) {
+  // spare servers match the dominant type: if no 7U, spare is 3U
+  const s7t = s7 > 0 ? s7 + redund : 0;
+  const s3t = s7 > 0 ? s3 : s3 + redund;
+  const total = s7t + s3t;
+  const ru = s7t*7 + s3t*3;
+  const provisioned = s7t*12000 + s3t*5000;
+  const exact = provisioned === req.raw;
+  const cost = s7t*pr.p7 + s3t*pr.p3;
+  const gbps = ((s7t*0.6)+(s3t*0.25)).toFixed(2);
+  return {s7t, s3t, total, ru, provisioned, exact, cost, gbps, racks:Math.ceil(ru/47)};
+}
+
+const SRV_PRICES = {
+  'System X': {p3:400,  p7:1600, eol3:4, eol7:4},
+  'RISC':     {p3:450,  p7:1750, eol3:5, eol7:5},
+  'Mainframe':{p3:850,  p7:2000, eol3:7, eol7:5},
+  'GPU':      {p3:550,  p7:2200, eol3:3, eol7:3},
+};
+const TYPE_COLORS = {'System X':'var(--c-hi)','RISC':'var(--c-g)','Mainframe':'var(--c-p)','GPU':'var(--c-r)'};
+
+function calculateAll() {
+  if (!requirements.length) { alert('Please add at least one requirement first.'); return; }
+
+  let totSrv=0, totPorts=0, totU=0, totIops=0, totCost=0;
+  let html = '';
+
+  function resultCardHTML(r, label, color, req) {
+    return `<div class="result-card" style="border-color:${color}22;">
+      <div class="result-header">
+        <span class="result-title" style="color:${TYPE_COLORS[req.type]}">${req.type}</span>
+        <span class="result-target" style="color:${color};font-weight:700;">${label}</span>
+        <span style="flex:1;text-align:right;font-size:0.78rem;color:var(--text3);">Target: ${req.raw.toLocaleString()} IOPS${req.redund>0?` · +${req.redund} spare`:''}</span>
+        <span class="match-badge ${r.exact?'match-exact':'match-over'}">${r.exact?'Exact':'Overage'}</span>
+      </div>
+      <div class="result-grid">
+        <div class="result-cell"><div class="result-cell-label">7U Servers</div><div class="result-cell-val c-hi">${r.s7t}</div>${req.redund>0?`<div class="result-sub">incl. ${req.redund} spare</div>`:''}</div>
+        <div class="result-cell"><div class="result-cell-label">3U Servers</div><div class="result-cell-val c-hi">${r.s3t}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-o">${r.total}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Ports</div><div class="result-cell-val c-g">${r.total}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Rack Space</div><div class="result-cell-val c-o">${r.ru}U</div><div class="result-sub">${r.racks} rack${r.racks!==1?'s':''}</div></div>
+        <div class="result-cell"><div class="result-cell-label">IOPS</div><div class="result-cell-val ${r.exact?'c-g':'c-o'}">${r.provisioned.toLocaleString()}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Bandwidth</div><div class="result-cell-val c-g">${r.gbps} Gbps</div></div>
+        <div class="result-cell"><div class="result-cell-label">Est. Cost</div><div class="result-cell-val c-r">$${r.cost.toLocaleString()}</div></div>
       </div>
     </div>`;
+  }
+
+  requirements.forEach(req => {
+    const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
+
+    if (srvMode === 'both') {
+      const smart3U = optimize3U(req.raw);
+      const rSmart = calcResult(optimizeSmart(req.raw).s7, optimizeSmart(req.raw).s3, req.redund, req, pr);
+      const r3U    = calcResult(0, smart3U.s3, req.redund, req, pr);
+      totSrv += rSmart.total; totPorts += rSmart.total; totU += rSmart.ru; totIops += rSmart.provisioned; totCost += rSmart.cost;
+      html += resultCardHTML(rSmart, '⚡ 7U Preferred', 'var(--c-hi)', req);
+      html += resultCardHTML(r3U,    '🟢 3U Only',     'var(--c-g)',  req);
+    } else if (srvMode === '3u') {
+      const r3U = calcResult(0, optimize3U(req.raw).s3, req.redund, req, pr);
+      totSrv += r3U.total; totPorts += r3U.total; totU += r3U.ru; totIops += r3U.provisioned; totCost += r3U.cost;
+      html += resultCardHTML(r3U, '🟢 3U Only', 'var(--c-g)', req);
+    } else {
+      const {s7, s3} = optimizeSmart(req.raw);
+      const r = calcResult(s7, s3, req.redund, req, pr);
+      totSrv += r.total; totPorts += r.total; totU += r.ru; totIops += r.provisioned; totCost += r.cost;
+      html += resultCardHTML(r, '⚡ 7U Preferred', 'var(--c-hi)', req);
+    }
+  });
+
+  // Summary
+  function summaryCardHTML(label, color, srv, ports, ru, iops, cost) {
+    return `<div class="summary-card" style="border-color:${color}44;">
+      <div class="result-header" style="background:var(--tab-act);">
+        <span class="result-title" style="color:${color};">📊 Total Summary — ${label}</span>
+        <span class="result-target">${requirements.length} requirement${requirements.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-hi">${srv}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Total Ports</div><div class="result-cell-val c-g">${ports}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Rack Space</div><div class="result-cell-val c-o">${ru}U<div class="result-sub">${Math.ceil(ru/47)} racks</div></div></div>
+        <div class="summary-cell"><div class="result-cell-label">Total IOPS</div><div class="result-cell-val c-g">${iops.toLocaleString()}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Est. Cost</div><div class="result-cell-val c-r">$${cost.toLocaleString()}</div></div>
+      </div>
+    </div>`;
+  }
+
+  if (srvMode === 'both') {
+    // Recalculate both totals separately for summary
+    let tSrv7=0,tPorts7=0,tU7=0,tIops7=0,tCost7=0;
+    let tSrv3=0,tPorts3=0,tU3=0,tIops3=0,tCost3=0;
+    requirements.forEach(req => {
+      const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
+      const rS = calcResult(optimizeSmart(req.raw).s7, optimizeSmart(req.raw).s3, req.redund, req, pr);
+      const r3 = calcResult(0, optimize3U(req.raw).s3, req.redund, req, pr);
+      tSrv7+=rS.total; tPorts7+=rS.total; tU7+=rS.ru; tIops7+=rS.provisioned; tCost7+=rS.cost;
+      tSrv3+=r3.total; tPorts3+=r3.total; tU3+=r3.ru; tIops3+=r3.provisioned; tCost3+=r3.cost;
+    });
+    html += summaryCardHTML('⚡ 7U Preferred', 'var(--c-hi)', tSrv7, tPorts7, tU7, tIops7, tCost7);
+    html += summaryCardHTML('🟢 3U Only',      'var(--c-g)',  tSrv3, tPorts3, tU3, tIops3, tCost3);
+  } else {
+    html += summaryCardHTML(
+      srvMode === '3u' ? '🟢 3U Only' : '⚡ 7U Preferred',
+      srvMode === '3u' ? 'var(--c-g)' : 'var(--c-hi)',
+      totSrv, totPorts, totU, totIops, totCost
+    );
+  }
+
+  document.getElementById('calcResults').innerHTML = html;
 }
 
-function resetAll() {
-  selectedCustomer = null;
-  stepsDone.clear();
-  document.getElementById('customerPicker').value = '';
-  document.getElementById('customerCard').style.display = 'none';
-  ['sw16','sw4','sw4x16','sw32','pp','racks','srvx3','srvx7','srvr3','srvr7'].forEach(id=>{
-    const el = document.getElementById(id); if(el) el.value=0;
-  });
-  renderWelcome();
+// ===================== CG PLANNER =====================
+let cgGroups = [];
+let coreGroups = [];
+let selectedPool = null;
+let coreLimit = 0;
+let coreCounter = 1;
+
+function nextCGNum() {
+  const used = new Set(cgGroups.map(g => parseInt(g.name.replace(/\D/g,''))).filter(n => !isNaN(n)));
+  let n = 1;
+  while (used.has(n)) n++;
+  return n;
+}
+
+function addCG() {
+  const n = nextCGNum();
+  cgGroups.push({id: Date.now(), name: `CG${String(n).padStart(2,'0')}`, members: []});
+  renderCGGroups(); renderPool();
+}
+
+function addCore() {
+  coreGroups.push({id: Date.now(), name: `Core${String(coreCounter).padStart(2,'0')}A`, cgIds: [], maxGbps: 0});
+  coreCounter++;
+  renderCores();
+}
+
+function cgGbps(cg) { return cg.members.reduce((s,m) => s + (m.gbps || 0), 0); }
+function coreGbps(core) { return core.cgIds.reduce((s,id) => { const cg = cgGroups.find(g => g.id===id); return s + (cg ? cgGbps(cg) : 0); }, 0); }
+function renameCore(coreId, val) {
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core && val.trim()) core.name = val.trim();
+}
+function setCoreMaxGbps(coreId, val) {
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core) core.maxGbps = parseFloat(val) || 0;
+  setTimeout(() => renderCores(), 0);
+}
+
+function renderPool() {
+  const assigned = new Set();
+  cgGroups.forEach(cg => cg.members.forEach(m => assigned.add(m.n)));
+  document.getElementById('poolList').innerHTML = CUSTOMERS.map(c => {
+    const inCg = assigned.has(c.n);
+    const dotCls = c.sw === '4 Port' ? 'd-4' : c.sw === '4+16' ? 'd-4x16' : 'd-32';
+    return `<div class="pool-item ${inCg ? 'in-cg' : ''} ${selectedPool === c.n && !inCg ? 'selected-pool' : ''}"
+      ${inCg ? '' : `onclick="selectPool(${c.n})"`}>
+      <span class="pool-num">${c.n}</span>
+      <span class="pool-dot ${dotCls}"></span>
+      <span class="pool-name">${c.name}</span>
+      ${inCg ? '<span style="font-size:0.7rem;color:var(--text4);">assigned</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectPool(n) {
+  selectedPool = selectedPool === n ? null : n;
+  renderPool();
+}
+
+function renderCGGroups() {
+  const assigned = new Set();
+  cgGroups.forEach(cg => cg.members.forEach(n => assigned.add(n)));
+
+  const wrap = document.getElementById('cgGroups');
+  wrap.innerHTML = cgGroups.map(cg => {
+    const total = cgGbps(cg);
+    const pct = coreLimit > 0 ? Math.min(100, (total / coreLimit) * 100) : 0;
+    const over = coreLimit > 0 && total > coreLimit;
+    const fillColor = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-hi)';
+
+    const members = cg.members.map(m => {
+      const c = CUSTOMERS.find(x => x.n === m.n);
+      return `<div class="cg-member">
+        <span class="pool-dot ${c?.sw==='4 Port'?'d-4':c?.sw==='4+16'?'d-4x16':'d-32'}"></span>
+        <span class="cg-member-name">#${m.n} ${c?.name||''}</span>
+        <input class="gbps-input" type="number" min="0" step="0.5" value="${m.gbps||0}"
+          style="width:52px;"
+          onchange="setCGMemberGbps(${cg.id},${m.n},this.value)" onblur="setCGMemberGbps(${cg.id},${m.n},this.value)">
+        <span style="font-size:0.75rem;color:var(--text3);">Gbps</span>
+        <span class="cg-member-del" onclick="removeCGMember(${cg.id},${m.n})">✕</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="cg-group">
+      <div class="cg-head">
+        <input class="cg-name-input" value="${cg.name}" onchange="renameCG(${cg.id},this.value)" onblur="renameCG(${cg.id},this.value)">
+        <div class="cg-bar-wrap">
+          <div class="cg-bar-text ${over ? 'over' : ''}">
+            <span>${total.toFixed(1)} Gbps${coreLimit > 0 ? ' / '+coreLimit+' Gbps' : ''}</span>
+            ${over ? '<span>⚠️ OVER LIMIT</span>' : ''}
+          </div>
+          <div class="cg-bar"><div class="cg-bar-fill" style="width:${pct}%;background:${fillColor};"></div></div>
+        </div>
+        <span class="cg-del" onclick="removeCG(${cg.id})">✕</span>
+      </div>
+      <div class="cg-body">
+        ${members}
+        <div class="cg-drop" onclick="assignToCG(${cg.id})">
+          ${selectedPool
+            ? `➕ Add #${selectedPool} ${CUSTOMERS.find(x=>x.n===selectedPool)?.name||''}`
+            : '← Select a customer from the list'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renameCG(id, val) {
+  const cg = cgGroups.find(g => g.id === id);
+  if (cg) cg.name = val;
+  setTimeout(() => renderCores(), 0);
+}
+
+function assignToCG(cgId) {
+  if (!selectedPool) return;
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (cg && !cg.members.find(m => m.n === selectedPool)) {
+    cg.members.push({n: selectedPool, gbps: 0});
+  }
+  selectedPool = null;
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function removeCGMember(cgId, n) {
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (cg) cg.members = cg.members.filter(m => m.n !== n);
+  renderPool(); renderCGGroups(); renderCores();
+}
+function setCGMemberGbps(cgId, n, val) {
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (!cg) return;
+  const member = cg.members.find(m => m.n === n);
+  if (member) member.gbps = parseFloat(val) || 0;
+  setTimeout(() => { renderCGGroups(); renderCores(); }, 0);
+}
+
+function removeCG(id) {
+  cgGroups = cgGroups.filter(g => g.id !== id);
+  coreGroups.forEach(c => c.cgIds = c.cgIds.filter(x => x !== id));
+  renderPool(); renderCGGroups(); renderCores();
+}
+
+function renderCores() {
+  const unassigned = cgGroups.filter(cg => !coreGroups.some(co => co.cgIds.includes(cg.id)));
+  document.getElementById('coreList').innerHTML = coreGroups.map(core => {
+    const total = coreGbps(core);
+    const limit = core.maxGbps || 0;
+    const over = limit > 0 && total > limit;
+    const pct = limit > 0 ? Math.min(100, (total/limit)*100) : 0;
+    const fc = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-hi)';
+
+    const tags = core.cgIds.map(cgId => {
+      const cg = cgGroups.find(g => g.id === cgId);
+      if (!cg) return '';
+      return `<div class="core-cg-tag">
+        <span>${cg.name} (${cgGbps(cg).toFixed(1)} Gbps)</span>
+        <span class="core-tag-del" onclick="removeCoreAssign(${core.id},${cgId})">✕</span>
+      </div>`;
+    }).join('');
+
+    const assignSelect = unassigned.length ? `
+      <select onchange="assignCGtoCore(${core.id},this.value);this.value='';"
+        style="font-size:0.8rem;margin-top:4px;width:100%;background:var(--input-bg);border:1px solid var(--border2);color:var(--text);padding:5px;border-radius:6px;outline:none;">
+        <option value="">Assign CG group…</option>
+        ${unassigned.map(cg=>`<option value="${cg.id}">${cg.name} (${cgGbps(cg).toFixed(1)} Gbps)</option>`).join('')}
+      </select>` : '';
+
+    return `<div class="core-item">
+      <div class="core-item-head">
+        <input value="${core.name}"
+          style="flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--warn-col);font-size:0.82rem;font-weight:700;outline:none;min-width:0;cursor:text;"
+          onfocus="this.style.borderBottomColor='var(--tab-bord)'"
+          onblur="this.style.borderBottomColor='transparent';renameCore(${core.id},this.value)"
+          onchange="renameCore(${core.id},this.value)">
+        <span style="font-size:0.78rem;color:var(--text3);white-space:nowrap;margin-right:6px;">${total.toFixed(1)} Gbps</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.75rem;color:var(--warn-col);flex-shrink:0;">
+          Max:
+          <input type="number" value="${limit||''}" placeholder="∞"
+            style="width:62px;background:var(--input-bg);border:1px solid var(--warn-bord);color:var(--warn-col);padding:2px 6px;border-radius:4px;font-size:0.78rem;outline:none;"
+            onchange="setCoreMaxGbps(${core.id},this.value)" onblur="setCoreMaxGbps(${core.id},this.value)"> Gbps
+        </span>
+        <span class="core-item-del" onclick="removeCore(${core.id})">✕</span>
+      </div>
+      <div class="core-item-body">
+        ${limit > 0 ? `<div class="core-bar"><div class="core-bar-fill" style="width:${pct}%;background:${fc};"></div></div>` : ''}
+        ${over ? `<div style="font-size:0.75rem;color:var(--c-r);font-weight:700;margin-bottom:4px;">⚠️ Over ${limit} Gbps!</div>` : ''}
+        ${tags}
+        ${assignSelect}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function assignCGtoCore(coreId, cgId) {
+  cgId = parseInt(cgId);
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core && !core.cgIds.includes(cgId)) core.cgIds.push(cgId);
+  renderCores();
+}
+function removeCoreAssign(coreId, cgId) {
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core) core.cgIds = core.cgIds.filter(x => x !== cgId);
+  renderCores();
+}
+function removeCore(id) {
+  coreGroups = coreGroups.filter(c => c.id !== id);
+  renderCores();
+}
+
+// ===================== CHANGELOG =====================
+function openChangelog() {
+  document.getElementById('changelogModal').classList.add('open');
+  renderChangelog();
+}
+
+function renderChangelog() {
+  const el = document.getElementById('cl-app-content');
+  if (!el || !window.CHANGELOG) return;
+  const typeLabel = {feat:'New', change:'Change', fix:'Fix'};
+  el.innerHTML = window.CHANGELOG.map((v, idx) => {
+    const items = v.entries.map(e =>
+      '<li class="cl-item ' + e.type + '">'
+      + '<span class="cl-type ' + e.type + '">' + (typeLabel[e.type] || e.type) + '</span>'
+      + e.text
+      + '</li>'
+    ).join('');
+    return '<div class="cl-entry">'
+      + '<div class="cl-version">' + v.version + (v.title ? ' — ' + v.title : '') + '</div>'
+      + (idx === 0 ? '<div class="cl-date">Current version</div>' : '')
+      + '<ul class="cl-items">' + items + '</ul>'
+      + '</div>';
+  }).join('');
+}
+function closeChangelog(e) {
+  if (!e || e.target === document.getElementById('changelogModal'))
+    document.getElementById('changelogModal').classList.remove('open');
+}
+function switchModalTab(id, btn) {
+  document.querySelectorAll('.modal-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.modal-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+let steamLoaded = false;
+async function loadSteamNews() {
+  if (steamLoaded) return;
+  const loading = document.getElementById('steamLoading');
+  const news    = document.getElementById('steamNews');
+  const fallback= document.getElementById('steamFallback');
+  try {
+    const url = 'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=4170200&count=15&maxlength=400&format=json';
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data?.appnews?.newsitems || [];
+    if (!items.length) throw new Error('No items');
+    news.innerHTML = items.map(item => {
+      const date = new Date(item.date * 1000).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+      const body = item.contents
+        .replace(/<[^>]+>/g,'')
+        .replace(/\[.*?\]/g,'')
+        .slice(0, 300) + (item.contents.length > 300 ? '…' : '');
+      return `<div class="steam-item">
+        <div class="steam-item-title">${item.title}</div>
+        <div class="steam-item-date">${date}</div>
+        <div class="steam-item-body">${body}</div>
+        <a class="steam-link" href="${item.url}" target="_blank" style="font-size:0.75rem;padding:4px 10px;">Read more ↗</a>
+      </div>`;
+    }).join('');
+    loading.style.display = 'none';
+    news.style.display = 'block';
+    steamLoaded = true;
+  } catch(e) {
+    loading.style.display = 'none';
+    fallback.style.display = 'block';
+  }
 }
 
 // ===================== INIT =====================
-buildCustomerPicker();
+buildCustomerTable();
+renderPool();
+renderCGGroups();
+renderCores();
 </script>
 </body>
 </html>
