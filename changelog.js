@@ -4,9 +4,25 @@
 
 window.CHANGELOG = [
   {
+    version: "v5.0",
+    title: "Save & Share system",
+    date: "Current version",
+    entries: [
+      { type: "feat",   text: "Calculator: Save and Load profiles — stores requirements list and server mode to localStorage" },
+      { type: "feat",   text: "CG Planner: Save and Load profiles — stores CG groups, Core groups and all Gbps values to localStorage" },
+      { type: "feat",   text: "CG Planner: Export plan as JSON file for sharing" },
+      { type: "feat",   text: "CG Planner: Import JSON plan from file or paste — fully validated before applying" },
+      { type: "feat",   text: "Security: imported JSON is structurally validated and sanitized — no code injection possible" },
+      { type: "feat",   text: "saves.js: dedicated save system file — clean separation from app logic" },
+      { type: "fix",    text: "Setup Guide: Back to Dashboard link updated to index.html" },
+      { type: "feat",   text: "Setup Guide: server preference toggle (7U preferred / 3U only) — guide adapts accordingly" },
+      { type: "feat",   text: "Setup Guide: unlocked switches panel — guide recommends only switches available in-game" },
+      { type: "fix",    text: "Setup Guide: SyntaxError crash fixed — renderCustomerGuide rewritten without nested template literals" }
+    ]
+  },
+  {
     version: "v4.5",
     title: "CG Planner width & blur crash fix",
-    date: "Current version",
     entries: [
       { type: "fix",    text: "CG Planner: NotFoundError crash when pressing Enter in Max Gbps field — render now deferred after blur event" },
       { type: "fix",    text: "CG Planner: same deferred render fix applied to member Gbps and CG name inputs" },
