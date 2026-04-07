@@ -494,24 +494,23 @@ function getUnlocked() {
 }
 
 function bestAvailableSwitch(needed, unlocked) {
-  // Returns {name, available, warning}
   const swMap = {
-    '4 Port':  { key:'sw4',   name:'4×SFP+ Switch' },
-    '4+16':    { key:'sw4x16',name:'4×QSFP+ 16×SFP+ Switch' },
-    '32 Port': { key:'sw32',  name:'32×QSFP+ Switch' },
+    '4 Port':  { key:'sw4',   name:'4x SFP+ Switch' },
+    '4+16':    { key:'sw4x16',name:'4x QSFP+ 16x SFP+ Switch' },
+    '32 Port': { key:'sw32',  name:'32x QSFP+ Switch' },
   };
   const target = swMap[needed];
-  if (!target) return { name:'16×RJ45 Switch', available:true, warning:null };
+  if (!target) return { name:'16x RJ45 Switch', available:true, warning:null };
   if (unlocked[target.key]) return { name:target.name, available:true, warning:null };
-  // Find best available fallback
   const order = ['sw32','sw4x16','sw4','sw16'];
-  const names  = {sw32:'32×QSFP+ Switch', sw4x16:'4×QSFP+ 16×SFP+ Switch', sw4:'4×SFP+ Switch', sw16:'16×RJ45 Switch'};
+  const names  = {sw32:'32x QSFP+ Switch', sw4x16:'4x QSFP+ 16x SFP+ Switch', sw4:'4x SFP+ Switch', sw16:'16x RJ45 Switch'};
   const fallback = order.find(k => unlocked[k] || k === 'sw16');
+  const fallbackName = names[fallback] || '16x RJ45 Switch';
   return {
     name: target.name,
     available: false,
-    fallback: names[fallback] || '16×RJ45 Switch',
-    warning: `⚠️ ${target.name} not yet unlocked. Best available: ${names[fallback] || '16×RJ45 Switch'} — note: this may not meet the customer's full speed requirements.`
+    fallback: fallbackName,
+    warning: 'Not yet unlocked: ' + target.name + '. Best available: ' + fallbackName + ' — may not meet full speed requirements.'
   };
 }
 
@@ -599,8 +598,9 @@ function renderCustomerGuide(c) {
   const typeNames = {sx:'System X',ri:'RISC',mf:'Mainframe',gpu:'GPU'};
   const typeColors = {sx:'c-hi',ri:'c-g',mf:'c-p',gpu:'c-r'};
   const activeTypes = types.filter(t => c[t] > 0);
+  const beg = !expertMode;
 
-  // Calculate server needs based on srvPref
+  // Calculate server needs
   const needs = {};
   let totalServers=0, totalRU=0, totalPorts=0;
   activeTypes.forEach(t => {
@@ -620,208 +620,177 @@ function renderCustomerGuide(c) {
 
   const unlocked = getUnlocked();
   const switchInfo = bestAvailableSwitch(c.sw, unlocked);
-
   const needsHighSpeed = c.sw !== '4 Port';
-  const beg = !expertMode;
 
+  // ---- Pre-build all conditional HTML blocks ----
+  const prefLabel = srvPref === '3u' ? '3U Only mode' : '7U Preferred mode';
+  const prefIcon  = srvPref === '3u' ? 'green' : 'blue';
+
+  const serverRows = activeTypes.map(t => {
+    const n = needs[t];
+    const parts = [];
+    if (n.s7 > 0) parts.push(n.s7 + 'x 7U');
+    if (n.s3 > 0) parts.push(n.s3 + 'x 3U');
+    return '<div class="crb-item">'
+      + '<div class="crb-item-label">' + typeNames[t] + '</div>'
+      + '<div class="crb-item-val ' + typeColors[t] + '">' + parts.join(' + ') + '</div>'
+      + '<div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">' + n.iops.toLocaleString() + ' IOPS - ' + n.ru + 'U rack</div>'
+      + '</div>';
+  }).join('');
+
+  const step1Explain = beg
+    ? '<div class="explain-box">First things first — you need servers to process this customer data. Here is exactly what to buy based on your current preference (' + prefLabel + ').</div>'
+    : '';
+
+  const step1Info = beg && srvPref === 'smart'
+    ? '<div class="info-box">Why 7U first? A 7U server gives 12,000 IOPS in 7U of space. A 3U gives 5,000 IOPS. 7U is more space-efficient. Change to 3U only on the left if you have not unlocked 7U yet.</div>'
+    : (beg && srvPref === '3u' ? '<div class="info-box">3U only mode: Each 3U server provides 5,000 IOPS. When you unlock 7U servers, switch to 7U preferred to save rack space.</div>' : '');
+
+  const switchName = switchInfo.available ? switchInfo.name : switchInfo.fallback;
+  const switchHint = switchInfo.available
+    ? 'This is the customer switch. Their cable plugs into this.'
+    : 'Ideal: ' + switchInfo.name + ' not yet unlocked. Using best available.';
+  const switchWarning = !switchInfo.available
+    ? '<div class="warn-box">' + switchInfo.warning + '</div>'
+    : '';
+
+  const step2Explain = beg
+    ? '<div class="explain-box">The customer connects to your data center through a switch. Think of it as the reception desk — all traffic from this customer goes through it. You also need a patch panel to keep cabling organised.</div>'
+    : '';
+
+  const fiberNote = needsHighSpeed
+    ? '<div class="action-item"><div class="icon">💡</div><div class="action-text"><strong>Fiber modules needed</strong> — this customer requires high-speed connections<span class="hint">You will need SFP28 (25 Gbps) or QSFP+ (40 Gbps) modules. Check your switch port types.</span></div></div>'
+    : '';
+
+  const step3Explain = beg
+    ? '<div class="explain-box">Now place your equipment in racks. You will want two racks: one for the network gear (switch + patch panel) and one for the servers. Keep them separate — it stays organised as you grow.</div>'
+    : '';
+
+  const step4Explain = beg
+    ? '<div class="explain-box">This is the part that looks scary but follows a simple pattern. Data travels: Customer to Patch Panel to Switch to Servers. Every cable just connects one step to the next.</div>'
+    : '';
+
+  const patchWarn = beg
+    ? '<div class="warn-box">Do not skip the patch panel! You could wire directly, but patch panels let you reorganise without re-cabling everything later.</div>'
+    : '';
+
+  const lacpStep = c.iops > 100 ? (
+    '<div class="step locked" id="step-5">'
+    + '<div class="step-header" onclick="toggleStep(5)">'
+    + '<div class="step-num">5</div>'
+    + '<div class="step-title">Set up LACP if needed</div>'
+    + '<div class="step-status">Waiting...</div>'
+    + '</div>'
+    + '<div class="step-body">'
+    + (beg ? '<div class="explain-box">LACP lets you bundle multiple cables together so the game treats them as one big pipe. If one cable cannot carry enough traffic alone, you add more and group them.</div>' : '')
+    + '<div class="calc-result-box"><div class="crb-title">Do you need LACP?</div><div class="crb-grid">'
+    + '<div class="crb-item"><div class="crb-item-label">Customer total IOPS</div><div class="crb-item-val c-o">' + (c.iops*1000).toLocaleString() + '</div></div>'
+    + '<div class="crb-item"><div class="crb-item-label">Single port max</div><div class="crb-item-val c-hi">' + maxPortSpeed + ' Gbps</div></div>'
+    + '<div class="crb-item"><div class="crb-item-label">Servers needing ports</div><div class="crb-item-val c-g">' + totalPorts + '</div></div>'
+    + '</div></div>'
+    + (beg ? '<div class="info-box">In-game: select multiple cables between the same two switches, then right-click and choose Group as LACP. The game combines their bandwidth automatically.</div>' : '')
+    + '<button class="step-btn done-btn" onclick="completeStep(5)">Done — finish</button>'
+    + '</div></div>'
+  ) : '';
+
+  const sPlural = totalServers !== 1 ? 's' : '';
+  const pPlural = totalPorts !== 1 ? 's' : '';
+
+  // ---- Render ----
   const panel = document.getElementById('rightPanel');
-  panel.innerHTML = `
-    <div class="guide-header">
-      <div>
-        <div class="guide-title">📋 Setup guide for: ${c.name}</div>
-        <div class="guide-subtitle">Follow these steps in order · check them off as you go</div>
-      </div>
-    </div>
+  panel.innerHTML =
+    '<div class="guide-header">'
+    + '<div>'
+    + '<div class="guide-title">Setup guide for: ' + c.name + '</div>'
+    + '<div class="guide-subtitle">Follow these steps in order - check them off as you go</div>'
+    + '</div></div>'
 
-    <div class="steps" id="stepsContainer">
+    + '<div class="steps" id="stepsContainer">'
 
-      <!-- STEP 1: BUY SERVERS -->
-      <div class="step active" id="step-1">
-        <div class="step-header" onclick="toggleStep(1)">
-          <div class="step-num">1</div>
-          <div class="step-title">Buy the servers</div>
-          <div class="step-status">In progress</div>
-        </div>
-        <div class="step-body">
-          ${beg ? `<div class="explain-box">First things first — you need servers to process this customer's data. Here's exactly what to buy based on your current preference (${srvPref === '3u' ? '3U only' : '7U preferred'}).</div>` : ''}
-          <div class="calc-result-box">
-            <div class="crb-title">What to buy — ${srvPref === '3u' ? '🟢 3U Only mode' : '⚡ 7U Preferred mode'}</div>
-            <div class="crb-grid">
-              ${activeTypes.map(t=>`
-                <div class="crb-item">
-                  <div class="crb-item-label">${typeNames[t]}</div>
-                  <div class="crb-item-val ${typeColors[t]}">
-                    ${needs[t].s7>0?needs[t].s7+'× 7U':''}${needs[t].s7>0&&needs[t].s3>0?' + ':''}${needs[t].s3>0?needs[t].s3+'× 3U':''}
-                  </div>
-                  <div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">${needs[t].iops.toLocaleString()} IOPS · ${needs[t].ru}U rack</div>
-                </div>`).join('')}
-              <div class="crb-item">
-                <div class="crb-item-label">Total servers</div>
-                <div class="crb-item-val c-o">${totalServers}</div>
-              </div>
-              <div class="crb-item">
-                <div class="crb-item-label">Total rack space</div>
-                <div class="crb-item-val c-o">${totalRU}U</div>
-              </div>
-            </div>
-          </div>
-          ${srvPref === 'smart' && beg ? `<div class="info-box">💡 <strong>Why 7U first?</strong> A 7U server gives 12,000 IOPS in 7U of space. A 3U gives 5,000 IOPS. 7U is more space-efficient — change to "3U only" on the left if you haven't unlocked 7U yet.</div>` : ''}
-          ${srvPref === '3u' && beg ? `<div class="info-box">💡 <strong>3U only mode:</strong> Each 3U server provides 5,000 IOPS. When you unlock 7U servers, switch to "7U preferred" to save rack space.</div>` : ''}
-          <button class="step-btn done-btn" onclick="completeStep(1)">✓ Bought the servers — next step</button>
-        </div>
-      </div>
+    // STEP 1
+    + '<div class="step active" id="step-1">'
+    + '<div class="step-header" onclick="toggleStep(1)">'
+    + '<div class="step-num">1</div><div class="step-title">Buy the servers</div><div class="step-status">In progress</div>'
+    + '</div>'
+    + '<div class="step-body">'
+    + step1Explain
+    + '<div class="calc-result-box"><div class="crb-title">What to buy — ' + prefLabel + '</div>'
+    + '<div class="crb-grid">'
+    + serverRows
+    + '<div class="crb-item"><div class="crb-item-label">Total servers</div><div class="crb-item-val c-o">' + totalServers + '</div></div>'
+    + '<div class="crb-item"><div class="crb-item-label">Total rack space</div><div class="crb-item-val c-o">' + totalRU + 'U</div></div>'
+    + '</div></div>'
+    + step1Info
+    + '<button class="step-btn done-btn" onclick="completeStep(1)">Bought the servers — next step</button>'
+    + '</div></div>'
 
-      <!-- STEP 2: BUY SWITCH + PATCH PANEL -->
-      <div class="step locked" id="step-2">
-        <div class="step-header" onclick="toggleStep(2)">
-          <div class="step-num">2</div>
-          <div class="step-title">Buy the network gear</div>
-          <div class="step-status">Waiting…</div>
-        </div>
-        <div class="step-body">
-          ${beg ? `<div class="explain-box">The customer connects to your data center through a switch. Think of it as the reception desk — all traffic from this customer goes through it. You also need a patch panel to keep cabling organised.</div>` : ''}
-          ${!switchInfo.available ? `<div class="warn-box">${switchInfo.warning}</div>` : ''}
-          <div class="action-list">
-            <div class="action-item">
-              <div class="icon">🔌</div>
-              <div class="action-text">
-                <strong>1× ${switchInfo.available ? switchInfo.name : switchInfo.fallback}</strong>
-                ${!switchInfo.available ? `<span class="hint" style="color:var(--c-o);">Ideal: ${switchInfo.name} — not yet unlocked, using best available.</span>` : '<span class="hint">This is the customer's switch. Their cable plugs into this.</span>'}
-              </div>
-            </div>
-            <div class="action-item">
-              <div class="icon">📌</div>
-              <div class="action-text">
-                <strong>1× Patch Panel</strong>
-                <span class="hint">Keeps your cabling tidy. All cables go through here before the switch.</span>
-              </div>
-            </div>
-            ${needsHighSpeed ? `<div class="action-item">
-              <div class="icon">💡</div>
-              <div class="action-text">
-                <strong>Fiber modules needed</strong> — this customer requires high-speed connections
-                <span class="hint">You'll need SFP28 (25 Gbps) or QSFP+ (40 Gbps) modules. Check your switch port types.</span>
-              </div>
-            </div>` : ''}
-          </div>
-          <button class="step-btn done-btn" onclick="completeStep(2)">✓ Bought — next step</button>
-        </div>
-      </div>
+    // STEP 2
+    + '<div class="step locked" id="step-2">'
+    + '<div class="step-header" onclick="toggleStep(2)">'
+    + '<div class="step-num">2</div><div class="step-title">Buy the network gear</div><div class="step-status">Waiting...</div>'
+    + '</div>'
+    + '<div class="step-body">'
+    + step2Explain
+    + switchWarning
+    + '<div class="action-list">'
+    + '<div class="action-item"><div class="icon">🔌</div><div class="action-text"><strong>1x ' + switchName + '</strong><span class="hint">' + switchHint + '</span></div></div>'
+    + '<div class="action-item"><div class="icon">📌</div><div class="action-text"><strong>1x Patch Panel</strong><span class="hint">Keeps your cabling tidy. All cables go through here before the switch.</span></div></div>'
+    + fiberNote
+    + '</div>'
+    + '<button class="step-btn done-btn" onclick="completeStep(2)">Bought — next step</button>'
+    + '</div></div>'
 
-      <!-- STEP 3: PLACE IN RACK -->
-      <div class="step locked" id="step-3">
-        <div class="step-header" onclick="toggleStep(3)">
-          <div class="step-num">3</div>
-          <div class="step-title">Place everything in racks</div>
-          <div class="step-status">Waiting…</div>
-        </div>
-        <div class="step-body">
-          ${beg ? `<div class="explain-box">Now place your equipment in racks. You'll want two racks: one for the network gear (switch + patch panel) and one for the servers. Keep them separate — it stays organised as you grow.</div>` : ''}
-          <div class="action-list">
-            <div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Network rack</strong> — place patch panel at top, switch below it<span class="hint">Top = where cables come in. Bottom = switch that handles them.</span></div></div>
-            <div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Server rack</strong> — place all your servers here<span class="hint">Add a patch panel at the top of this rack too — it'll make cabling easier.</span></div></div>
-          </div>
-          <button class="step-btn done-btn" onclick="completeStep(3)">✓ Placed — next step</button>
-        </div>
-      </div>
+    // STEP 3
+    + '<div class="step locked" id="step-3">'
+    + '<div class="step-header" onclick="toggleStep(3)">'
+    + '<div class="step-num">3</div><div class="step-title">Place everything in racks</div><div class="step-status">Waiting...</div>'
+    + '</div>'
+    + '<div class="step-body">'
+    + step3Explain
+    + '<div class="action-list">'
+    + '<div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Network rack</strong> — place patch panel at top, switch below it<span class="hint">Top = where cables come in. Bottom = switch that handles them.</span></div></div>'
+    + '<div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Server rack</strong> — place all your servers here<span class="hint">Add a patch panel at the top of this rack too — it makes cabling easier.</span></div></div>'
+    + '</div>'
+    + '<button class="step-btn done-btn" onclick="completeStep(3)">Placed — next step</button>'
+    + '</div></div>'
 
-      <!-- STEP 4: CABLE IT UP -->
-      <div class="step locked" id="step-4">
-        <div class="step-header" onclick="toggleStep(4)">
-          <div class="step-num">4</div>
-          <div class="step-title">Connect the cables</div>
-          <div class="step-status">Waiting…</div>
-        </div>
-        <div class="step-body">
-          ${beg ? `<div class="explain-box">This is the part that looks scary but follows a simple pattern. Data travels: <strong>Customer → Patch Panel → Switch → Servers</strong>. That's it. Every cable just connects one step to the next.</div>` : ''}
+    // STEP 4
+    + '<div class="step locked" id="step-4">'
+    + '<div class="step-header" onclick="toggleStep(4)">'
+    + '<div class="step-num">4</div><div class="step-title">Connect the cables</div><div class="step-status">Waiting...</div>'
+    + '</div>'
+    + '<div class="step-body">'
+    + step4Explain
+    + '<div class="cable-diagram"><div class="cd-title">Cable routing — follow this order</div>'
+    + '<div class="cd-row"><span class="cd-box bg-blue">Customer</span><div class="cd-line line-blue"></div><span class="cd-arrow">→</span><span class="cd-box bg-blue">Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">blue cable</span></div>'
+    + '<div class="cd-row"><span class="cd-box bg-blue">Patch Panel</span><div class="cd-line line-green"></div><span class="cd-arrow">→</span><span class="cd-box bg-green">Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">green cable</span></div>'
+    + '<div class="cd-row"><span class="cd-box bg-green">Switch</span><div class="cd-line line-orange"></div><span class="cd-arrow">→</span><span class="cd-box bg-orange">Server Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">orange cable</span></div>'
+    + '<div class="cd-row"><span class="cd-box bg-orange">Server Patch Panel</span><div class="cd-line line-yellow"></div><span class="cd-arrow">→</span><span class="cd-box bg-yellow">Servers</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">yellow cable</span></div>'
+    + '</div>'
+    + '<div class="action-list">'
+    + '<div class="action-item"><div class="icon">1️⃣</div><div class="action-text"><strong>Customer cable to Patch Panel (top)</strong><span class="hint">The customer main cable goes into the first free port on the patch panel.</span></div></div>'
+    + '<div class="action-item"><div class="icon">2️⃣</div><div class="action-text"><strong>Patch Panel to Switch</strong><span class="hint">Connect each patch panel port to the corresponding switch port.</span></div></div>'
+    + '<div class="action-item"><div class="icon">3️⃣</div><div class="action-text"><strong>Switch to Server Rack Patch Panel</strong><span class="hint">Run cables from the switch uplink ports to the patch panel in your server rack.</span></div></div>'
+    + '<div class="action-item"><div class="icon">4️⃣</div><div class="action-text"><strong>Server Patch Panel to each Server</strong><span class="hint">One cable per server. Each server gets its own dedicated port.</span></div></div>'
+    + '</div>'
+    + patchWarn
+    + '<button class="step-btn done-btn" onclick="completeStep(4)">Cabled up — next step</button>'
+    + '</div></div>'
 
-          <div class="cable-diagram">
-            <div class="cd-title">Cable routing — follow this order</div>
-            <div class="cd-row">
-              <span class="cd-box bg-blue">Customer</span>
-              <div class="cd-line line-blue"></div>
-              <span class="cd-arrow">→</span>
-              <span class="cd-box bg-blue">Patch Panel</span>
-              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🔵 blue cable</span>
-            </div>
-            <div class="cd-row">
-              <span class="cd-box bg-blue">Patch Panel</span>
-              <div class="cd-line line-green"></div>
-              <span class="cd-arrow">→</span>
-              <span class="cd-box bg-green">Switch</span>
-              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟢 green cable</span>
-            </div>
-            <div class="cd-row">
-              <span class="cd-box bg-green">Switch</span>
-              <div class="cd-line line-orange"></div>
-              <span class="cd-arrow">→</span>
-              <span class="cd-box bg-orange">Server Patch Panel</span>
-              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟠 orange cable</span>
-            </div>
-            <div class="cd-row">
-              <span class="cd-box bg-orange">Server Patch Panel</span>
-              <div class="cd-line line-yellow"></div>
-              <span class="cd-arrow">→</span>
-              <span class="cd-box bg-yellow">Servers</span>
-              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟡 yellow cable</span>
-            </div>
-          </div>
+    // STEP 5 (conditional)
+    + lacpStep
 
-          <div class="action-list">
-            <div class="action-item"><div class="icon">1️⃣</div><div class="action-text"><strong>Customer cable → Patch Panel (top)</strong><span class="hint">The customer's main cable goes into the first free port on the patch panel.</span></div></div>
-            <div class="action-item"><div class="icon">2️⃣</div><div class="action-text"><strong>Patch Panel → Switch</strong><span class="hint">Connect each patch panel port to the corresponding switch port.</span></div></div>
-            <div class="action-item"><div class="icon">3️⃣</div><div class="action-text"><strong>Switch → Server Rack Patch Panel</strong><span class="hint">Run cables from the switch uplink ports to the patch panel in your server rack.</span></div></div>
-            <div class="action-item"><div class="icon">4️⃣</div><div class="action-text"><strong>Server Patch Panel → each Server</strong><span class="hint">One cable per server. Each server gets its own dedicated port.</span></div></div>
-          </div>
+    // FINAL
+    + '<div class="step locked" id="step-final">'
+    + '<div class="step-header"><div class="step-num">🎉</div><div class="step-title">You are done!</div><div class="step-status"></div></div>'
+    + '<div class="step-body">'
+    + '<div class="info-box">Connected and ready to serve: ' + c.name + '<br><br>' + totalServers + ' server' + sPlural + ' - ' + totalRU + 'U rack space - ' + totalPorts + ' switch port' + pPlural + '</div>'
+    + '<div class="action-list">'
+    + '<div class="action-item"><div class="icon">💰</div><div class="action-text"><strong>Check the customer panel in-game</strong> — confirm requirements are met and traffic is flowing.<span class="hint">Look for green indicators. Red means something is not connected properly.</span></div></div>'
+    + '<div class="action-item"><div class="icon">📈</div><div class="action-text"><strong>Ready for the next customer?</strong> Pick them from the list on the left and repeat!<span class="hint">Each customer gets their own switch. They all share the same servers.</span></div></div>'
+    + '</div></div></div>'
 
-          ${beg ? `<div class="warn-box">⚠️ <strong>Don't skip the patch panel!</strong> You could wire directly, but patch panels let you reorganise without re-cabling everything later.</div>` : ''}
-          <button class="step-btn done-btn" onclick="completeStep(4)">✓ Cabled up — next step</button>
-        </div>
-      </div>
-
-      <!-- STEP 5: LACP (if needed) -->
-      ${c.iops > 100 ? `
-      <div class="step locked" id="step-5">
-        <div class="step-header" onclick="toggleStep(5)">
-          <div class="step-num">5</div>
-          <div class="step-title">Set up LACP if needed</div>
-          <div class="step-status">Waiting…</div>
-        </div>
-        <div class="step-body">
-          ${beg ? `<div class="explain-box">LACP (Link Aggregation Control Protocol) lets you bundle multiple cables together so the game treats them as one big pipe. If one cable can't carry enough traffic alone, you add more and group them.</div>` : ''}
-          <div class="calc-result-box">
-            <div class="crb-title">Do you need LACP?</div>
-            <div class="crb-grid">
-              <div class="crb-item"><div class="crb-item-label">Customer total IOPS</div><div class="crb-item-val c-o">${(c.iops*1000).toLocaleString()}</div></div>
-              <div class="crb-item"><div class="crb-item-label">Single port max</div><div class="crb-item-val c-hi">${maxPortSpeed} Gbps</div></div>
-              <div class="crb-item"><div class="crb-item-label">Servers needing ports</div><div class="crb-item-val c-g">${totalPorts}</div></div>
-            </div>
-          </div>
-          ${beg ? `<div class="info-box">💡 In-game: select multiple cables between the same two switches, then right-click → Group as LACP. The game combines their bandwidth automatically.</div>` : ''}
-          <button class="step-btn done-btn" onclick="completeStep(5)">✓ Done — finish</button>
-        </div>
-      </div>` : ''}
-
-      <!-- FINAL -->
-      <div class="step locked" id="step-final">
-        <div class="step-header">
-          <div class="step-num">🎉</div>
-          <div class="step-title">You're done!</div>
-          <div class="step-status"></div>
-        </div>
-        <div class="step-body">
-          <div class="info-box">
-            ✅ <strong>${c.name}</strong> is connected and ready to serve.<br><br>
-            ${totalServers} server${totalServers!==1?'s':''} · ${totalRU}U rack space · ${totalPorts} switch port${totalPorts!==1?'s':''}
-          </div>
-          <div class="action-list">
-            <div class="action-item"><div class="icon">💰</div><div class="action-text"><strong>Check the customer panel in-game</strong> — confirm their requirements are met and traffic is flowing.<span class="hint">Look for green indicators. Red means something isn't connected properly.</span></div></div>
-            <div class="action-item"><div class="icon">📈</div><div class="action-text"><strong>Ready for the next customer?</strong> Pick them from the list on the left and repeat!<span class="hint">Each customer gets their own switch. They all share the same servers.</span></div></div>
-          </div>
-        </div>
-      </div>
-
-    </div>`;
+    + '</div>';
 }
 
 // ===================== STEP CONTROL =====================
