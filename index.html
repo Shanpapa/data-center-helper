@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Data Center Helper</title>
 <style>
-/* =======================
+/* =====================
    CSS VARIABLES / THEMES
    ===================== */
 :root {
@@ -188,6 +188,7 @@ body {
    SECTIONS
    ===================== */
 .section { display: none; max-width: 1000px; margin: 0 auto; padding: 24px 20px; flex: 1; }
+#cgplanner { max-width: none; padding-left: 20px; padding-right: 20px; }
 .section.active { display: block; }
 
 .section-title {
@@ -423,8 +424,8 @@ input[type=number].small {
 /* =====================
    CG PLANNER
    ===================== */
-.cg-layout { display: grid; grid-template-columns: 220px 1fr 240px; gap: 14px; min-height: 520px; }
-@media (max-width: 900px) { .cg-layout { grid-template-columns: 1fr; } }
+.cg-layout { display: grid; grid-template-columns: 200px 1fr; gap: 14px; min-height: 520px; }
+@media (max-width: 700px) { .cg-layout { grid-template-columns: 1fr; } }
 
 .panel-box {
   background: var(--card-bg);
@@ -478,7 +479,7 @@ input[type=number].small {
 .d-4 { background: #4488cc; } .d-4x16 { background: #44aa88; } .d-32 { background: #cc8844; }
 .pool-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gbps-input {
-  width: 48px;
+  width: 72px;
   background: var(--input-bg);
   border: 1px solid var(--border2);
   color: var(--c-o);
@@ -511,7 +512,8 @@ input[type=number].small {
   font-size: 0.88rem;
   font-weight: 700;
   outline: none;
-  width: 90px;
+  width: 120px;
+  min-width: 0;
   border-bottom: 1px solid transparent;
 }
 .cg-name-input:focus { border-bottom-color: var(--tab-bord); }
@@ -695,7 +697,15 @@ footer {
 /* =====================
    SCROLLBAR
    ===================== */
+/* Hide number input spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Hide number input spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
@@ -719,7 +729,10 @@ footer {
   <div class="sep"></div>
   <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</div>
   <div class="sep"></div>
-  <span class="version-badge">Game v1.0.38</span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <span class="version-badge">Game v1.0.38</span>
+    <button class="changelog-btn" onclick="openChangelog()" style="margin:0;">📋 Changelog</button>
+  </div>
 </div>
 
 <!-- ===================== TABS ===================== -->
@@ -728,6 +741,9 @@ footer {
   <button class="tab" onclick="showTab('customers',this)">👤 Customers</button>
   <button class="tab" onclick="showTab('calculator',this)">🧮 Calculator</button>
   <button class="tab" onclick="showTab('cgplanner',this)">📊 CG Planner</button>
+  <a href="setup_guide.html" style="text-decoration:none;">
+    <button class="tab" style="background:var(--info-bg);border-color:var(--info-bord);color:var(--info-col);">🧭 Setup Guide ↗</button>
+  </a>
 </div>
 
 <!-- ===================== DEVICES ===================== -->
@@ -799,6 +815,15 @@ footer {
       <div class="calc-panel">
         <div class="calc-panel-title">Add Requirement</div>
         <div class="calc-field">
+          <label>Server size preference</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="srvModeBtns">
+            <button class="btn btn-primary" onclick="setSrvMode('smart',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">⚡ 7U preferred</button>
+            <button class="btn" onclick="setSrvMode('3u',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">🟢 3U only</button>
+            <button class="btn" onclick="setSrvMode('both',this)" style="flex:1;font-size:0.8rem;padding:6px 8px;">📊 Show both</button>
+          </div>
+          <div id="srvModeHint" style="font-size:0.75rem;color:var(--text3);margin-top:3px;">Space-efficient: fills 7U first, tops up with 3U</div>
+        </div>
+        <div class="calc-field">
           <label>Server Type</label>
           <select id="newType">
             <option>System X</option><option>RISC</option>
@@ -841,62 +866,123 @@ footer {
 
 <!-- ===================== CG PLANNER ===================== -->
 <div class="section" id="cgplanner">
-  <div class="warn-box" id="cgWarnBox">
-    <strong>Core limit:</strong> Set your limit in the Core panel on the right.<br>
-    Set each customer's Gbps requirement in the pool list, then assign them to CG groups. CG groups can then be assigned to Cores.
-  </div>
   <div class="cg-layout">
 
-    <!-- POOL -->
+    <!-- LEFT: POOL -->
     <div class="panel-box">
-      <div class="panel-header">Customers — click to select</div>
+      <div class="panel-header">Customers</div>
       <div class="panel-scroll" id="poolList"></div>
     </div>
 
-    <!-- CG GROUPS -->
-    <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
-      <div class="groups-wrap" id="cgGroups"></div>
-      <div class="add-cg-btn" onclick="addCG()">+ New CG Group</div>
-    </div>
+    <!-- RIGHT: Core on top, CG below -->
+    <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-height:0;">
 
-    <!-- CORES -->
-    <div class="panel-box">
-      <div class="panel-header">Core Groups</div>
-      <div class="panel-sub">
-        <label>Max Gbps / Core:</label>
-        <input type="number" class="small" id="coreLimitInput" value="0" min="0"
-          oninput="coreLimit=parseFloat(this.value)||0;renderCGGroups();renderCores();">
+      <!-- CORE GROUPS -->
+      <div class="panel-box" style="flex-shrink:0;">
+        <div class="panel-header">Core Groups</div>
+        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:6px;" id="coreList"></div>
+        <div class="panel-footer">
+          <div class="add-core-btn" onclick="addCore()">+ New Core</div>
+        </div>
       </div>
-      <div class="panel-scroll" id="coreList"></div>
-      <div class="panel-footer">
-        <div class="add-core-btn" onclick="addCore()">+ New Core</div>
-      </div>
-    </div>
 
+      <!-- CG GROUPS -->
+      <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+        <div style="font-size:0.78rem;color:var(--text3);padding:2px 0;">
+          Click a customer on the left, then click a CG group below to assign.
+        </div>
+        <div class="groups-wrap" id="cgGroups"></div>
+        <div class="add-cg-btn" onclick="addCG()">+ New CG Group</div>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
   <span class="footer-note">🎮 Fan-made helper for the <strong>Data Center</strong> game (Waseku)</span>
-  <button class="changelog-btn" onclick="openChangelog()">📋 Changelog</button>
   <span class="footer-credit">Built by Claude (Anthropic) · Not affiliated with Waseku</span>
 </footer>
 
 <!-- ===================== CHANGELOG MODAL ===================== -->
+<style>
+.modal-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); flex-shrink:0; }
+.modal-tab { padding:10px 18px; font-size:0.85rem; font-weight:600; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; }
+.modal-tab:hover { color:var(--text); }
+.modal-tab.active { color:var(--tab-col); border-bottom-color:var(--tab-bord); }
+.modal-tab-content { display:none; overflow-y:auto; flex:1; padding:16px 20px; }
+.modal-tab-content.active { display:block; }
+.steam-item { background:var(--pool-bg); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+.steam-item-title { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+.steam-item-date { font-size:0.75rem; color:var(--text4); margin-bottom:8px; }
+.steam-item-body { font-size:0.82rem; color:var(--text2); line-height:1.6; }
+.steam-loading { text-align:center; padding:30px; font-size:0.9rem; color:var(--text3); }
+.steam-link { display:inline-block; margin-top:12px; padding:7px 16px; border-radius:8px; background:var(--tab-act); border:1px solid var(--tab-bord); color:var(--tab-col); font-size:0.82rem; font-weight:600; text-decoration:none; }
+.steam-link:hover { filter:brightness(1.15); }
+</style>
 <div class="modal-overlay" id="changelogModal" onclick="closeChangelog(event)">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">📋 Changelog</span>
       <span class="modal-close" onclick="closeChangelog(null)">×</span>
     </div>
-    <div class="modal-body">
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchModalTab('cl-app',this)">App Updates</div>
+      <div class="modal-tab" onclick="switchModalTab('cl-steam',this);loadSteamNews()">Steam Patch Notes</div>
+    </div>
+    <div class="modal-tab-content active" id="cl-app">
+
+      <div class="cl-entry">
+        <div class="cl-version">v4.5 — CG Planner width & blur crash fix</div>
+        <div class="cl-date">Current version</div>
+        <ul class="cl-items">
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: customer names now show correctly in pool list</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: Gbps input moved inside each CG member — value is now saved correctly and carried over</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: removed default 10 Gbps — value starts at 0, set per member after assigning</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>CG Planner: layout changed to 2-column — pool + combined CG/Core view, more space for names</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>CG Planner: Max Gbps/Core moved to top bar, Core Groups no longer takes a full column</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Calculator: server size mode selector — 7U preferred, 3U only (early game), or show both</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Calculator: spare servers now always match the selected server size (3U spare in 3U-only mode, not 7U)</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Calculator: Show Both mode now generates two separate Total Summary cards — one per mode</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>CG Planner: layout changed to Core Groups on top, CG Groups below — wider and more readable</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>CG Planner: Max Gbps limit is now set per individual Core (not global)</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: Gbps input field is wider, spinner arrows removed for cleaner input</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Calculator: ReferenceError — optimize3U and calcResult functions were not defined at runtime</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Calculator: 3U Only mode incorrectly added spare server as 7U — spare now always matches selected server size</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Calculator: Show Both mode — Total Summary now shows two separate cards (one per mode) instead of one combined</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: Gbps inputs lost focus after every keystroke — now updates on blur/enter instead of every keypress</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: Core Max Gbps input did not activate — same focus loss fix applied</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>CG Planner: Core group name is now editable inline</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: CG group name input widened so full name is visible</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>CG Planner: section width increased to match Customers tab table width</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>CG Planner: section now uses full available page width</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: NotFoundError crash when pressing Enter in Max Gbps field — render now deferred after blur event</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG Planner: same deferred render fix applied to member Gbps and CG name inputs</li>
+        </ul>
+      </div>
+
+      <div class="cl-entry">
+        <div class="cl-version">v4.0 — Setup Guide</div>
+        <div class="cl-date">Previous version</div>
+        <ul class="cl-items">
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Setup Guide — separate interactive page for step-by-step guidance</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>"I have a customer" mode — select any of the 34 customers and get exact shopping list + wiring steps</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>"I have gear" mode — enter what you own and get connection advice and issue detection</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Beginner / Expert toggle — beginner mode shows explanations for every step, expert mode is concise</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Step-by-step checklist with unlock flow — steps unlock one by one as you complete them</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Visual cable diagram per customer showing exact colour-coded routing</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Auto server optimisation — calculates exact 7U/3U mix for each server type required</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>Changelog button moved to topbar next to game version badge</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Steam Patch Notes tab in changelog (attempts live load, falls back to Steam link)</li>
+        </ul>
+      </div>
 
       <div class="cl-entry">
         <div class="cl-version">v3.0 — Full Rebuild</div>
-        <div class="cl-date">Current version</div>
+        <div class="cl-date">Previous version</div>
         <ul class="cl-items">
-          <li class="cl-item change"><span class="cl-type change">Change</span>Complete rewrite </li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>Complete rewrite — English only, no more language switching</li>
           <li class="cl-item feat"><span class="cl-type feat">New</span>Light / Dark theme toggle (Dark default)</li>
           <li class="cl-item feat"><span class="cl-type feat">New</span>Larger font sizes throughout for better readability</li>
           <li class="cl-item feat"><span class="cl-type feat">New</span>Responsive layout — works on mobile and desktop</li>
@@ -927,7 +1013,7 @@ footer {
           <li class="cl-item feat"><span class="cl-type feat">New</span>Assign CG groups to Core groups with configurable limit</li>
           <li class="cl-item feat"><span class="cl-type feat">New</span>Visual capacity bar per CG and Core with overflow warning</li>
           <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG group numbering now reuses deleted numbers correctly</li>
-          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Core limit default changed to 0 (user-defined)</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Core limit default changed from 560 to 0 (user-defined)</li>
         </ul>
       </div>
 
@@ -940,7 +1026,22 @@ footer {
         </ul>
       </div>
 
-    </div>
+    </div><!-- end cl-app -->
+
+    <div class="modal-tab-content" id="cl-steam">
+      <div class="steam-loading" id="steamLoading">
+        ⏳ Loading Steam patch notes…
+      </div>
+      <div id="steamNews" style="display:none;"></div>
+      <div id="steamFallback" style="display:none;" class="steam-loading">
+        ⚠️ Could not load Steam patch notes directly (browser CORS restriction).<br><br>
+        You can view the full update history here:<br>
+        <a class="steam-link" href="https://store.steampowered.com/news/app/4170200" target="_blank">
+          🎮 Open on Steam
+        </a>
+      </div>
+    </div><!-- end cl-steam -->
+
   </div>
 </div>
 
@@ -1039,10 +1140,23 @@ function setFilter(val, btn) {
 
 // ===================== CALCULATOR =====================
 let requirements = [];
+let srvMode = 'smart'; // 'smart' | '3u' | 'both'
 
 function updateIopsHint() {
   const v = parseInt(document.getElementById('newIops').value) || 0;
   document.getElementById('iopsHint').textContent = v > 0 ? `= ${(v/1000).toFixed(1)}k IOPS` : '';
+}
+
+function setSrvMode(mode, btn) {
+  srvMode = mode;
+  document.querySelectorAll('#srvModeBtns .btn').forEach(b => b.classList.remove('btn-primary'));
+  btn.classList.add('btn-primary');
+  const hints = {
+    smart: 'Space-efficient: fills 7U first, tops up with 3U',
+    '3u':  'Early game mode: uses only 3U servers',
+    both:  'Shows both options side by side'
+  };
+  document.getElementById('srvModeHint').textContent = hints[mode];
 }
 
 function addRequirement() {
@@ -1089,13 +1203,29 @@ function renderReqList() {
     </div>`).join('');
 }
 
-function optimize(targetRaw) {
+function optimizeSmart(targetRaw) {
   const i7 = 12000, i3 = 5000;
   if (targetRaw <= 0) return {s7:0, s3:0};
-  if (targetRaw < i7) return {s7:0, s3:Math.ceil(targetRaw / i3)};
-  const s7 = Math.floor(targetRaw / i7);
-  const rem = targetRaw - s7 * i7;
-  return {s7, s3: rem > 0 ? Math.ceil(rem / i3) : 0};
+  if (targetRaw < i7) return {s7:0, s3:Math.ceil(targetRaw/i3)};
+  const s7 = Math.floor(targetRaw/i7);
+  const rem = targetRaw - s7*i7;
+  return {s7, s3: rem>0 ? Math.ceil(rem/i3) : 0};
+}
+function optimize3U(targetRaw) {
+  return {s7:0, s3:Math.ceil((targetRaw||0)/5000)};
+}
+function optimize(targetRaw) { return optimizeSmart(targetRaw); }
+function calcResult(s7, s3, redund, req, pr) {
+  // spare servers match the dominant type: if no 7U, spare is 3U
+  const s7t = s7 > 0 ? s7 + redund : 0;
+  const s3t = s7 > 0 ? s3 : s3 + redund;
+  const total = s7t + s3t;
+  const ru = s7t*7 + s3t*3;
+  const provisioned = s7t*12000 + s3t*5000;
+  const exact = provisioned === req.raw;
+  const cost = s7t*pr.p7 + s3t*pr.p3;
+  const gbps = ((s7t*0.6)+(s3t*0.25)).toFixed(2);
+  return {s7t, s3t, total, ru, provisioned, exact, cost, gbps, racks:Math.ceil(ru/47)};
 }
 
 const SRV_PRICES = {
@@ -1112,80 +1242,86 @@ function calculateAll() {
   let totSrv=0, totPorts=0, totU=0, totIops=0, totCost=0;
   let html = '';
 
-  requirements.forEach(req => {
-    const {s7, s3} = optimize(req.raw);
-    const s7t = s7 + req.redund;
-    const s3t = s3;
-    const total = s7t + s3t;
-    const ru = s7t * 7 + s3t * 3;
-    const provisioned = s7t * 12000 + s3t * 5000;
-    const exact = provisioned === req.raw;
-    const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
-    const cost = s7t * pr.p7 + s3t * pr.p3;
-    const gbps = ((s7t * 0.6) + (s3t * 0.25)).toFixed(2);
-    const racks = Math.ceil(ru / 47);
-
-    totSrv += total; totPorts += total; totU += ru; totIops += provisioned; totCost += cost;
-
-    html += `<div class="result-card">
+  function resultCardHTML(r, label, color, req) {
+    return `<div class="result-card" style="border-color:${color}22;">
       <div class="result-header">
         <span class="result-title" style="color:${TYPE_COLORS[req.type]}">${req.type}</span>
-        <span class="result-target">Target: ${req.raw.toLocaleString()} IOPS${req.redund > 0 ? ` · +${req.redund} spare` : ''}</span>
-        <span class="match-badge ${exact ? 'match-exact' : 'match-over'}">${exact ? 'Exact' : 'Overage'}</span>
+        <span class="result-target" style="color:${color};font-weight:700;">${label}</span>
+        <span style="flex:1;text-align:right;font-size:0.78rem;color:var(--text3);">Target: ${req.raw.toLocaleString()} IOPS${req.redund>0?` · +${req.redund} spare`:''}</span>
+        <span class="match-badge ${r.exact?'match-exact':'match-over'}">${r.exact?'Exact':'Overage'}</span>
       </div>
       <div class="result-grid">
-        <div class="result-cell">
-          <div class="result-cell-label">7U Servers</div>
-          <div class="result-cell-val c-hi">${s7t}</div>
-          ${req.redund > 0 ? `<div class="result-sub">incl. ${req.redund} spare</div>` : ''}
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">3U Servers</div>
-          <div class="result-cell-val c-hi">${s3t}</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Total Servers</div>
-          <div class="result-cell-val c-o">${total}</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Ports Required</div>
-          <div class="result-cell-val c-g">${total}</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Rack Space</div>
-          <div class="result-cell-val c-o">${ru}U</div>
-          <div class="result-sub">${racks} rack${racks !== 1 ? 's' : ''}</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Provisioned IOPS</div>
-          <div class="result-cell-val ${exact ? 'c-g' : 'c-o'}">${provisioned.toLocaleString()}</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Bandwidth</div>
-          <div class="result-cell-val c-g">${gbps} Gbps</div>
-        </div>
-        <div class="result-cell">
-          <div class="result-cell-label">Est. Cost</div>
-          <div class="result-cell-val c-r">$${cost.toLocaleString()}</div>
-        </div>
+        <div class="result-cell"><div class="result-cell-label">7U Servers</div><div class="result-cell-val c-hi">${r.s7t}</div>${req.redund>0?`<div class="result-sub">incl. ${req.redund} spare</div>`:''}</div>
+        <div class="result-cell"><div class="result-cell-label">3U Servers</div><div class="result-cell-val c-hi">${r.s3t}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-o">${r.total}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Ports</div><div class="result-cell-val c-g">${r.total}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Rack Space</div><div class="result-cell-val c-o">${r.ru}U</div><div class="result-sub">${r.racks} rack${r.racks!==1?'s':''}</div></div>
+        <div class="result-cell"><div class="result-cell-label">IOPS</div><div class="result-cell-val ${r.exact?'c-g':'c-o'}">${r.provisioned.toLocaleString()}</div></div>
+        <div class="result-cell"><div class="result-cell-label">Bandwidth</div><div class="result-cell-val c-g">${r.gbps} Gbps</div></div>
+        <div class="result-cell"><div class="result-cell-label">Est. Cost</div><div class="result-cell-val c-r">$${r.cost.toLocaleString()}</div></div>
       </div>
     </div>`;
+  }
+
+  requirements.forEach(req => {
+    const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
+
+    if (srvMode === 'both') {
+      const smart3U = optimize3U(req.raw);
+      const rSmart = calcResult(optimizeSmart(req.raw).s7, optimizeSmart(req.raw).s3, req.redund, req, pr);
+      const r3U    = calcResult(0, smart3U.s3, req.redund, req, pr);
+      totSrv += rSmart.total; totPorts += rSmart.total; totU += rSmart.ru; totIops += rSmart.provisioned; totCost += rSmart.cost;
+      html += resultCardHTML(rSmart, '⚡ 7U Preferred', 'var(--c-hi)', req);
+      html += resultCardHTML(r3U,    '🟢 3U Only',     'var(--c-g)',  req);
+    } else if (srvMode === '3u') {
+      const r3U = calcResult(0, optimize3U(req.raw).s3, req.redund, req, pr);
+      totSrv += r3U.total; totPorts += r3U.total; totU += r3U.ru; totIops += r3U.provisioned; totCost += r3U.cost;
+      html += resultCardHTML(r3U, '🟢 3U Only', 'var(--c-g)', req);
+    } else {
+      const {s7, s3} = optimizeSmart(req.raw);
+      const r = calcResult(s7, s3, req.redund, req, pr);
+      totSrv += r.total; totPorts += r.total; totU += r.ru; totIops += r.provisioned; totCost += r.cost;
+      html += resultCardHTML(r, '⚡ 7U Preferred', 'var(--c-hi)', req);
+    }
   });
 
   // Summary
-  html += `<div class="summary-card">
-    <div class="result-header" style="background:var(--tab-act);">
-      <span class="result-title c-hi">📊 Total Summary</span>
-      <span class="result-target">${requirements.length} requirement${requirements.length !== 1 ? 's' : ''}</span>
-    </div>
-    <div class="summary-grid">
-      <div class="summary-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-hi">${totSrv}</div></div>
-      <div class="summary-cell"><div class="result-cell-label">Total Ports</div><div class="result-cell-val c-g">${totPorts}</div></div>
-      <div class="summary-cell"><div class="result-cell-label">Total Rack Space</div><div class="result-cell-val c-o">${totU}U<div class="result-sub">${Math.ceil(totU/47)} racks</div></div></div>
-      <div class="summary-cell"><div class="result-cell-label">Total IOPS</div><div class="result-cell-val c-g">${totIops.toLocaleString()}</div></div>
-      <div class="summary-cell"><div class="result-cell-label">Total Est. Cost</div><div class="result-cell-val c-r">$${totCost.toLocaleString()}</div></div>
-    </div>
-  </div>`;
+  function summaryCardHTML(label, color, srv, ports, ru, iops, cost) {
+    return `<div class="summary-card" style="border-color:${color}44;">
+      <div class="result-header" style="background:var(--tab-act);">
+        <span class="result-title" style="color:${color};">📊 Total Summary — ${label}</span>
+        <span class="result-target">${requirements.length} requirement${requirements.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-hi">${srv}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Total Ports</div><div class="result-cell-val c-g">${ports}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Rack Space</div><div class="result-cell-val c-o">${ru}U<div class="result-sub">${Math.ceil(ru/47)} racks</div></div></div>
+        <div class="summary-cell"><div class="result-cell-label">Total IOPS</div><div class="result-cell-val c-g">${iops.toLocaleString()}</div></div>
+        <div class="summary-cell"><div class="result-cell-label">Est. Cost</div><div class="result-cell-val c-r">$${cost.toLocaleString()}</div></div>
+      </div>
+    </div>`;
+  }
+
+  if (srvMode === 'both') {
+    // Recalculate both totals separately for summary
+    let tSrv7=0,tPorts7=0,tU7=0,tIops7=0,tCost7=0;
+    let tSrv3=0,tPorts3=0,tU3=0,tIops3=0,tCost3=0;
+    requirements.forEach(req => {
+      const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
+      const rS = calcResult(optimizeSmart(req.raw).s7, optimizeSmart(req.raw).s3, req.redund, req, pr);
+      const r3 = calcResult(0, optimize3U(req.raw).s3, req.redund, req, pr);
+      tSrv7+=rS.total; tPorts7+=rS.total; tU7+=rS.ru; tIops7+=rS.provisioned; tCost7+=rS.cost;
+      tSrv3+=r3.total; tPorts3+=r3.total; tU3+=r3.ru; tIops3+=r3.provisioned; tCost3+=r3.cost;
+    });
+    html += summaryCardHTML('⚡ 7U Preferred', 'var(--c-hi)', tSrv7, tPorts7, tU7, tIops7, tCost7);
+    html += summaryCardHTML('🟢 3U Only',      'var(--c-g)',  tSrv3, tPorts3, tU3, tIops3, tCost3);
+  } else {
+    html += summaryCardHTML(
+      srvMode === '3u' ? '🟢 3U Only' : '⚡ 7U Preferred',
+      srvMode === '3u' ? 'var(--c-g)' : 'var(--c-hi)',
+      totSrv, totPorts, totU, totIops, totCost
+    );
+  }
 
   document.getElementById('calcResults').innerHTML = html;
 }
@@ -1211,17 +1347,26 @@ function addCG() {
 }
 
 function addCore() {
-  coreGroups.push({id: Date.now(), name: `Core${String(coreCounter).padStart(2,'0')}A`, cgIds: []});
+  coreGroups.push({id: Date.now(), name: `Core${String(coreCounter).padStart(2,'0')}A`, cgIds: [], maxGbps: 0});
   coreCounter++;
   renderCores();
 }
 
-function cgGbps(cg) { return cg.members.reduce((s,n) => s + (parseFloat(document.getElementById(`gbps_${n}`)?.value) || 0), 0); }
+function cgGbps(cg) { return cg.members.reduce((s,m) => s + (m.gbps || 0), 0); }
 function coreGbps(core) { return core.cgIds.reduce((s,id) => { const cg = cgGroups.find(g => g.id===id); return s + (cg ? cgGbps(cg) : 0); }, 0); }
+function renameCore(coreId, val) {
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core && val.trim()) core.name = val.trim();
+}
+function setCoreMaxGbps(coreId, val) {
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core) core.maxGbps = parseFloat(val) || 0;
+  setTimeout(() => renderCores(), 0);
+}
 
 function renderPool() {
   const assigned = new Set();
-  cgGroups.forEach(cg => cg.members.forEach(n => assigned.add(n)));
+  cgGroups.forEach(cg => cg.members.forEach(m => assigned.add(m.n)));
   document.getElementById('poolList').innerHTML = CUSTOMERS.map(c => {
     const inCg = assigned.has(c.n);
     const dotCls = c.sw === '4 Port' ? 'd-4' : c.sw === '4+16' ? 'd-4x16' : 'd-32';
@@ -1230,9 +1375,7 @@ function renderPool() {
       <span class="pool-num">${c.n}</span>
       <span class="pool-dot ${dotCls}"></span>
       <span class="pool-name">${c.name}</span>
-      <input class="gbps-input" id="gbps_${c.n}" type="number" min="0" step="0.5" value="10"
-        onclick="event.stopPropagation()"
-        oninput="renderCGGroups();renderCores();"> Gbps
+      ${inCg ? '<span style="font-size:0.7rem;color:var(--text4);">assigned</span>' : ''}
     </div>`;
   }).join('');
 }
@@ -1253,20 +1396,22 @@ function renderCGGroups() {
     const over = coreLimit > 0 && total > coreLimit;
     const fillColor = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-hi)';
 
-    const members = cg.members.map(n => {
-      const c = CUSTOMERS.find(x => x.n === n);
-      const g = parseFloat(document.getElementById(`gbps_${n}`)?.value) || 0;
+    const members = cg.members.map(m => {
+      const c = CUSTOMERS.find(x => x.n === m.n);
       return `<div class="cg-member">
-        <span class="pool-dot ${c.sw==='4 Port'?'d-4':c.sw==='4+16'?'d-4x16':'d-32'}"></span>
-        <span class="cg-member-name">#${n} ${c?.name||''}</span>
-        <span class="cg-member-gbps">${g} Gbps</span>
-        <span class="cg-member-del" onclick="removeCGMember(${cg.id},${n})">✕</span>
+        <span class="pool-dot ${c?.sw==='4 Port'?'d-4':c?.sw==='4+16'?'d-4x16':'d-32'}"></span>
+        <span class="cg-member-name">#${m.n} ${c?.name||''}</span>
+        <input class="gbps-input" type="number" min="0" step="0.5" value="${m.gbps||0}"
+          style="width:52px;"
+          onchange="setCGMemberGbps(${cg.id},${m.n},this.value)" onblur="setCGMemberGbps(${cg.id},${m.n},this.value)">
+        <span style="font-size:0.75rem;color:var(--text3);">Gbps</span>
+        <span class="cg-member-del" onclick="removeCGMember(${cg.id},${m.n})">✕</span>
       </div>`;
     }).join('');
 
     return `<div class="cg-group">
       <div class="cg-head">
-        <input class="cg-name-input" value="${cg.name}" oninput="renameCG(${cg.id},this.value)">
+        <input class="cg-name-input" value="${cg.name}" onchange="renameCG(${cg.id},this.value)" onblur="renameCG(${cg.id},this.value)">
         <div class="cg-bar-wrap">
           <div class="cg-bar-text ${over ? 'over' : ''}">
             <span>${total.toFixed(1)} Gbps${coreLimit > 0 ? ' / '+coreLimit+' Gbps' : ''}</span>
@@ -1291,21 +1436,30 @@ function renderCGGroups() {
 function renameCG(id, val) {
   const cg = cgGroups.find(g => g.id === id);
   if (cg) cg.name = val;
-  renderCores();
+  setTimeout(() => renderCores(), 0);
 }
 
 function assignToCG(cgId) {
   if (!selectedPool) return;
   const cg = cgGroups.find(g => g.id === cgId);
-  if (cg && !cg.members.includes(selectedPool)) cg.members.push(selectedPool);
+  if (cg && !cg.members.find(m => m.n === selectedPool)) {
+    cg.members.push({n: selectedPool, gbps: 0});
+  }
   selectedPool = null;
   renderPool(); renderCGGroups(); renderCores();
 }
 
 function removeCGMember(cgId, n) {
   const cg = cgGroups.find(g => g.id === cgId);
-  if (cg) cg.members = cg.members.filter(x => x !== n);
+  if (cg) cg.members = cg.members.filter(m => m.n !== n);
   renderPool(); renderCGGroups(); renderCores();
+}
+function setCGMemberGbps(cgId, n, val) {
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (!cg) return;
+  const member = cg.members.find(m => m.n === n);
+  if (member) member.gbps = parseFloat(val) || 0;
+  setTimeout(() => { renderCGGroups(); renderCores(); }, 0);
 }
 
 function removeCG(id) {
@@ -1318,9 +1472,11 @@ function renderCores() {
   const unassigned = cgGroups.filter(cg => !coreGroups.some(co => co.cgIds.includes(cg.id)));
   document.getElementById('coreList').innerHTML = coreGroups.map(core => {
     const total = coreGbps(core);
-    const over = coreLimit > 0 && total > coreLimit;
-    const pct = coreLimit > 0 ? Math.min(100, (total/coreLimit)*100) : 0;
-    const fc = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-o)';
+    const limit = core.maxGbps || 0;
+    const over = limit > 0 && total > limit;
+    const pct = limit > 0 ? Math.min(100, (total/limit)*100) : 0;
+    const fc = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-hi)';
+
     const tags = core.cgIds.map(cgId => {
       const cg = cgGroups.find(g => g.id === cgId);
       if (!cg) return '';
@@ -1332,19 +1488,30 @@ function renderCores() {
 
     const assignSelect = unassigned.length ? `
       <select onchange="assignCGtoCore(${core.id},this.value);this.value='';"
-        style="font-size:0.8rem;margin-top:4px;">
+        style="font-size:0.8rem;margin-top:4px;width:100%;background:var(--input-bg);border:1px solid var(--border2);color:var(--text);padding:5px;border-radius:6px;outline:none;">
         <option value="">Assign CG group…</option>
         ${unassigned.map(cg=>`<option value="${cg.id}">${cg.name} (${cgGbps(cg).toFixed(1)} Gbps)</option>`).join('')}
       </select>` : '';
 
     return `<div class="core-item">
       <div class="core-item-head">
-        <span>${core.name} — ${total.toFixed(1)} Gbps</span>
+        <input value="${core.name}"
+          style="flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--warn-col);font-size:0.82rem;font-weight:700;outline:none;min-width:0;cursor:text;"
+          onfocus="this.style.borderBottomColor='var(--tab-bord)'"
+          onblur="this.style.borderBottomColor='transparent';renameCore(${core.id},this.value)"
+          onchange="renameCore(${core.id},this.value)">
+        <span style="font-size:0.78rem;color:var(--text3);white-space:nowrap;margin-right:6px;">${total.toFixed(1)} Gbps</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.75rem;color:var(--warn-col);flex-shrink:0;">
+          Max:
+          <input type="number" value="${limit||''}" placeholder="∞"
+            style="width:62px;background:var(--input-bg);border:1px solid var(--warn-bord);color:var(--warn-col);padding:2px 6px;border-radius:4px;font-size:0.78rem;outline:none;"
+            onchange="setCoreMaxGbps(${core.id},this.value)" onblur="setCoreMaxGbps(${core.id},this.value)"> Gbps
+        </span>
         <span class="core-item-del" onclick="removeCore(${core.id})">✕</span>
       </div>
       <div class="core-item-body">
-        <div class="core-bar"><div class="core-bar-fill" style="width:${pct}%;background:${fc};"></div></div>
-        ${over ? `<div style="font-size:0.75rem;color:var(--c-r);font-weight:700;">⚠️ Over ${coreLimit} Gbps!</div>` : ''}
+        ${limit > 0 ? `<div class="core-bar"><div class="core-bar-fill" style="width:${pct}%;background:${fc};"></div></div>` : ''}
+        ${over ? `<div style="font-size:0.75rem;color:var(--c-r);font-weight:700;margin-bottom:4px;">⚠️ Over ${limit} Gbps!</div>` : ''}
         ${tags}
         ${assignSelect}
       </div>
@@ -1374,6 +1541,47 @@ function closeChangelog(e) {
   if (!e || e.target === document.getElementById('changelogModal'))
     document.getElementById('changelogModal').classList.remove('open');
 }
+function switchModalTab(id, btn) {
+  document.querySelectorAll('.modal-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.modal-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+let steamLoaded = false;
+async function loadSteamNews() {
+  if (steamLoaded) return;
+  const loading = document.getElementById('steamLoading');
+  const news    = document.getElementById('steamNews');
+  const fallback= document.getElementById('steamFallback');
+  try {
+    const url = 'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=4170200&count=15&maxlength=400&format=json';
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data?.appnews?.newsitems || [];
+    if (!items.length) throw new Error('No items');
+    news.innerHTML = items.map(item => {
+      const date = new Date(item.date * 1000).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+      const body = item.contents
+        .replace(/<[^>]+>/g,'')
+        .replace(/\[.*?\]/g,'')
+        .slice(0, 300) + (item.contents.length > 300 ? '…' : '');
+      return `<div class="steam-item">
+        <div class="steam-item-title">${item.title}</div>
+        <div class="steam-item-date">${date}</div>
+        <div class="steam-item-body">${body}</div>
+        <a class="steam-link" href="${item.url}" target="_blank" style="font-size:0.75rem;padding:4px 10px;">Read more ↗</a>
+      </div>`;
+    }).join('');
+    loading.style.display = 'none';
+    news.style.display = 'block';
+    steamLoaded = true;
+  } catch(e) {
+    loading.style.display = 'none';
+    fallback.style.display = 'block';
+  }
+}
 
 // ===================== INIT =====================
 buildCustomerTable();
@@ -1383,4 +1591,3 @@ renderCores();
 </script>
 </body>
 </html>
-
