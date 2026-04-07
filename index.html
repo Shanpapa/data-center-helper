@@ -1,594 +1,1352 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Center – Reference</title>
+<title>Data Center Helper</title>
 <style>
+/* =====================
+   CSS VARIABLES / THEMES
+   ===================== */
+:root {
+  --bg:        #0a0c12;
+  --bg2:       #14171f;
+  --bg3:       #1e2130;
+  --bg4:       #0d0f18;
+  --border:    #222;
+  --border2:   #2a2d3a;
+  --text:      #e0e0e0;
+  --text2:     #aaa;
+  --text3:     #666;
+  --text4:     #444;
+  --c-hi:      #61dafb;
+  --c-g:       #4cdf9a;
+  --c-o:       #ffaa44;
+  --c-r:       #ff6666;
+  --c-p:       #cc88ff;
+  --tab-bg:    #14171f;
+  --tab-act:   #1a2a4a;
+  --tab-bord:  #3a6aaa;
+  --tab-col:   #88bbff;
+  --input-bg:  #0a0c12;
+  --hover:     #12141c;
+  --rep-bg:    #1e2130;
+  --card-bg:   #14171f;
+  --badge-g:   #1a1c24;
+  --badge-t:   #0a2828;
+  --badge-o:   #3a1a00;
+  --badge-tc:  #44ddcc;
+  --badge-oc:  #ffaa44;
+  --info-bg:   #0d1a0d;
+  --info-bord: #1a3a1a;
+  --info-col:  #7acc7a;
+  --warn-bg:   #1a1200;
+  --warn-bord: #3a3000;
+  --warn-col:  #ccaa44;
+  --pool-bg:   #0d0f18;
+  --shadow:    rgba(0,0,0,0.4);
+}
+
+[data-theme="light"] {
+  --bg:        #f0f2f5;
+  --bg2:       #ffffff;
+  --bg3:       #e8eaf0;
+  --bg4:       #f8f9fb;
+  --border:    #d0d4dc;
+  --border2:   #c0c4cc;
+  --text:      #1a1d27;
+  --text2:     #555;
+  --text3:     #888;
+  --text4:     #aaa;
+  --c-hi:      #0066cc;
+  --c-g:       #1a8a5a;
+  --c-o:       #cc6600;
+  --c-r:       #cc2222;
+  --c-p:       #7722cc;
+  --tab-bg:    #ffffff;
+  --tab-act:   #ddeeff;
+  --tab-bord:  #4488cc;
+  --tab-col:   #1155aa;
+  --input-bg:  #ffffff;
+  --hover:     #f0f4f8;
+  --rep-bg:    #e0e4f0;
+  --card-bg:   #ffffff;
+  --badge-g:   #e8e8f0;
+  --badge-t:   #e0f4f0;
+  --badge-o:   #fff4e0;
+  --badge-tc:  #117766;
+  --badge-oc:  #885500;
+  --info-bg:   #e8f8e8;
+  --info-bord: #88cc88;
+  --info-col:  #226622;
+  --warn-bg:   #fff8e0;
+  --warn-bord: #ccaa44;
+  --warn-col:  #886600;
+  --pool-bg:   #f8f9fb;
+  --shadow:    rgba(0,0,0,0.1);
+}
+
+/* =====================
+   RESET & BASE
+   ===================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0a0c12; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
 
-/* TOP */
-.topbar { background: #14171f; border-bottom: 1px solid #222; padding: 8px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.topbar h1 { font-size: 0.95em; color: #61dafb; }
-.sep { width: 1px; height: 18px; background: #333; }
-.lang-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid #333; background: #1e2130; color: #aaa; font-size: 0.72em; cursor: pointer; font-weight: 700; }
-.lang-btn.active { background: #1a3a5a; border-color: #3a7aaa; color: #88bbff; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s, color 0.2s;
+}
 
-/* TABS */
-.tabs { display: flex; justify-content: center; gap: 6px; padding: 14px 14px 0; flex-wrap: wrap; }
-.tab { padding: 7px 16px; border-radius: 20px; border: 1px solid #333; background: #14171f; color: #666; font-size: 0.76em; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-.tab.active { background: #1a2a4a; border-color: #3a6aaa; color: #88bbff; }
+/* =====================
+   TOPBAR
+   ===================== */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-.section { display: none; max-width: 960px; margin: 0 auto; padding: 18px 14px; }
+.topbar h1 {
+  font-size: 1.1rem;
+  color: var(--c-hi);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.sep { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text2);
+  font-weight: 600;
+  transition: all 0.2s;
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+
+.version-badge {
+  font-size: 0.75rem;
+  color: var(--text4);
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+}
+
+/* =====================
+   TABS
+   ===================== */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 20px 0;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 9px 20px;
+  border-radius: 22px;
+  border: 1px solid var(--border2);
+  background: var(--tab-bg);
+  color: var(--text3);
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.tab:hover { border-color: var(--tab-bord); color: var(--text2); }
+.tab.active {
+  background: var(--tab-act);
+  border-color: var(--tab-bord);
+  color: var(--tab-col);
+}
+
+/* =====================
+   SECTIONS
+   ===================== */
+.section { display: none; max-width: 1000px; margin: 0 auto; padding: 24px 20px; flex: 1; }
 .section.active { display: block; }
 
-/* CARDS */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 10px; margin-bottom: 16px; }
-.card { background: #14171f; border: 1px solid #222; border-radius: 8px; padding: 12px; }
-.card-title { font-size: 0.7em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
-.card-val { font-size: 1.1em; font-weight: bold; margin-bottom: 3px; }
-.card-sub { font-size: 0.67em; color: #555; }
+.section-title {
+  font-size: 0.8rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border2);
+  font-weight: 700;
+}
 
-/* TABLES */
-table { width: 100%; border-collapse: collapse; font-size: 0.71em; margin-bottom: 16px; }
-th { background: #1e2130; color: #777; padding: 7px 9px; text-align: left; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2a2d3a; }
-td { padding: 6px 9px; border-bottom: 1px solid #14161e; color: #ccc; vertical-align: middle; }
-tr:hover td { background: #12141c; }
-.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
-.b-grey   { background: #1a1c24; color: #aaa; }
-.b-teal   { background: #0a2828; color: #44ddcc; }
-.b-orange { background: #3a1a00; color: #ffaa44; }
+/* =====================
+   CARDS
+   ===================== */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
 
-.section-title { font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 9px; padding-bottom: 5px; border-bottom: 1px solid #1e2130; }
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.card-title { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+.card-val { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+.card-sub { font-size: 0.78rem; color: var(--text3); }
 
-.info  { background: #0d1a0d; border: 1px solid #1a3a1a; border-radius: 6px; padding: 8px 12px; font-size: 0.71em; color: #7acc7a; line-height: 1.8; margin-bottom: 12px; }
-.warn2 { background: #1a1200; border: 1px solid #3a3000; border-radius: 6px; padding: 8px 12px; font-size: 0.71em; color: #ccaa44; line-height: 1.8; margin-bottom: 12px; }
-.info b { color: #aaffaa; }
-.warn2 b { color: #ffcc44; }
+/* =====================
+   TABLES
+   ===================== */
+.table-wrap { overflow-x: auto; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 4px var(--shadow); }
 
-/* COLORS */
-.c-hi  { color: #61dafb; }
-.c-g   { color: #4cdf9a; }
-.c-o   { color: #ffaa44; }
-.c-r   { color: #ff6666; }
-.c-p   { color: #cc88ff; }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+th {
+  background: var(--bg3);
+  color: var(--text3);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--hover); }
 
-/* REP BAR */
-.rep-bar { height: 5px; border-radius: 3px; background: #1e2130; margin-top: 3px; }
-.rep-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#1a4aaa,#cc44ff); }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; }
+.b-grey   { background: var(--badge-g); color: var(--text2); }
+.b-teal   { background: var(--badge-t); color: var(--badge-tc); }
+.b-orange { background: var(--badge-o); color: var(--badge-oc); }
 
-/* COMPANY FILTER */
-.filter-row { display: flex; gap: 7px; margin-bottom: 11px; flex-wrap: wrap; align-items: center; }
-.fl { font-size: 0.7em; color: #555; }
-.fbtn { padding: 4px 10px; border-radius: 11px; border: 1px solid #333; background: #14171f; color: #777; font-size: 0.69em; cursor: pointer; }
-.fbtn.on { background: #1a3a5a; border-color: #3a7aaa; color: #88bbff; }
-.sbox { background: #14171f; border: 1px solid #333; border-radius: 6px; color: #ccc; padding: 4px 9px; font-size: 0.72em; width: 170px; outline: none; }
-.sbox:focus { border-color: #3a6aaa; }
+/* =====================
+   COLOR UTILITIES
+   ===================== */
+.c-hi { color: var(--c-hi); }
+.c-g  { color: var(--c-g); }
+.c-o  { color: var(--c-o); }
+.c-r  { color: var(--c-r); }
+.c-p  { color: var(--c-p); }
 
-/* CALC */
-.calc-input { background: #0a0c12; border: 1px solid #333; color: #fff; padding: 5px 8px; border-radius: 5px; width: 100%; font-size: 1em; outline: none; }
-.calc-select { background: #0a0c12; border: 1px solid #333; color: #ccc; padding: 5px; border-radius: 5px; width: 100%; font-size: 0.83em; outline: none; }
+/* =====================
+   INFO / WARN BOXES
+   ===================== */
+.info-box {
+  background: var(--info-bg);
+  border: 1px solid var(--info-bord);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--info-col);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.warn-box {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-bord);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--warn-col);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
 
-/* ===== CG PLANNER ===== */
-.cg-layout { display: grid; grid-template-columns: 200px 1fr 220px; gap: 12px; min-height: 500px; }
+/* =====================
+   FORM ELEMENTS
+   ===================== */
+input[type=text], input[type=number], select {
+  background: var(--input-bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input[type=text]:focus, input[type=number]:focus, select:focus {
+  border-color: var(--tab-bord);
+}
+input[type=number].small {
+  width: 65px;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+}
 
-/* customer pool */
-.pool-panel { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-.panel-title { background: #1e2130; padding: 7px 10px; font-size: 0.7em; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
-.pool-list { flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 3px; }
-.pool-item { border-radius: 5px; padding: 5px 8px; font-size: 0.67em; cursor: pointer; border: 1px solid #1e2130; background: #0d0f18; display: flex; align-items: center; gap: 5px; transition: all 0.1s; }
-.pool-item:hover { border-color: #3a3d4a; background: #12141e; }
+/* =====================
+   BUTTONS
+   ===================== */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn:hover { border-color: var(--tab-bord); color: var(--text); }
+.btn-primary { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-success { background: var(--info-bg); border-color: var(--info-bord); color: var(--info-col); }
+.btn-success:hover { filter: brightness(1.1); }
+.btn-danger  { background: #2a0a0a; border-color: #7a2a2a; color: #ff8888; }
+.btn-danger:hover { filter: brightness(1.15); }
+.btn-full { width: 100%; }
+
+/* =====================
+   CUSTOMERS TAB
+   ===================== */
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 0.85rem; color: var(--text3); }
+.fbtn { padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border2); background: var(--bg2); color: var(--text3); font-size: 0.8rem; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+.fbtn:hover { border-color: var(--tab-bord); }
+.fbtn.on { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
+
+.search-input { max-width: 220px; }
+
+.rep-bar { height: 5px; border-radius: 3px; background: var(--rep-bg); margin-top: 4px; }
+.rep-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c-hi), var(--c-p)); }
+
+/* =====================
+   CALCULATOR TAB
+   ===================== */
+.calc-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 700px) { .calc-layout { grid-template-columns: 1fr; } }
+
+.calc-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.calc-panel-title { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.calc-field { display: flex; flex-direction: column; gap: 4px; }
+.calc-field label { font-size: 0.82rem; color: var(--text3); font-weight: 600; }
+.iops-hint { font-size: 0.78rem; color: var(--c-o); margin-top: 2px; }
+.req-list { display: flex; flex-direction: column; gap: 6px; }
+.req-item {
+  background: var(--pool-bg);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.req-type { font-weight: 700; min-width: 90px; }
+.req-iops { flex: 1; color: var(--c-o); }
+.req-spare { color: var(--text3); font-size: 0.8rem; }
+.req-del { color: var(--text4); cursor: pointer; font-size: 1.1rem; margin-left: auto; }
+.req-del:hover { color: var(--c-r); }
+.req-empty { font-size: 0.85rem; color: var(--text4); text-align: center; padding: 12px; }
+
+.result-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.result-header {
+  padding: 10px 14px;
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.result-title { font-size: 0.95rem; font-weight: 700; }
+.result-target { font-size: 0.8rem; color: var(--text3); flex: 1; }
+.match-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
+.match-exact { background: var(--info-bg); color: var(--info-col); border: 1px solid var(--info-bord); }
+.match-over  { background: var(--warn-bg); color: var(--warn-col); border: 1px solid var(--warn-bord); }
+.result-grid { display: grid; grid-template-columns: repeat(4,1fr); border-top: 1px solid var(--border); }
+@media (max-width: 600px) { .result-grid { grid-template-columns: repeat(2,1fr); } }
+.result-cell {
+  padding: 10px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.result-cell:last-child { border-right: none; }
+.result-cell-label { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.result-cell-val { font-size: 1rem; font-weight: 700; }
+.result-sub { font-size: 0.75rem; color: var(--text4); margin-top: 1px; }
+.summary-card { background: var(--tab-act); border: 1px solid var(--tab-bord); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px var(--shadow); }
+.summary-grid { display: grid; grid-template-columns: repeat(5,1fr); border-top: 1px solid var(--tab-bord); }
+@media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
+.summary-cell { padding: 10px 14px; border-right: 1px solid var(--tab-bord); border-bottom: 1px solid var(--tab-bord); }
+.summary-cell:last-child { border-right: none; }
+.calc-results { display: flex; flex-direction: column; gap: 12px; }
+.calc-placeholder { font-size: 0.9rem; color: var(--text4); text-align: center; padding: 40px; }
+
+/* =====================
+   CG PLANNER
+   ===================== */
+.cg-layout { display: grid; grid-template-columns: 220px 1fr 240px; gap: 14px; min-height: 520px; }
+@media (max-width: 900px) { .cg-layout { grid-template-columns: 1fr; } }
+
+.panel-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.panel-header {
+  background: var(--bg3);
+  padding: 9px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-sub {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-sub label { font-size: 0.8rem; color: var(--text3); white-space: nowrap; }
+.panel-scroll { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.panel-footer { padding: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.pool-item {
+  border-radius: 7px;
+  padding: 6px 9px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--pool-bg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.1s;
+}
+.pool-item:hover { border-color: var(--border2); background: var(--hover); }
 .pool-item.in-cg { opacity: 0.35; cursor: default; }
-.pool-item.selected-pool { border-color: #61b0ff; background: #0d1a2a; }
-.pool-num { font-size: 0.8em; color: #444; width: 13px; text-align: right; flex-shrink: 0; }
-.pool-sw { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
-.sw4c { background: #2a3a5a; } .sw4x16c { background: #1a5a3a; } .sw32c { background: #5a3a1a; }
-.pool-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #bbb; }
-.pool-gbps-input { width: 42px; background: #0a0c12; border: 1px solid #2a2d3a; color: #ffaa44; font-size: 0.85em; padding: 1px 3px; border-radius: 3px; text-align: right; outline: none; }
+.pool-item.selected-pool { border-color: var(--tab-bord); background: var(--tab-act); }
+.pool-num { font-size: 0.75rem; color: var(--text4); width: 16px; text-align: right; flex-shrink: 0; }
+.pool-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.d-4 { background: #4488cc; } .d-4x16 { background: #44aa88; } .d-32 { background: #cc8844; }
+.pool-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gbps-input {
+  width: 48px;
+  background: var(--input-bg);
+  border: 1px solid var(--border2);
+  color: var(--c-o);
+  font-size: 0.78rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  text-align: right;
+  outline: none;
+}
 
-/* CG groups */
-.groups-panel { display: flex; flex-direction: column; gap: 10px; }
-.cg-group { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
-.cg-header { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #1e2130; }
-.cg-header-name { font-size: 0.72em; font-weight: 700; color: #ccc; flex: 1; }
-.cg-gbps-bar-wrap { flex: 1; }
-.cg-gbps-bar { height: 5px; border-radius: 3px; background: #2a2d3a; }
-.cg-gbps-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
-.cg-gbps-text { font-size: 0.65em; color: #888; white-space: nowrap; }
-.cg-gbps-text.over { color: #ff6666; font-weight: bold; }
-.cg-body { padding: 5px 8px; display: flex; flex-direction: column; gap: 3px; min-height: 32px; }
-.cg-customer { border-radius: 4px; padding: 4px 7px; font-size: 0.65em; border: 1px solid #1e2130; background: #0d0f18; display: flex; align-items: center; gap: 5px; }
-.cg-cust-name { flex: 1; color: #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cg-cust-gbps { color: #ffaa44; font-size: 0.85em; white-space: nowrap; }
-.cg-remove { color: #2a2d3a; cursor: pointer; font-size: 1.0em; }
-.cg-remove:hover { color: #ff6666; }
-.cg-drop-hint { font-size: 0.62em; color: #2a2d3a; text-align: center; padding: 5px; border: 1px dashed #1e2130; border-radius: 4px; cursor: pointer; }
-.cg-drop-hint:hover { border-color: #3a6aaa; color: #4a7aaa; }
-.add-cg-btn { border: 1px dashed #2a3a5a; border-radius: 7px; padding: 8px; text-align: center; font-size: 0.69em; color: #3a5a7a; cursor: pointer; background: #0d0f18; }
-.add-cg-btn:hover { border-color: #4a7aaa; color: #6a9aaa; }
+.cg-group {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.cg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.cg-name-input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  outline: none;
+  width: 90px;
+  border-bottom: 1px solid transparent;
+}
+.cg-name-input:focus { border-bottom-color: var(--tab-bord); }
+.cg-bar-wrap { flex: 1; }
+.cg-bar { height: 6px; border-radius: 3px; background: var(--rep-bg); }
+.cg-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+.cg-bar-text { font-size: 0.72rem; color: var(--text3); display: flex; justify-content: space-between; margin-bottom: 2px; }
+.cg-bar-text.over { color: var(--c-r); font-weight: 700; }
+.cg-del { color: var(--text4); cursor: pointer; font-size: 1.1rem; flex-shrink: 0; }
+.cg-del:hover { color: var(--c-r); }
+.cg-body { padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; min-height: 36px; }
+.cg-member {
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--pool-bg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cg-member-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text2); }
+.cg-member-gbps { color: var(--c-o); font-size: 0.8rem; white-space: nowrap; font-weight: 600; }
+.cg-member-del { color: var(--text4); cursor: pointer; }
+.cg-member-del:hover { color: var(--c-r); }
+.cg-drop {
+  font-size: 0.78rem;
+  color: var(--text4);
+  text-align: center;
+  padding: 6px;
+  border: 1px dashed var(--border2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cg-drop:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.add-cg-btn {
+  border: 1.5px dashed var(--border2);
+  border-radius: 9px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text3);
+  cursor: pointer;
+  background: var(--pool-bg);
+  transition: all 0.15s;
+}
+.add-cg-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.groups-wrap { display: flex; flex-direction: column; gap: 10px; }
 
-/* core assignment panel */
-.core-panel { background: #14171f; border: 1px solid #222; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-.core-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 8px; }
-.core-item { background: #0d0f18; border: 1px solid #1e2130; border-radius: 6px; overflow: hidden; }
-.core-item-title { background: #1a1200; border-bottom: 1px solid #3a2a00; padding: 4px 8px; font-size: 0.67em; color: #cc8844; font-weight: 700; display: flex; justify-content: space-between; }
-.core-item-body { padding: 5px; display: flex; flex-direction: column; gap: 3px; }
-.core-cg-tag { border-radius: 4px; padding: 3px 7px; font-size: 0.63em; background: #0a1828; border: 1px solid #1a3a5a; color: #88bbff; display: flex; justify-content: space-between; align-items: center; }
-.core-cg-remove { color: #2a2d3a; cursor: pointer; }
-.core-cg-remove:hover { color: #ff6666; }
-.core-drop { font-size: 0.6em; color: #2a2d3a; text-align: center; padding: 4px; border: 1px dashed #1e2130; border-radius: 3px; cursor: pointer; }
-.core-drop:hover { border-color: #3a6aaa; color: #4a7aaa; }
-.add-core-btn { border: 1px dashed #3a2a00; border-radius: 6px; padding: 6px; text-align: center; font-size: 0.67em; color: #4a3a00; cursor: pointer; background: #0d0a00; }
-.add-core-btn:hover { color: #cc8844; border-color: #7a5a00; }
+.core-item {
+  background: var(--pool-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.core-item-head {
+  background: var(--warn-bg);
+  border-bottom: 1px solid var(--warn-bord);
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--warn-col);
+  font-weight: 700;
+}
+.core-item-del { cursor: pointer; color: var(--text4); }
+.core-item-del:hover { color: var(--c-r); }
+.core-item-body { padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; }
+.core-bar { height: 5px; border-radius: 3px; background: var(--rep-bg); margin-bottom: 4px; }
+.core-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+.core-cg-tag {
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  background: var(--tab-act);
+  border: 1px solid var(--tab-bord);
+  color: var(--tab-col);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.core-tag-del { color: var(--text4); cursor: pointer; }
+.core-tag-del:hover { color: var(--c-r); }
+.add-core-btn {
+  border: 1.5px dashed var(--warn-bord);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--warn-col);
+  cursor: pointer;
+  background: var(--warn-bg);
+  transition: all 0.15s;
+}
+.add-core-btn:hover { filter: brightness(1.1); }
 
-.cg-name-input { background: transparent; border: none; color: #ccc; font-size: 0.72em; font-weight: 700; outline: none; width: 80px; }
+/* =====================
+   FOOTER
+   ===================== */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.footer-note { font-size: 0.82rem; color: var(--text3); }
+.footer-credit { font-size: 0.8rem; color: var(--text4); }
+.changelog-btn {
+  padding: 5px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text3);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.changelog-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: #0a0c12; }
-::-webkit-scrollbar-thumb { background: #2a2d3a; border-radius: 2px; }
+/* =====================
+   CHANGELOG MODAL
+   ===================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.modal-title { font-size: 1.05rem; font-weight: 700; color: var(--c-hi); }
+.modal-close { font-size: 1.4rem; color: var(--text3); cursor: pointer; line-height: 1; }
+.modal-close:hover { color: var(--c-r); }
+.modal-body { overflow-y: auto; padding: 16px 20px; }
+.cl-entry { margin-bottom: 20px; }
+.cl-version { font-size: 0.88rem; font-weight: 700; color: var(--c-hi); margin-bottom: 2px; }
+.cl-date { font-size: 0.78rem; color: var(--text4); margin-bottom: 8px; }
+.cl-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.cl-item { font-size: 0.875rem; color: var(--text2); padding-left: 16px; position: relative; }
+.cl-item::before { content: ''; position: absolute; left: 4px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
+.cl-item.feat::before { background: var(--c-g); }
+.cl-item.change::before { background: var(--c-hi); }
+.cl-item.fix::before { background: var(--c-o); }
+.cl-type { font-size: 0.72rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+.cl-type.feat   { background: var(--info-bg); color: var(--info-col); }
+.cl-type.change { background: var(--tab-act); color: var(--tab-col); }
+.cl-type.fix    { background: var(--warn-bg); color: var(--warn-col); }
+
+/* =====================
+   SCROLLBAR
+   ===================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* =====================
+   RESPONSIVE
+   ===================== */
+@media (max-width: 600px) {
+  .topbar h1 { font-size: 0.95rem; }
+  .tabs { gap: 6px; padding: 14px 12px 0; }
+  .tab { padding: 7px 14px; font-size: 0.82rem; }
+  .section { padding: 16px 12px; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
+}
 </style>
 </head>
 <body>
 
+<!-- ===================== TOPBAR ===================== -->
 <div class="topbar">
-  <h1 id="appTitle">🖥️ Data Center – Referencia Dashboard</h1>
+  <h1>🖥️ Data Center Helper</h1>
   <div class="sep"></div>
-  <button class="lang-btn" onclick="setLang('hu')">🇭🇺 HU</button>
-  <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+  <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</div>
   <div class="sep"></div>
-  <span style="font-size:0.67em;color:#444;">v1.0.38</span>
+  <span class="version-badge">Game v1.0.38</span>
 </div>
 
+<!-- ===================== TABS ===================== -->
 <div class="tabs">
-  <button class="tab active" onclick="show('eszk',this)" data-hu="🔧 Eszközök" data-en="🔧 Devices">🔧 Eszközök</button>
-  <button class="tab" onclick="show('ugyf',this)" data-hu="👤 Ügyfelek" data-en="👤 Customers">👤 Ügyfelek</button>
-  <button class="tab" onclick="show('kalc',this)" data-hu="🧮 Kalkulátor" data-en="🧮 Calculator">🧮 Kalkulátor</button>
-  <button class="tab" onclick="show('cgpl',this)" data-hu="📊 CG Tervező" data-en="📊 CG Planner">📊 CG Tervező</button>
+  <button class="tab active" onclick="showTab('devices',this)">🔧 Devices</button>
+  <button class="tab" onclick="showTab('customers',this)">👤 Customers</button>
+  <button class="tab" onclick="showTab('calculator',this)">🧮 Calculator</button>
+  <button class="tab" onclick="showTab('cgplanner',this)">📊 CG Planner</button>
 </div>
 
-<!-- ===== DEVICES ===== -->
-<div class="section active" id="eszk">
-  <p class="section-title" data-hu="Portok & Modulok" data-en="Ports & Modules">Portok & Modulok</p>
+<!-- ===================== DEVICES ===================== -->
+<div class="section active" id="devices">
+
+  <p class="section-title">Ports & Modules</p>
   <div class="card-grid">
-    <div class="card"><div class="card-title" data-hu="RJ45 Port" data-en="RJ45 Port">RJ45 Port</div><div class="card-val c-hi">10 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
-    <div class="card"><div class="card-title">SFP+ / SFP28</div><div class="card-val c-hi">25 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
-    <div class="card"><div class="card-title">QSFP+ Port</div><div class="card-val c-hi">40 Gbps</div><div class="card-sub" data-hu="Max / port" data-en="Max / port">Max / port</div></div>
-    <div class="card"><div class="card-title" data-hu="Rack méret" data-en="Rack size">Rack méret</div><div class="card-val c-hi">47U</div><div class="card-sub" data-hu="Slot / rack" data-en="Slot / rack">Slot / rack</div></div>
+    <div class="card"><div class="card-title">RJ45 Port</div><div class="card-val c-hi">10 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">SFP+ / SFP28 Port</div><div class="card-val c-hi">25 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">QSFP+ Port</div><div class="card-val c-hi">40 Gbps</div><div class="card-sub">Max speed per port</div></div>
+    <div class="card"><div class="card-title">Rack Size</div><div class="card-val c-hi">47U</div><div class="card-sub">Slots per rack</div></div>
   </div>
 
-  <p class="section-title" data-hu="SFP Modulok" data-en="SFP Modules">SFP Modulok</p>
-  <table>
-    <tr><th data-hu="Modul" data-en="Module">Modul</th><th data-hu="Sebesség" data-en="Speed">Sebesség</th><th data-hu="Kábel" data-en="Cable">Kábel</th><th data-hu="Port típus" data-en="Port type">Port típus</th><th data-hu="Ár" data-en="Price">Ár</th></tr>
-    <tr><td><span class="badge b-grey">SFP+ RJ45</span></td><td class="c-g">10 Gbps</td><td>CAT6</td><td>SFP+/SFP28</td><td class="c-o">$50</td></tr>
-    <tr><td><span class="badge b-grey">SFP+ Fiber 10G</span></td><td class="c-g">10 Gbps</td><td>Fiber 1 lane</td><td>SFP+/SFP28</td><td class="c-o">$70</td></tr>
-    <tr><td><span class="badge b-teal">SFP28 Fiber 25G</span></td><td class="c-hi">25 Gbps</td><td>Fiber 1 lane</td><td>SFP+/SFP28</td><td class="c-o">$180</td></tr>
-    <tr><td><span class="badge b-orange">QSFP+ Fiber 40G</span></td><td class="c-p">40 Gbps</td><td>Fiber 4 lane</td><td>QSFP+</td><td class="c-r">$300</td></tr>
-  </table>
+  <p class="section-title">SFP Modules</p>
+  <div class="table-wrap"><table>
+    <tr><th>Module</th><th>Speed</th><th>Cable</th><th>Port Type</th><th>Price</th></tr>
+    <tr><td><span class="badge b-grey">SFP+ RJ45</span></td><td class="c-g">10 Gbps</td><td>CAT6</td><td>SFP+ / SFP28</td><td class="c-o">$50</td></tr>
+    <tr><td><span class="badge b-grey">SFP+ Fiber 10G</span></td><td class="c-g">10 Gbps</td><td>Fiber 1 lane</td><td>SFP+ / SFP28</td><td class="c-o">$70</td></tr>
+    <tr><td><span class="badge b-teal">SFP28 Fiber 25G</span></td><td class="c-hi">25 Gbps</td><td>Fiber 1 lane</td><td>SFP+ / SFP28</td><td class="c-o">$180</td></tr>
+    <tr><td><span class="badge b-orange">QSFP+ Fiber 40G</span></td><td class="c-p">40 Gbps</td><td>Fiber 4 lane (QSFP)</td><td>QSFP+</td><td class="c-r">$300</td></tr>
+  </table></div>
 
-  <p class="section-title" data-hu="Switchek" data-en="Switches">Switchek</p>
-  <table>
-    <tr><th data-hu="Switch" data-en="Switch">Switch</th><th>RJ45</th><th>SFP+/SFP28</th><th>QSFP+</th><th data-hu="Max sávszélesség" data-en="Max bandwidth">Max sávszélesség</th><th data-hu="Megjegyzés" data-en="Note">Megjegyzés</th></tr>
-    <tr><td><span class="badge b-grey">16 Port</span></td><td class="c-g">16</td><td>–</td><td>–</td><td>16×10 = <b>160 Gbps</b></td><td data-hu="Kis ügyfelek" data-en="Small customers">Kis ügyfelek</td></tr>
-    <tr><td><span class="badge b-grey">4×SFP+</span></td><td>–</td><td class="c-g">4</td><td>–</td><td>4×25 = <b>100 Gbps</b></td><td data-hu="Kis uplink" data-en="Small uplink">Kis uplink</td></tr>
-    <tr><td><span class="badge b-teal">4×QSFP+ 16×SFP+</span></td><td>–</td><td class="c-hi">16</td><td class="c-hi">4</td><td>4×40+16×25 = <b>560 Gbps</b></td><td data-hu="⭐ Core / Row!" data-en="⭐ Core / Row!">⭐ Core / Row!</td></tr>
-    <tr><td><span class="badge b-orange">32×QSFP+</span></td><td>–</td><td>–</td><td class="c-p">32</td><td>32×40 = <b>1280 Gbps</b></td><td data-hu="Nagy backbone" data-en="Large backbone">Nagy backbone</td></tr>
-  </table>
+  <p class="section-title">Switches</p>
+  <div class="table-wrap"><table>
+    <tr><th>Switch</th><th>RJ45</th><th>SFP+/SFP28</th><th>QSFP+</th><th>Max Bandwidth</th><th>Best For</th></tr>
+    <tr><td><span class="badge b-grey">16 Port</span></td><td class="c-g">16</td><td>–</td><td>–</td><td>16×10 = <strong>160 Gbps</strong></td><td>Small customers</td></tr>
+    <tr><td><span class="badge b-grey">4×SFP+</span></td><td>–</td><td class="c-g">4</td><td>–</td><td>4×25 = <strong>100 Gbps</strong></td><td>Small uplink</td></tr>
+    <tr><td><span class="badge b-teal">4×QSFP+ 16×SFP+</span></td><td>–</td><td class="c-hi">16</td><td class="c-hi">4</td><td>4×40+16×25 = <strong>560 Gbps</strong></td><td>⭐ Core / Row switch</td></tr>
+    <tr><td><span class="badge b-orange">32×QSFP+</span></td><td>–</td><td>–</td><td class="c-p">32</td><td>32×40 = <strong>1,280 Gbps</strong></td><td>Large backbone</td></tr>
+  </table></div>
 
-  <p class="section-title" data-hu="Szerverek" data-en="Servers">Szerverek</p>
-  <table>
-    <tr><th data-hu="Típus" data-en="Type">Típus</th><th data-hu="Méret" data-en="Size">Méret</th><th>IOPS (k)</th><th data-hu="Sebesség" data-en="Speed">Sebesség</th><th data-hu="Élettartam" data-en="Lifetime">Élettartam</th><th data-hu="Ár" data-en="Price">Ár</th><th>IOPS/$</th></tr>
-    <tr><td>System X 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-r">4h</td><td class="c-o">$400</td><td>12.5</td></tr>
-    <tr><td>System X 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-r">4h</td><td class="c-o">$1600</td><td class="c-g">7.5</td></tr>
-    <tr><td>RISC 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-hi">5h</td><td class="c-o">$450</td><td>11.1</td></tr>
-    <tr><td>RISC 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-o">$1750</td><td>6.9</td></tr>
-    <tr><td>Mainframe 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-g">7h</td><td class="c-r">$850</td><td>5.9</td></tr>
-    <tr><td>Mainframe 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-r">$2000</td><td>6.0</td></tr>
-    <tr><td>GPU 3U</td><td>3U</td><td>5k</td><td>0.25 Gbps</td><td class="c-r">3h</td><td class="c-o">$550</td><td>9.1</td></tr>
-    <tr><td>GPU 7U</td><td>7U</td><td>12k</td><td>0.6 Gbps</td><td class="c-r">3h</td><td class="c-r">$2200</td><td>5.5</td></tr>
-  </table>
+  <p class="section-title">Servers</p>
+  <div class="table-wrap"><table>
+    <tr><th>Type</th><th>Size</th><th>IOPS</th><th>Bandwidth</th><th>Lifetime</th><th>Price</th><th>IOPS/$</th></tr>
+    <tr><td>System X 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-r">4h</td><td class="c-o">$400</td><td class="c-g">12.5</td></tr>
+    <tr><td>System X 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-r">4h</td><td class="c-o">$1,600</td><td>7.5</td></tr>
+    <tr><td>RISC 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-hi">5h</td><td class="c-o">$450</td><td>11.1</td></tr>
+    <tr><td>RISC 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-o">$1,750</td><td>6.9</td></tr>
+    <tr><td>Mainframe 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-g">7h</td><td class="c-r">$850</td><td>5.9</td></tr>
+    <tr><td>Mainframe 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-hi">5h</td><td class="c-r">$2,000</td><td>6.0</td></tr>
+    <tr><td>GPU 3U</td><td>3U</td><td>5,000</td><td>0.25 Gbps</td><td class="c-r">3h</td><td class="c-o">$550</td><td>9.1</td></tr>
+    <tr><td>GPU 7U</td><td>7U</td><td>12,000</td><td>0.6 Gbps</td><td class="c-r">3h</td><td class="c-r">$2,200</td><td>5.5</td></tr>
+  </table></div>
+
+  <div class="info-box"><strong>Best value:</strong> System X 3U has the best IOPS/$ ratio (12.5). RISC lasts longer (5h). Mainframe 3U has the longest lifetime (7h) but costs most. GPU servers expire fastest — only provision when a customer specifically requires them.</div>
 </div>
 
-<!-- ===== CUSTOMERS ===== -->
-<div class="section" id="ugyf">
+<!-- ===================== CUSTOMERS ===================== -->
+<div class="section" id="customers">
   <div class="filter-row">
-    <span class="fl" data-hu="Szűrő:" data-en="Filter:">Szűrő:</span>
-    <input class="sbox" type="text" id="searchBox" oninput="filterC()" data-placeholder-hu="Ügyfél neve..." data-placeholder-en="Customer name..." placeholder="Ügyfél neve...">
-    <button class="fbtn on" onclick="toggleF('all',this)" data-hu="Mind" data-en="All">Mind</button>
-    <button class="fbtn" onclick="toggleF('4 Port',this)" data-hu="4 Port" data-en="4 Port">4 Port</button>
-    <button class="fbtn" onclick="toggleF('4+16',this)" data-hu="4+16 Port" data-en="4+16 Port">4+16 Port</button>
-    <button class="fbtn" onclick="toggleF('32 Port',this)" data-hu="32 Port" data-en="32 Port">32 Port</button>
+    <span class="filter-label">Filter:</span>
+    <input type="text" class="search-input" id="searchBox" placeholder="Search customer name…" oninput="filterCustomers()">
+    <button class="fbtn on" onclick="setFilter('all',this)">All</button>
+    <button class="fbtn" onclick="setFilter('4 Port',this)">4 Port</button>
+    <button class="fbtn" onclick="setFilter('4+16',this)">4+16 Port</button>
+    <button class="fbtn" onclick="setFilter('32 Port',this)">32 Port</button>
   </div>
-  <table id="companyTable">
-    <tr><th>#</th><th data-hu="Név" data-en="Name">Név</th><th data-hu="Reputáció" data-en="Reputation">Reputáció</th><th data-hu="Switch" data-en="Switch">Switch</th><th>Total IOPS</th><th>System X</th><th>RISC</th><th>Mainframe</th><th>GPU</th><th>IPs</th></tr>
-  </table>
+  <div class="table-wrap"><table id="customerTable">
+    <tr><th>#</th><th>Name</th><th>Reputation</th><th>Switch</th><th>Total IOPS</th><th>System X</th><th>RISC</th><th>Mainframe</th><th>GPU</th><th>IPs</th></tr>
+  </table></div>
 </div>
 
-<!-- ===== CALCULATOR ===== -->
-<div class="section" id="kalc">
-  <p class="section-title" data-hu="Szerver igény kalkulátor" data-en="Server requirement calculator">Szerver igény kalkulátor</p>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title" data-hu="Szükséges IOPS" data-en="Required IOPS">Required IOPS</div>
-      <input type="number" id="iops" value="80000" min="1" class="calc-input" oninput="calc()">
-      <div style="font-size:0.62em;color:#555;margin-top:3px;" id="iopsNote">= 80k IOPS</div>
+<!-- ===================== CALCULATOR ===================== -->
+<div class="section" id="calculator">
+  <div class="calc-layout">
+
+    <!-- LEFT -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="calc-panel">
+        <div class="calc-panel-title">Add Requirement</div>
+        <div class="calc-field">
+          <label>Server Type</label>
+          <select id="newType">
+            <option>System X</option><option>RISC</option>
+            <option>Mainframe</option><option>GPU</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Target IOPS (raw, e.g. 80000)</label>
+          <input type="number" id="newIops" placeholder="e.g. 80000" min="1" oninput="updateIopsHint()">
+          <div class="iops-hint" id="iopsHint"></div>
+        </div>
+        <div class="calc-field">
+          <label>N+1 Redundancy</label>
+          <select id="newRedund">
+            <option value="0">None</option>
+            <option value="1" selected>+1 spare server</option>
+            <option value="2">+2 spare servers</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addRequirement()">+ Add Requirement</button>
+      </div>
+
+      <div class="calc-panel">
+        <div class="calc-panel-title">Requirements List</div>
+        <div class="req-list" id="reqList">
+          <div class="req-empty">No requirements added yet.</div>
+        </div>
+      </div>
+
+      <button class="btn btn-success btn-full" onclick="calculateAll()" style="padding:12px;font-size:1rem;">⚡ Calculate All</button>
+      <button class="btn btn-danger btn-full" onclick="clearRequirements()">🗑️ Clear All</button>
     </div>
-    <div class="card">
-      <div class="card-title" data-hu="Szerver típus" data-en="Server type">Szerver típus</div>
-      <select id="srv" class="calc-select" onchange="calc()">
-        <option value="3" data-hu="3U szerver (5k IOPS)" data-en="3U server (5k IOPS)">3U szerver (5k IOPS)</option>
-        <option value="7" selected data-hu="7U szerver (12k IOPS)" data-en="7U server (12k IOPS)">7U szerver (12k IOPS)</option>
-      </select>
-    </div>
-    <div class="card">
-      <div class="card-title" data-hu="N+1 redundancia" data-en="N+1 redundancy">N+1 redundancia</div>
-      <select id="redund" class="calc-select" onchange="calc()">
-        <option value="0" data-hu="Nem kell" data-en="Not needed">Nem kell</option>
-        <option value="1" selected data-hu="+1 tartalék" data-en="+1 spare">+1 tartalék</option>
-        <option value="2" data-hu="+2 tartalék" data-en="+2 spare">+2 tartalék</option>
-      </select>
+
+    <!-- RIGHT -->
+    <div class="calc-results" id="calcResults">
+      <div class="calc-placeholder">Add requirements on the left, then click <strong>Calculate All</strong>.</div>
     </div>
   </div>
-  <div id="calcResult" class="card-grid"></div>
 </div>
 
-<!-- ===== CG PLANNER ===== -->
-<div class="section" id="cgpl">
-  <div style="margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <span class="section-title" style="margin:0;border:none;" data-hu="CG / Core kapacitás tervező" data-en="CG / Core capacity planner">CG / Core kapacitás tervező</span>
-    <span style="font-size:0.68em;color:#555;" data-hu="Kattints egy ügyfélre, majd egy CG csoportra a hozzáadáshoz" data-en="Click a customer then a CG group to assign">Kattints egy ügyfélre, majd egy CG csoportra a hozzáadáshoz</span>
+<!-- ===================== CG PLANNER ===================== -->
+<div class="section" id="cgplanner">
+  <div class="warn-box" id="cgWarnBox">
+    <strong>Core limit:</strong> Set your limit in the Core panel on the right.<br>
+    Set each customer's Gbps requirement in the pool list, then assign them to CG groups. CG groups can then be assigned to Cores.
   </div>
-
-  <div class="warn2" id="cgInfo">
-    <b data-hu="Core limit: állítsd be a maximumot jobb oldalt" data-en="Core limit: set your limit on the right">Core limit: set your limit on the right</b><br>
-    <span data-hu="Add meg az ügyfelek Gbps igényét a pool listában (narancssárga mező), majd rendeld hozzá őket CG csoportokhoz. A CG csoportokat Core-okba rendezheted." data-en="Set each customer's Gbps requirement in the pool list (orange field), then assign them to CG groups. CG groups can be assigned to Cores.">Set each customer's Gbps requirement in the pool list (orange field), then assign them to CG groups. CG groups can be assigned to Cores.</span>
-  </div>
-
   <div class="cg-layout">
 
     <!-- POOL -->
-    <div class="pool-panel">
-      <div class="panel-title" data-hu="Ügyfelek (kattints a kiválasztáshoz)" data-en="Customers (click to select)">Ügyfelek</div>
-      <div class="pool-list" id="poolList"></div>
+    <div class="panel-box">
+      <div class="panel-header">Customers — click to select</div>
+      <div class="panel-scroll" id="poolList"></div>
     </div>
 
     <!-- CG GROUPS -->
-    <div class="groups-panel" id="cgGroups"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+      <div class="groups-wrap" id="cgGroups"></div>
+      <div class="add-cg-btn" onclick="addCG()">+ New CG Group</div>
+    </div>
 
-    <!-- CORE ASSIGNMENT -->
-    <div class="core-panel">
-      <div class="panel-title" data-hu="Core csoportok" data-en="Core groups">Core csoportok</div>
-      <div style="padding:6px 8px;border-bottom:1px solid #1e2130;display:flex;align-items:center;gap:6px;flex-shrink:0;">
-        <span style="font-size:0.63em;color:#666;" data-hu="Max Gbps/Core:" data-en="Max Gbps/Core:">Max Gbps/Core:</span>
-        <input type="number" min="1" value="0" id="coreLimitInput" style="width:65px;background:#0a0c12;border:1px solid #3a2a00;color:#ffaa44;padding:2px 5px;border-radius:4px;font-size:0.7em;outline:none;"
+    <!-- CORES -->
+    <div class="panel-box">
+      <div class="panel-header">Core Groups</div>
+      <div class="panel-sub">
+        <label>Max Gbps / Core:</label>
+        <input type="number" class="small" id="coreLimitInput" value="0" min="0"
           oninput="coreLimit=parseFloat(this.value)||0;renderCGGroups();renderCores();">
       </div>
-      <div class="core-list" id="coreList"></div>
-      <div style="padding:5px;">
-        <div class="add-core-btn" onclick="addCore()" data-hu="+ Új Core" data-en="+ New Core">+ Új Core</div>
+      <div class="panel-scroll" id="coreList"></div>
+      <div class="panel-footer">
+        <div class="add-core-btn" onclick="addCore()">+ New Core</div>
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <span class="footer-note">🎮 Fan-made helper for the <strong>Data Center</strong> game (Waseku)</span>
+  <button class="changelog-btn" onclick="openChangelog()">📋 Changelog</button>
+  <span class="footer-credit">Built by Claude (Anthropic) · Not affiliated with Waseku</span>
+</footer>
+
+<!-- ===================== CHANGELOG MODAL ===================== -->
+<div class="modal-overlay" id="changelogModal" onclick="closeChangelog(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📋 Changelog</span>
+      <span class="modal-close" onclick="closeChangelog(null)">×</span>
+    </div>
+    <div class="modal-body">
+
+      <div class="cl-entry">
+        <div class="cl-version">v3.0 — Full Rebuild</div>
+        <div class="cl-date">Current version</div>
+        <ul class="cl-items">
+          <li class="cl-item change"><span class="cl-type change">Change</span>Complete rewrite </li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Light / Dark theme toggle (Dark default)</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Larger font sizes throughout for better readability</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Responsive layout — works on mobile and desktop</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Footer with game credit and changelog button</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>This changelog</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>Cleaner, more consistent UI styling across all tabs</li>
+        </ul>
+      </div>
+
+      <div class="cl-entry">
+        <div class="cl-version">v2.5 — Calculator Overhaul</div>
+        <div class="cl-date">Previous version</div>
+        <ul class="cl-items">
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Multi-requirement calculator — add System X, RISC, Mainframe, GPU separately</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Smart optimization: maximizes 7U servers, supplements with 3U</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Port count, rack space, bandwidth and cost per requirement</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Total summary card across all requirements</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>N+1 redundancy support per requirement</li>
+          <li class="cl-item change"><span class="cl-type change">Change</span>IOPS input now accepts raw values (e.g. 80000) instead of k-values</li>
+        </ul>
+      </div>
+
+      <div class="cl-entry">
+        <div class="cl-version">v2.0 — CG Planner</div>
+        <ul class="cl-items">
+          <li class="cl-item feat"><span class="cl-type feat">New</span>CG Planner tab for capacity planning</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Assign customers to CG groups with Gbps tracking</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Assign CG groups to Core groups with configurable limit</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Visual capacity bar per CG and Core with overflow warning</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>CG group numbering now reuses deleted numbers correctly</li>
+          <li class="cl-item fix"><span class="cl-type fix">Fix</span>Core limit default changed to 0 (user-defined)</li>
+        </ul>
+      </div>
+
+      <div class="cl-entry">
+        <div class="cl-version">v1.0 — Initial Release</div>
+        <ul class="cl-items">
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Devices tab: ports, modules, switches, servers with specs</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Customers tab: all 34 customers with IOPS breakdown, filterable</li>
+          <li class="cl-item feat"><span class="cl-type feat">New</span>Basic server requirement calculator</li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <script>
-// ===== LANG =====
-let lang = 'en';
-function setLang(l) {
-  lang = l;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
-  applyLang();
-}
-function applyLang() {
-  document.querySelectorAll('[data-hu]').forEach(el=>{
-    if(el.tagName==='INPUT' && el.dataset[lang+'placeholder'] !== undefined) {
-      el.placeholder = el.dataset[(lang==='hu'?'placeholder-hu':'placeholder-en')] || el.placeholder;
-    } else {
-      const txt = el.dataset[lang];
-      if(txt !== undefined) el.textContent = txt;
-    }
-  });
-  document.querySelectorAll('option[data-hu]').forEach(el=>{
-    const txt = el.dataset[lang];
-    if(txt) el.textContent = txt;
-  });
-  document.getElementById('appTitle').textContent = lang==='hu'
-    ? '🖥️ Data Center – Referencia Dashboard'
-    : '🖥️ Data Center – Reference Dashboard';
-  document.querySelectorAll('.tab').forEach(t=>{
-    const txt=t.dataset[lang]; if(txt) t.textContent=txt;
-  });
-  // searchbox placeholder
-  const sb = document.getElementById('searchBox');
-  sb.placeholder = lang==='hu'?'Ügyfél neve...':'Customer name...';
-  renderPool(); renderCGGroups(); renderCores();
+// ===================== THEME =====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('themeBtn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
 }
 
-// ===== TABS =====
-function show(id,btn) {
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+// ===================== TABS =====================
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
-  if(id==='kalc') calc();
 }
 
-// ===== DATA =====
+// ===================== DATA =====================
 const CUSTOMERS = [
-  {n:1,  name:'Bermuda Triangle Backup', sw:'4 Port', iops:40,   sx:40,  ri:0,   mf:0,   gpu:0,   ip:13,  rep:0},
-  {n:2,  name:'Dad Joke Database',       sw:'4 Port', iops:80,   sx:80,  ri:0,   mf:0,   gpu:0,   ip:29,  rep:10},
-  {n:3,  name:'UFO Download Station',    sw:'4 Port', iops:100,  sx:100, ri:0,   mf:0,   gpu:0,   ip:29,  rep:20},
-  {n:4,  name:'TaxHaven Holdings',       sw:'4 Port', iops:120,  sx:120, ri:0,   mf:0,   gpu:0,   ip:29,  rep:30},
-  {n:5,  name:'FakeNews Daily',          sw:'4 Port', iops:150,  sx:100, ri:50,  mf:0,   gpu:0,   ip:42,  rep:40},
-  {n:6,  name:'Pollution Plus',          sw:'4 Port', iops:170,  sx:100, ri:70,  mf:0,   gpu:0,   ip:58,  rep:50},
-  {n:7,  name:'ClimateChange Industries',sw:'4 Port', iops:190,  sx:100, ri:90,  mf:0,   gpu:0,   ip:58,  rep:60},
-  {n:8,  name:'Honest Politicians',      sw:'4 Port', iops:220,  sx:100, ri:120, mf:0,   gpu:0,   ip:58,  rep:80},
-  {n:9,  name:'Vaporware Corp',          sw:'4 Port', iops:240,  sx:100, ri:140, mf:0,   gpu:0,   ip:58,  rep:100},
-  {n:10, name:'Maybe Finance',           sw:'4 Port', iops:260,  sx:100, ri:90,  mf:70,  gpu:0,   ip:87,  rep:130},
-  {n:11, name:'Organised Chaos',         sw:'4 Port', iops:290,  sx:100, ri:90,  mf:100, gpu:0,   ip:87,  rep:170},
-  {n:12, name:'Not Hackers',             sw:'4 Port', iops:310,  sx:100, ri:90,  mf:120, gpu:0,   ip:87,  rep:220},
-  {n:13, name:'CryptoMine Inc',          sw:'4 Port', iops:340,  sx:100, ri:90,  mf:150, gpu:0,   ip:87,  rep:280},
-  {n:14, name:'The Invisible Hand',      sw:'4 Port', iops:370,  sx:100, ri:90,  mf:80,  gpu:100, ip:116, rep:360},
-  {n:15, name:'AnonMask',               sw:'4 Port', iops:400,  sx:100, ri:90,  mf:80,  gpu:130, ip:116, rep:460},
-  {n:16, name:'Global Megacorp',         sw:'4+16',   iops:480,  sx:120, ri:120, mf:120, gpu:120, ip:252, rep:580},
-  {n:17, name:'Doomscroll Media',        sw:'4+16',   iops:600,  sx:150, ri:150, mf:150, gpu:150, ip:252, rep:720},
-  {n:18, name:'Subscription Hell',       sw:'4+16',   iops:720,  sx:180, ri:180, mf:180, gpu:180, ip:252, rep:880},
-  {n:19, name:'Greed is Good',           sw:'4+16',   iops:840,  sx:210, ri:210, mf:210, gpu:210, ip:252, rep:1060},
-  {n:20, name:'Too Big To Fail',         sw:'4+16',   iops:1000, sx:250, ri:250, mf:250, gpu:250, ip:500, rep:1060},
-  {n:21, name:'Mega International',      sw:'4+16',   iops:1100, sx:275, ri:275, mf:275, gpu:275, ip:500, rep:1060},
-  {n:22, name:'Oligarch Online',         sw:'4+16',   iops:1200, sx:300, ri:300, mf:300, gpu:300, ip:500, rep:1060},
-  {n:23, name:'Moon Launches',           sw:'4+16',   iops:1400, sx:360, ri:360, mf:360, gpu:320, ip:500, rep:1060},
-  {n:24, name:'Make Mie',               sw:'32 Port', iops:1490, sx:140, ri:670, mf:340, gpu:340, ip:532, rep:1320},
-  {n:25, name:'Aero Dynasty',           sw:'32 Port', iops:1590, sx:250, ri:350, mf:640, gpu:350, ip:564, rep:1560},
-  {n:26, name:'Standard',               sw:'32 Port', iops:1560, sx:200, ri:300, mf:400, gpu:660, ip:564, rep:1840},
-  {n:27, name:'Richards and Richards',   sw:'32 Port', iops:1600, sx:700, ri:300, mf:300, gpu:300, ip:628, rep:2180},
-  {n:28, name:'Dewey Chaeatm',           sw:'32 Port', iops:1800, sx:300, ri:900, mf:300, gpu:300, ip:503, rep:2580},
-  {n:29, name:'AeroSpace',              sw:'32 Port', iops:1820, sx:240, ri:240, mf:1040,gpu:300, ip:500, rep:3050},
-  {n:30, name:'Bull and Bearly',         sw:'32 Port', iops:1700, sx:300, ri:300, mf:300, gpu:800, ip:628, rep:3600},
-  {n:31, name:'Waseku 🎮',              sw:'32 Port', iops:1820, sx:500, ri:440, mf:440, gpu:440, ip:500, rep:4250},
-  {n:32, name:'Sweatshop Effieciency',   sw:'32 Port', iops:1860, sx:360, ri:1000,mf:140, gpu:360, ip:532, rep:5020},
-  {n:33, name:'Pyramid Power',           sw:'32 Port', iops:1940, sx:240, ri:300, mf:1000,gpu:400, ip:564, rep:5930},
-  {n:34, name:'EvilCorp 😈',            sw:'32 Port', iops:1980, sx:200, ri:200, mf:300, gpu:1280,ip:500, rep:7000},
+  {n:1,  name:'Bermuda Triangle Backup', sw:'4 Port',  iops:40,   sx:40,  ri:0,   mf:0,    gpu:0,    ip:13,  rep:0},
+  {n:2,  name:'Dad Joke Database',       sw:'4 Port',  iops:80,   sx:80,  ri:0,   mf:0,    gpu:0,    ip:29,  rep:10},
+  {n:3,  name:'UFO Download Station',    sw:'4 Port',  iops:100,  sx:100, ri:0,   mf:0,    gpu:0,    ip:29,  rep:20},
+  {n:4,  name:'TaxHaven Holdings',       sw:'4 Port',  iops:120,  sx:120, ri:0,   mf:0,    gpu:0,    ip:29,  rep:30},
+  {n:5,  name:'FakeNews Daily',          sw:'4 Port',  iops:150,  sx:100, ri:50,  mf:0,    gpu:0,    ip:42,  rep:40},
+  {n:6,  name:'Pollution Plus',          sw:'4 Port',  iops:170,  sx:100, ri:70,  mf:0,    gpu:0,    ip:58,  rep:50},
+  {n:7,  name:'ClimateChange Industries',sw:'4 Port',  iops:190,  sx:100, ri:90,  mf:0,    gpu:0,    ip:58,  rep:60},
+  {n:8,  name:'Honest Politicians',      sw:'4 Port',  iops:220,  sx:100, ri:120, mf:0,    gpu:0,    ip:58,  rep:80},
+  {n:9,  name:'Vaporware Corp',          sw:'4 Port',  iops:240,  sx:100, ri:140, mf:0,    gpu:0,    ip:58,  rep:100},
+  {n:10, name:'Maybe Finance',           sw:'4 Port',  iops:260,  sx:100, ri:90,  mf:70,   gpu:0,    ip:87,  rep:130},
+  {n:11, name:'Organised Chaos',         sw:'4 Port',  iops:290,  sx:100, ri:90,  mf:100,  gpu:0,    ip:87,  rep:170},
+  {n:12, name:'Not Hackers',             sw:'4 Port',  iops:310,  sx:100, ri:90,  mf:120,  gpu:0,    ip:87,  rep:220},
+  {n:13, name:'CryptoMine Inc',          sw:'4 Port',  iops:340,  sx:100, ri:90,  mf:150,  gpu:0,    ip:87,  rep:280},
+  {n:14, name:'The Invisible Hand',      sw:'4 Port',  iops:370,  sx:100, ri:90,  mf:80,   gpu:100,  ip:116, rep:360},
+  {n:15, name:'AnonMask',               sw:'4 Port',  iops:400,  sx:100, ri:90,  mf:80,   gpu:130,  ip:116, rep:460},
+  {n:16, name:'Global Megacorp',         sw:'4+16',    iops:480,  sx:120, ri:120, mf:120,  gpu:120,  ip:252, rep:580},
+  {n:17, name:'Doomscroll Media',        sw:'4+16',    iops:600,  sx:150, ri:150, mf:150,  gpu:150,  ip:252, rep:720},
+  {n:18, name:'Subscription Hell',       sw:'4+16',    iops:720,  sx:180, ri:180, mf:180,  gpu:180,  ip:252, rep:880},
+  {n:19, name:'Greed is Good',           sw:'4+16',    iops:840,  sx:210, ri:210, mf:210,  gpu:210,  ip:252, rep:1060},
+  {n:20, name:'Too Big To Fail',         sw:'4+16',    iops:1000, sx:250, ri:250, mf:250,  gpu:250,  ip:500, rep:1060},
+  {n:21, name:'Mega International',      sw:'4+16',    iops:1100, sx:275, ri:275, mf:275,  gpu:275,  ip:500, rep:1060},
+  {n:22, name:'Oligarch Online',         sw:'4+16',    iops:1200, sx:300, ri:300, mf:300,  gpu:300,  ip:500, rep:1060},
+  {n:23, name:'Moon Launches',           sw:'4+16',    iops:1400, sx:360, ri:360, mf:360,  gpu:320,  ip:500, rep:1060},
+  {n:24, name:'Make Mie',               sw:'32 Port', iops:1490, sx:140, ri:670, mf:340,  gpu:340,  ip:532, rep:1320},
+  {n:25, name:'Aero Dynasty',           sw:'32 Port', iops:1590, sx:250, ri:350, mf:640,  gpu:350,  ip:564, rep:1560},
+  {n:26, name:'Standard',               sw:'32 Port', iops:1560, sx:200, ri:300, mf:400,  gpu:660,  ip:564, rep:1840},
+  {n:27, name:'Richards and Richards',   sw:'32 Port', iops:1600, sx:700, ri:300, mf:300,  gpu:300,  ip:628, rep:2180},
+  {n:28, name:'Dewey Chaeatm',           sw:'32 Port', iops:1800, sx:300, ri:900, mf:300,  gpu:300,  ip:503, rep:2580},
+  {n:29, name:'AeroSpace',              sw:'32 Port', iops:1820, sx:240, ri:240, mf:1040, gpu:300,  ip:500, rep:3050},
+  {n:30, name:'Bull and Bearly',         sw:'32 Port', iops:1700, sx:300, ri:300, mf:300,  gpu:800,  ip:628, rep:3600},
+  {n:31, name:'Waseku 🎮',              sw:'32 Port', iops:1820, sx:500, ri:440, mf:440,  gpu:440,  ip:500, rep:4250},
+  {n:32, name:'Sweatshop Effieciency',   sw:'32 Port', iops:1860, sx:360, ri:1000,mf:140,  gpu:360,  ip:532, rep:5020},
+  {n:33, name:'Pyramid Power',           sw:'32 Port', iops:1940, sx:240, ri:300, mf:1000, gpu:400,  ip:564, rep:5930},
+  {n:34, name:'EvilCorp 😈',            sw:'32 Port', iops:1980, sx:200, ri:200, mf:300,  gpu:1280, ip:500, rep:7000},
 ];
 
-// ===== CUSTOMER TABLE =====
+// ===================== CUSTOMERS TAB =====================
 let activeFilter = 'all';
-function buildCompanyTable() {
-  const tb = document.getElementById('companyTable');
-  // clear rows except header
-  while(tb.rows.length > 1) tb.deleteRow(1);
+
+function buildCustomerTable() {
   const search = document.getElementById('searchBox').value.toLowerCase();
+  const tb = document.getElementById('customerTable');
+  while (tb.rows.length > 1) tb.deleteRow(1);
   CUSTOMERS.forEach(c => {
     const swKey = c.sw === '4 Port' ? '4 Port' : c.sw === '4+16' ? '4+16' : '32 Port';
-    if(activeFilter !== 'all' && swKey !== activeFilter) return;
-    if(!c.name.toLowerCase().includes(search)) return;
-    const swBadge = c.sw==='4 Port'?'b-grey':c.sw==='4+16'?'b-teal':'b-orange';
-    const pct = Math.min(100,(c.rep/7000)*100).toFixed(0);
+    if (activeFilter !== 'all' && swKey !== activeFilter) return;
+    if (!c.name.toLowerCase().includes(search)) return;
+    const badge = c.sw === '4 Port' ? 'b-grey' : c.sw === '4+16' ? 'b-teal' : 'b-orange';
+    const pct = Math.min(100, (c.rep / 7000) * 100).toFixed(1);
+    const iopsColor = c.iops >= 1000 ? 'c-r' : c.iops >= 400 ? 'c-o' : 'c-g';
     const tr = tb.insertRow();
     tr.innerHTML = `
       <td>${c.n}</td>
-      <td>${c.name}</td>
-      <td><div>${c.rep}</div><div class="rep-bar"><div class="rep-fill" style="width:${pct}%"></div></div></td>
-      <td><span class="badge ${swBadge}">${c.sw}</span></td>
-      <td class="${c.iops>=1000?'c-r':c.iops>=400?'c-o':'c-g'}">${c.iops}k</td>
-      <td>${c.sx||'–'}${c.sx?'k':''}</td>
-      <td>${c.ri||'–'}${c.ri?'k':''}</td>
-      <td>${c.mf||'–'}${c.mf?'k':''}</td>
-      <td>${c.gpu||'–'}${c.gpu?'k':''}</td>
+      <td><strong>${c.name}</strong></td>
+      <td><div style="font-size:0.8rem;">${c.rep.toLocaleString()}</div>
+          <div class="rep-bar"><div class="rep-fill" style="width:${pct}%"></div></div></td>
+      <td><span class="badge ${badge}">${c.sw}</span></td>
+      <td class="${iopsColor}" style="font-weight:700;">${c.iops.toLocaleString()}k</td>
+      <td>${c.sx ? c.sx+'k' : '–'}</td>
+      <td>${c.ri ? c.ri+'k' : '–'}</td>
+      <td>${c.mf ? c.mf+'k' : '–'}</td>
+      <td>${c.gpu ? c.gpu+'k' : '–'}</td>
       <td>${c.ip}</td>`;
   });
 }
-function filterC() { buildCompanyTable(); }
-function toggleF(val,btn) {
+
+function filterCustomers() { buildCustomerTable(); }
+function setFilter(val, btn) {
   activeFilter = val;
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-  buildCompanyTable();
+  buildCustomerTable();
 }
 
-// ===== CALCULATOR =====
-function calc() {
-  const iopsRaw = parseInt(document.getElementById('iops').value)||0;
-  const iops = iopsRaw / 1000;
-  const note = document.getElementById('iopsNote');
-  if(note) note.textContent = '= ' + (iops>=1?iops.toFixed(1)+'k':iopsRaw) + ' IOPS';
-  const sz = parseInt(document.getElementById('srv').value);
-  const red = parseInt(document.getElementById('redund').value);
-  const iopsPS = sz===3?5:12;
-  const ru = sz;
-  const gbps = sz===3?0.25:0.6;
-  const prices = {sx:sz===3?400:1600,ri:sz===3?450:1750,mf:sz===3?850:2000,gpu:sz===3?550:2200};
-  const eols = {sx:4,ri:5,mf:sz===3?7:5,gpu:3};
-  const needed = Math.ceil(iops/iopsPS);
-  const total = needed+red;
-  const res = document.getElementById('calcResult');
-  const hu = lang==='hu';
-  res.innerHTML = `
-    <div class="card"><div class="card-title">${hu?'Szükséges szerverek':'Required servers'}</div><div class="card-val c-hi">${needed} ${hu?'db':'pcs'}</div><div class="card-sub">+ ${red} ${hu?'tartalék':'spare'} = <b>${total} ${hu?'összesen':'total'}</b></div></div>
-    <div class="card"><div class="card-title">${hu?'Rack foglalás':'Rack space'}</div><div class="card-val c-o">${total*ru}U</div><div class="card-sub">${Math.ceil(total*ru/47)} rack (47U)</div></div>
-    <div class="card"><div class="card-title">${hu?'Sávszélesség':'Bandwidth'}</div><div class="card-val c-g">${(total*gbps).toFixed(1)} Gbps</div></div>
-    <div class="card" style="grid-column:1/-1;">
-      <div class="card-title">${hu?'Árak típusonként':'Prices by type'}</div>
-      <table style="margin:0;"><tr><th>${hu?'Típus':'Type'}</th><th>${hu?'Db ár':'Unit price'}</th><th>${hu?'Össz':'Total'}</th><th>${hu?'Élett.':'Lifetime'}</th></tr>
-      ${Object.entries(prices).map(([k,p])=>`<tr><td>${{sx:'System X',ri:'RISC',mf:'Mainframe',gpu:'GPU'}[k]} ${sz}U</td><td>$${p}</td><td class="c-o">$${total*p}</td><td class="${eols[k]<=3?'c-r':'c-g'}">${eols[k]}h</td></tr>`).join('')}
-      </table>
+// ===================== CALCULATOR =====================
+let requirements = [];
+
+function updateIopsHint() {
+  const v = parseInt(document.getElementById('newIops').value) || 0;
+  document.getElementById('iopsHint').textContent = v > 0 ? `= ${(v/1000).toFixed(1)}k IOPS` : '';
+}
+
+function addRequirement() {
+  const type   = document.getElementById('newType').value;
+  const raw    = parseInt(document.getElementById('newIops').value) || 0;
+  const redund = parseInt(document.getElementById('newRedund').value) || 0;
+  if (!raw) return;
+  requirements.push({ id: Date.now(), type, raw, redund });
+  document.getElementById('newIops').value = '';
+  document.getElementById('iopsHint').textContent = '';
+  renderReqList();
+}
+
+function removeRequirement(id) {
+  requirements = requirements.filter(r => r.id !== id);
+  renderReqList();
+  resetResults();
+}
+
+function clearRequirements() {
+  requirements = [];
+  renderReqList();
+  resetResults();
+}
+
+function resetResults() {
+  document.getElementById('calcResults').innerHTML =
+    '<div class="calc-placeholder">Add requirements on the left, then click <strong>Calculate All</strong>.</div>';
+}
+
+function renderReqList() {
+  const el = document.getElementById('reqList');
+  if (!requirements.length) {
+    el.innerHTML = '<div class="req-empty">No requirements added yet.</div>';
+    return;
+  }
+  const colors = {'System X':'c-hi','RISC':'c-g','Mainframe':'c-p','GPU':'c-r'};
+  el.innerHTML = requirements.map(r => `
+    <div class="req-item">
+      <span class="req-type ${colors[r.type]||''}">${r.type}</span>
+      <span class="req-iops">${r.raw.toLocaleString()} IOPS <span style="opacity:0.6;font-size:0.85em;">(${(r.raw/1000).toFixed(1)}k)</span></span>
+      ${r.redund > 0 ? `<span class="req-spare">+${r.redund} spare</span>` : ''}
+      <span class="req-del" onclick="removeRequirement(${r.id})">✕</span>
+    </div>`).join('');
+}
+
+function optimize(targetRaw) {
+  const i7 = 12000, i3 = 5000;
+  if (targetRaw <= 0) return {s7:0, s3:0};
+  if (targetRaw < i7) return {s7:0, s3:Math.ceil(targetRaw / i3)};
+  const s7 = Math.floor(targetRaw / i7);
+  const rem = targetRaw - s7 * i7;
+  return {s7, s3: rem > 0 ? Math.ceil(rem / i3) : 0};
+}
+
+const SRV_PRICES = {
+  'System X': {p3:400,  p7:1600, eol3:4, eol7:4},
+  'RISC':     {p3:450,  p7:1750, eol3:5, eol7:5},
+  'Mainframe':{p3:850,  p7:2000, eol3:7, eol7:5},
+  'GPU':      {p3:550,  p7:2200, eol3:3, eol7:3},
+};
+const TYPE_COLORS = {'System X':'var(--c-hi)','RISC':'var(--c-g)','Mainframe':'var(--c-p)','GPU':'var(--c-r)'};
+
+function calculateAll() {
+  if (!requirements.length) { alert('Please add at least one requirement first.'); return; }
+
+  let totSrv=0, totPorts=0, totU=0, totIops=0, totCost=0;
+  let html = '';
+
+  requirements.forEach(req => {
+    const {s7, s3} = optimize(req.raw);
+    const s7t = s7 + req.redund;
+    const s3t = s3;
+    const total = s7t + s3t;
+    const ru = s7t * 7 + s3t * 3;
+    const provisioned = s7t * 12000 + s3t * 5000;
+    const exact = provisioned === req.raw;
+    const pr = SRV_PRICES[req.type] || SRV_PRICES['System X'];
+    const cost = s7t * pr.p7 + s3t * pr.p3;
+    const gbps = ((s7t * 0.6) + (s3t * 0.25)).toFixed(2);
+    const racks = Math.ceil(ru / 47);
+
+    totSrv += total; totPorts += total; totU += ru; totIops += provisioned; totCost += cost;
+
+    html += `<div class="result-card">
+      <div class="result-header">
+        <span class="result-title" style="color:${TYPE_COLORS[req.type]}">${req.type}</span>
+        <span class="result-target">Target: ${req.raw.toLocaleString()} IOPS${req.redund > 0 ? ` · +${req.redund} spare` : ''}</span>
+        <span class="match-badge ${exact ? 'match-exact' : 'match-over'}">${exact ? 'Exact' : 'Overage'}</span>
+      </div>
+      <div class="result-grid">
+        <div class="result-cell">
+          <div class="result-cell-label">7U Servers</div>
+          <div class="result-cell-val c-hi">${s7t}</div>
+          ${req.redund > 0 ? `<div class="result-sub">incl. ${req.redund} spare</div>` : ''}
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">3U Servers</div>
+          <div class="result-cell-val c-hi">${s3t}</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Total Servers</div>
+          <div class="result-cell-val c-o">${total}</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Ports Required</div>
+          <div class="result-cell-val c-g">${total}</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Rack Space</div>
+          <div class="result-cell-val c-o">${ru}U</div>
+          <div class="result-sub">${racks} rack${racks !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Provisioned IOPS</div>
+          <div class="result-cell-val ${exact ? 'c-g' : 'c-o'}">${provisioned.toLocaleString()}</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Bandwidth</div>
+          <div class="result-cell-val c-g">${gbps} Gbps</div>
+        </div>
+        <div class="result-cell">
+          <div class="result-cell-label">Est. Cost</div>
+          <div class="result-cell-val c-r">$${cost.toLocaleString()}</div>
+        </div>
+      </div>
     </div>`;
+  });
+
+  // Summary
+  html += `<div class="summary-card">
+    <div class="result-header" style="background:var(--tab-act);">
+      <span class="result-title c-hi">📊 Total Summary</span>
+      <span class="result-target">${requirements.length} requirement${requirements.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-cell"><div class="result-cell-label">Total Servers</div><div class="result-cell-val c-hi">${totSrv}</div></div>
+      <div class="summary-cell"><div class="result-cell-label">Total Ports</div><div class="result-cell-val c-g">${totPorts}</div></div>
+      <div class="summary-cell"><div class="result-cell-label">Total Rack Space</div><div class="result-cell-val c-o">${totU}U<div class="result-sub">${Math.ceil(totU/47)} racks</div></div></div>
+      <div class="summary-cell"><div class="result-cell-label">Total IOPS</div><div class="result-cell-val c-g">${totIops.toLocaleString()}</div></div>
+      <div class="summary-cell"><div class="result-cell-label">Total Est. Cost</div><div class="result-cell-val c-r">$${totCost.toLocaleString()}</div></div>
+    </div>
+  </div>`;
+
+  document.getElementById('calcResults').innerHTML = html;
 }
 
-// ===== CG PLANNER =====
-let custGbps = {}; // n → Gbps
-CUSTOMERS.forEach(c => { custGbps[c.n] = 10; });
-
-let cgGroups = []; // [{id, name, members:[n,...]}]
-let coreGroups = []; // [{id, name, cgIds:[...]}]
+// ===================== CG PLANNER =====================
+let cgGroups = [];
+let coreGroups = [];
 let selectedPool = null;
-let selectedCG = null;
-
+let coreLimit = 0;
 let coreCounter = 1;
-let coreLimit = 0; // configurable
 
 function nextCGNum() {
-  const used = new Set(cgGroups.map(g => parseInt(g.name.replace(/\D/g,''))).filter(n=>!isNaN(n)));
+  const used = new Set(cgGroups.map(g => parseInt(g.name.replace(/\D/g,''))).filter(n => !isNaN(n)));
   let n = 1;
-  while(used.has(n)) n++;
+  while (used.has(n)) n++;
   return n;
 }
 
 function addCG() {
   const n = nextCGNum();
-  cgGroups.push({id: Date.now(), name:`CG${String(n).padStart(2,'0')}`, members:[]});
-  renderCGGroups(); renderCores(); renderPool();
+  cgGroups.push({id: Date.now(), name: `CG${String(n).padStart(2,'0')}`, members: []});
+  renderCGGroups(); renderPool();
 }
+
 function addCore() {
-  coreGroups.push({id: Date.now(), name:`Core${String(coreCounter).padStart(2,'0')}A`, cgIds:[]});
+  coreGroups.push({id: Date.now(), name: `Core${String(coreCounter).padStart(2,'0')}A`, cgIds: []});
   coreCounter++;
   renderCores();
 }
 
-function cgTotalGbps(cg) {
-  return cg.members.reduce((s,n)=>(s+(custGbps[n]||0)),0);
-}
-function coreTotalGbps(core) {
-  return core.cgIds.reduce((s,cgId)=>{
-    const cg=cgGroups.find(g=>g.id===cgId);
-    return s+(cg?cgTotalGbps(cg):0);
-  },0);
-}
+function cgGbps(cg) { return cg.members.reduce((s,n) => s + (parseFloat(document.getElementById(`gbps_${n}`)?.value) || 0), 0); }
+function coreGbps(core) { return core.cgIds.reduce((s,id) => { const cg = cgGroups.find(g => g.id===id); return s + (cg ? cgGbps(cg) : 0); }, 0); }
 
 function renderPool() {
-  const container = document.getElementById('poolList');
-  const assignedNs = new Set();
-  cgGroups.forEach(cg=>cg.members.forEach(n=>assignedNs.add(n)));
-
-  container.innerHTML = CUSTOMERS.map(c=>{
-    const swCls = c.sw==='4 Port'?'sw4c':c.sw==='4+16'?'sw4x16c':'sw32c';
-    const inCg = assignedNs.has(c.n);
-    return `<div class="pool-item ${inCg?'in-cg':''} ${selectedPool===c.n&&!inCg?'selected-pool':''}"
-      onclick="${inCg?'':` selectPool(${c.n})`}">
+  const assigned = new Set();
+  cgGroups.forEach(cg => cg.members.forEach(n => assigned.add(n)));
+  document.getElementById('poolList').innerHTML = CUSTOMERS.map(c => {
+    const inCg = assigned.has(c.n);
+    const dotCls = c.sw === '4 Port' ? 'd-4' : c.sw === '4+16' ? 'd-4x16' : 'd-32';
+    return `<div class="pool-item ${inCg ? 'in-cg' : ''} ${selectedPool === c.n && !inCg ? 'selected-pool' : ''}"
+      ${inCg ? '' : `onclick="selectPool(${c.n})"`}>
       <span class="pool-num">${c.n}</span>
-      <span class="pool-sw ${swCls}"></span>
+      <span class="pool-dot ${dotCls}"></span>
       <span class="pool-name">${c.name}</span>
-      <input class="pool-gbps-input" type="number" min="0.1" step="0.5" value="${custGbps[c.n]}"
+      <input class="gbps-input" id="gbps_${c.n}" type="number" min="0" step="0.5" value="10"
         onclick="event.stopPropagation()"
-        oninput="setCustGbps(${c.n},this.value)"> Gbps
+        oninput="renderCGGroups();renderCores();"> Gbps
     </div>`;
   }).join('');
 }
 
-function setCustGbps(n, val) {
-  custGbps[n] = parseFloat(val)||0;
-  renderCGGroups(); renderCores();
-}
-
 function selectPool(n) {
-  selectedPool = selectedPool===n?null:n;
+  selectedPool = selectedPool === n ? null : n;
   renderPool();
 }
 
 function renderCGGroups() {
-  const container = document.getElementById('cgGroups');
-  const hu = lang==='hu';
-  let html = cgGroups.map(cg=>{
-    const total = cgTotalGbps(cg);
-    const pct = coreLimit > 0 ? Math.min(100,(total/coreLimit)*100) : 0;
+  const assigned = new Set();
+  cgGroups.forEach(cg => cg.members.forEach(n => assigned.add(n)));
+
+  const wrap = document.getElementById('cgGroups');
+  wrap.innerHTML = cgGroups.map(cg => {
+    const total = cgGbps(cg);
+    const pct = coreLimit > 0 ? Math.min(100, (total / coreLimit) * 100) : 0;
     const over = coreLimit > 0 && total > coreLimit;
-    const fillColor = over ? '#ff4444' : pct>80 ? '#ffaa44' : '#2a7aff';
-    const membersHtml = cg.members.map(n=>{
-      const c=CUSTOMERS.find(x=>x.n===n);
-      return `<div class="cg-customer">
-        <span class="pool-sw ${c.sw==='4 Port'?'sw4c':c.sw==='4+16'?'sw4x16c':'sw32c'}"></span>
-        <span class="cg-cust-name">#${n} ${c?c.name:''}</span>
-        <span class="cg-cust-gbps">${custGbps[n]} Gbps</span>
-        <span class="cg-remove" onclick="removeCGMember(${cg.id},${n})">✕</span>
+    const fillColor = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-hi)';
+
+    const members = cg.members.map(n => {
+      const c = CUSTOMERS.find(x => x.n === n);
+      const g = parseFloat(document.getElementById(`gbps_${n}`)?.value) || 0;
+      return `<div class="cg-member">
+        <span class="pool-dot ${c.sw==='4 Port'?'d-4':c.sw==='4+16'?'d-4x16':'d-32'}"></span>
+        <span class="cg-member-name">#${n} ${c?.name||''}</span>
+        <span class="cg-member-gbps">${g} Gbps</span>
+        <span class="cg-member-del" onclick="removeCGMember(${cg.id},${n})">✕</span>
       </div>`;
     }).join('');
+
     return `<div class="cg-group">
-      <div class="cg-header">
+      <div class="cg-head">
         <input class="cg-name-input" value="${cg.name}" oninput="renameCG(${cg.id},this.value)">
-        <div class="cg-gbps-bar-wrap">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-            <span class="cg-gbps-text ${over?'over':''}">${total.toFixed(1)} Gbps${coreLimit > 0 ? " / "+coreLimit+" Gbps" : ""}</span>
-            ${over?`<span style="font-size:0.6em;color:#ff4444;font-weight:bold;">⚠️ ${hu?'TÚLLÉPÉS!':'OVERFLOW!'}</span>`:''}
+        <div class="cg-bar-wrap">
+          <div class="cg-bar-text ${over ? 'over' : ''}">
+            <span>${total.toFixed(1)} Gbps${coreLimit > 0 ? ' / '+coreLimit+' Gbps' : ''}</span>
+            ${over ? '<span>⚠️ OVER LIMIT</span>' : ''}
           </div>
-          <div class="cg-gbps-bar"><div class="cg-gbps-fill" style="width:${pct}%;background:${fillColor};"></div></div>
+          <div class="cg-bar"><div class="cg-bar-fill" style="width:${pct}%;background:${fillColor};"></div></div>
         </div>
-        <span style="font-size:0.65em;color:#ff6666;cursor:pointer;margin-left:6px;" onclick="removeCG(${cg.id})">✕</span>
+        <span class="cg-del" onclick="removeCG(${cg.id})">✕</span>
       </div>
       <div class="cg-body">
-        ${membersHtml}
-        <div class="cg-drop-hint" onclick="assignToGroup(${cg.id})">
-          ${selectedPool ? `➕ #${selectedPool} ${CUSTOMERS.find(x=>x.n===selectedPool)?.name||''} ${hu?'hozzáadása':'add here'}` : (hu?'← Válassz ügyfelet a listából':'← Select customer from list')}
+        ${members}
+        <div class="cg-drop" onclick="assignToCG(${cg.id})">
+          ${selectedPool
+            ? `➕ Add #${selectedPool} ${CUSTOMERS.find(x=>x.n===selectedPool)?.name||''}`
+            : '← Select a customer from the list'}
         </div>
       </div>
     </div>`;
   }).join('');
-
-  html += `<div class="add-cg-btn" onclick="addCG()">${hu?'+ Új CG csoport':'+ New CG group'}</div>`;
-  container.innerHTML = html;
 }
 
 function renameCG(id, val) {
-  const cg=cgGroups.find(g=>g.id===id);
-  if(cg) cg.name=val;
+  const cg = cgGroups.find(g => g.id === id);
+  if (cg) cg.name = val;
   renderCores();
 }
 
-function assignToGroup(cgId) {
-  if(!selectedPool) return;
-  const cg = cgGroups.find(g=>g.id===cgId);
-  if(!cg) return;
-  if(!cg.members.includes(selectedPool)) cg.members.push(selectedPool);
+function assignToCG(cgId) {
+  if (!selectedPool) return;
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (cg && !cg.members.includes(selectedPool)) cg.members.push(selectedPool);
   selectedPool = null;
   renderPool(); renderCGGroups(); renderCores();
 }
 
 function removeCGMember(cgId, n) {
-  const cg=cgGroups.find(g=>g.id===cgId);
-  if(cg) cg.members=cg.members.filter(x=>x!==n);
+  const cg = cgGroups.find(g => g.id === cgId);
+  if (cg) cg.members = cg.members.filter(x => x !== n);
   renderPool(); renderCGGroups(); renderCores();
 }
 
 function removeCG(id) {
-  cgGroups=cgGroups.filter(g=>g.id!==id);
-  coreGroups.forEach(c=>c.cgIds=c.cgIds.filter(x=>x!==id));
+  cgGroups = cgGroups.filter(g => g.id !== id);
+  coreGroups.forEach(c => c.cgIds = c.cgIds.filter(x => x !== id));
   renderPool(); renderCGGroups(); renderCores();
 }
 
 function renderCores() {
-  const container = document.getElementById('coreList');
-  const hu = lang==='hu';
-  const unassignedCGs = cgGroups.filter(cg=>!coreGroups.some(co=>co.cgIds.includes(cg.id)));
-
-  container.innerHTML = coreGroups.map(core=>{
-    const total = coreTotalGbps(core);
+  const unassigned = cgGroups.filter(cg => !coreGroups.some(co => co.cgIds.includes(cg.id)));
+  document.getElementById('coreList').innerHTML = coreGroups.map(core => {
+    const total = coreGbps(core);
     const over = coreLimit > 0 && total > coreLimit;
-    const pct = coreLimit > 0 ? Math.min(100,(total/coreLimit)*100) : 0;
-    const fc = over?'#ff4444':pct>80?'#ffaa44':'#cc7722';
-    const tagsHtml = core.cgIds.map(cgId=>{
-      const cg=cgGroups.find(g=>g.id===cgId);
-      if(!cg) return '';
+    const pct = coreLimit > 0 ? Math.min(100, (total/coreLimit)*100) : 0;
+    const fc = over ? 'var(--c-r)' : pct > 80 ? 'var(--c-o)' : 'var(--c-o)';
+    const tags = core.cgIds.map(cgId => {
+      const cg = cgGroups.find(g => g.id === cgId);
+      if (!cg) return '';
       return `<div class="core-cg-tag">
-        <span>${cg.name} (${cgTotalGbps(cg).toFixed(1)} Gbps)</span>
-        <span class="core-cg-remove" onclick="removeCoreAssign(${core.id},${cgId})">✕</span>
+        <span>${cg.name} (${cgGbps(cg).toFixed(1)} Gbps)</span>
+        <span class="core-tag-del" onclick="removeCoreAssign(${core.id},${cgId})">✕</span>
       </div>`;
     }).join('');
+
+    const assignSelect = unassigned.length ? `
+      <select onchange="assignCGtoCore(${core.id},this.value);this.value='';"
+        style="font-size:0.8rem;margin-top:4px;">
+        <option value="">Assign CG group…</option>
+        ${unassigned.map(cg=>`<option value="${cg.id}">${cg.name} (${cgGbps(cg).toFixed(1)} Gbps)</option>`).join('')}
+      </select>` : '';
+
     return `<div class="core-item">
-      <div class="core-item-title">
-        <span>${core.name} – ${total.toFixed(1)} Gbps</span>
-        <span style="cursor:pointer;color:#555;" onclick="removeCore(${core.id})">✕</span>
-      </div>
-      <div style="padding:4px 6px;">
-        <div class="cg-gbps-bar" style="margin-bottom:4px;"><div class="cg-gbps-fill" style="width:${pct}%;background:${fc};"></div></div>
-        ${over?`<div style="font-size:0.6em;color:#ff4444;font-weight:bold;margin-bottom:3px;">⚠️ ${hu?`${coreLimit} Gbps felett!`:`Over ${coreLimit} Gbps!`}</div>`:''}
+      <div class="core-item-head">
+        <span>${core.name} — ${total.toFixed(1)} Gbps</span>
+        <span class="core-item-del" onclick="removeCore(${core.id})">✕</span>
       </div>
       <div class="core-item-body">
-        ${tagsHtml}
-        ${unassignedCGs.length?`<select class="calc-select" style="font-size:0.62em;" onchange="assignCGtoCore(${core.id},this.value);this.value=''">
-          <option value="">${hu?'CG csoport hozzárendelése...':'Assign CG group...'}</option>
-          ${unassignedCGs.map(cg=>`<option value="${cg.id}">${cg.name} (${cgTotalGbps(cg).toFixed(1)} Gbps)</option>`).join('')}
-        </select>`:''}
+        <div class="core-bar"><div class="core-bar-fill" style="width:${pct}%;background:${fc};"></div></div>
+        ${over ? `<div style="font-size:0.75rem;color:var(--c-r);font-weight:700;">⚠️ Over ${coreLimit} Gbps!</div>` : ''}
+        ${tags}
+        ${assignSelect}
       </div>
     </div>`;
   }).join('');
@@ -596,27 +1354,33 @@ function renderCores() {
 
 function assignCGtoCore(coreId, cgId) {
   cgId = parseInt(cgId);
-  const core=coreGroups.find(c=>c.id===coreId);
-  if(core && !core.cgIds.includes(cgId)) core.cgIds.push(cgId);
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core && !core.cgIds.includes(cgId)) core.cgIds.push(cgId);
   renderCores();
 }
 function removeCoreAssign(coreId, cgId) {
-  const core=coreGroups.find(c=>c.id===coreId);
-  if(core) core.cgIds=core.cgIds.filter(x=>x!==cgId);
+  const core = coreGroups.find(c => c.id === coreId);
+  if (core) core.cgIds = core.cgIds.filter(x => x !== cgId);
   renderCores();
 }
 function removeCore(id) {
-  coreGroups=coreGroups.filter(c=>c.id!==id);
+  coreGroups = coreGroups.filter(c => c.id !== id);
   renderCores();
 }
 
-// ===== INIT =====
-applyLang();
-buildCompanyTable();
+// ===================== CHANGELOG =====================
+function openChangelog() { document.getElementById('changelogModal').classList.add('open'); }
+function closeChangelog(e) {
+  if (!e || e.target === document.getElementById('changelogModal'))
+    document.getElementById('changelogModal').classList.remove('open');
+}
+
+// ===================== INIT =====================
+buildCustomerTable();
 renderPool();
 renderCGGroups();
 renderCores();
-calc();
 </script>
 </body>
 </html>
+
