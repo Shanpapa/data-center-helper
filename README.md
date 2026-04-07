@@ -9,7 +9,7 @@ A fan-made helper tool for the [Data Center](https://store.steampowered.com/app/
 
 Built by a casual player who got lost in switches, patch panels and IOPS numbers — and decided to do something about it.
 
-**👉 [Open the tool]([https://shanpapa.github.io/dc-helper/](https://shanpapa.github.io/data-center-helper/index.html))**
+**👉 [Open the tool](https://shanpapa.github.io/dc-helper/](https://shanpapa.github.io/data-center-helper/index.html )**
 
 ---
 
