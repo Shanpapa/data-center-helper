@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Guide – Data Center Helper</title>
+<style>
+/* ===================== THEMES ===================== */
+:root {
+  --bg:       #0a0c12; --bg2: #14171f; --bg3: #1e2130; --bg4: #0d0f18;
+  --border:   #222;    --border2: #2a2d3a;
+  --text:     #e0e0e0; --text2: #aaa; --text3: #666; --text4: #3a3d4a;
+  --c-hi:     #61dafb; --c-g: #4cdf9a; --c-o: #ffaa44; --c-r: #ff6666; --c-p: #cc88ff;
+  --tab-bg:   #14171f; --tab-act: #1a2a4a; --tab-bord: #3a6aaa; --tab-col: #88bbff;
+  --input-bg: #0a0c12; --hover: #12141c; --card-bg: #14171f; --shadow: rgba(0,0,0,0.4);
+  --step-done: #0a2a1a; --step-done-b: #1a5a3a; --step-act: #0d1a30; --step-act-b: #2a4a7a;
+}
+[data-theme="light"] {
+  --bg: #f0f2f5; --bg2: #fff; --bg3: #e8eaf0; --bg4: #f8f9fb;
+  --border: #d0d4dc; --border2: #c0c4cc;
+  --text: #1a1d27; --text2: #555; --text3: #888; --text4: #bbb;
+  --c-hi: #0066cc; --c-g: #1a8a5a; --c-o: #cc6600; --c-r: #cc2222; --c-p: #7722cc;
+  --tab-bg: #fff; --tab-act: #ddeeff; --tab-bord: #4488cc; --tab-col: #1155aa;
+  --input-bg: #fff; --hover: #f0f4f8; --card-bg: #fff; --shadow: rgba(0,0,0,0.1);
+  --step-done: #e8f8e8; --step-done-b: #88cc88; --step-act: #e8f0ff; --step-act-b: #4488cc;
+}
+
+/* ===================== BASE ===================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ===================== TOPBAR ===================== */
+.topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 100; }
+.topbar h1 { font-size: 1.05rem; color: var(--c-hi); font-weight: 700; }
+.back-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 0.82rem; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+.back-btn:hover { border-color: var(--tab-bord); color: var(--tab-col); }
+.sep { width: 1px; height: 22px; background: var(--border2); }
+.theme-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 0.82rem; cursor: pointer; font-weight: 600; }
+.mode-badge { padding: 4px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: 1px solid var(--border2); transition: all 0.2s; }
+.mode-badge.beginner { background: #0a2a0a; border-color: #2a6a2a; color: #4cdf9a; }
+.mode-badge.expert { background: #1a1a2a; border-color: #4a4a8a; color: #8888ff; }
+
+/* ===================== LAYOUT ===================== */
+.main { display: grid; grid-template-columns: 300px 1fr; gap: 0; flex: 1; overflow: hidden; max-height: calc(100vh - 57px); }
+@media (max-width: 800px) { .main { grid-template-columns: 1fr; max-height: none; overflow: auto; } }
+
+/* ===================== LEFT PANEL – INVENTORY ===================== */
+.left-panel { background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+.panel-section { border-bottom: 1px solid var(--border); }
+.panel-section-title { padding: 10px 14px; font-size: 0.75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; background: var(--bg3); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.panel-section-title:hover { color: var(--text2); }
+.panel-section-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+.inventory-row { display: flex; align-items: center; gap: 8px; }
+.inv-label { font-size: 0.82rem; color: var(--text2); flex: 1; }
+.inv-hint { font-size: 0.72rem; color: var(--text3); }
+.inv-counter { display: flex; align-items: center; gap: 0; border: 1px solid var(--border2); border-radius: 7px; overflow: hidden; }
+.inv-btn { width: 28px; height: 28px; background: var(--bg3); border: none; color: var(--text2); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+.inv-btn:hover { background: var(--border2); color: var(--text); }
+.inv-val { width: 36px; text-align: center; background: var(--input-bg); font-size: 0.88rem; font-weight: 700; color: var(--text); border: none; outline: none; padding: 4px 0; }
+
+.customer-select-wrap { display: flex; flex-direction: column; gap: 6px; }
+.customer-select-wrap select { background: var(--input-bg); border: 1px solid var(--border2); color: var(--text); padding: 7px 10px; border-radius: 7px; font-size: 0.85rem; outline: none; width: 100%; }
+.customer-select-wrap select:focus { border-color: var(--tab-bord); }
+.selected-customer-card { background: var(--bg4); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; }
+.scc-name { font-size: 0.88rem; font-weight: 700; color: var(--c-hi); margin-bottom: 6px; }
+.scc-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text2); padding: 2px 0; }
+.scc-row span:last-child { font-weight: 600; color: var(--text); }
+
+.entry-mode-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.entry-tab { flex: 1; padding: 8px; text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.entry-tab.active { color: var(--tab-col); border-bottom-color: var(--tab-bord); }
+
+.reset-btn { margin: 10px 12px; padding: 8px; border-radius: 7px; border: 1px solid #3a1a1a; background: #1a0a0a; color: #ff8888; font-size: 0.8rem; cursor: pointer; font-weight: 600; width: calc(100% - 24px); transition: all 0.15s; }
+.reset-btn:hover { background: #2a0a0a; }
+
+/* ===================== RIGHT PANEL – GUIDE ===================== */
+.right-panel { overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Entry point cards */
+.entry-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .entry-cards { grid-template-columns: 1fr; } }
+.entry-card { background: var(--card-bg); border: 2px solid var(--border2); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.2s; }
+.entry-card:hover { border-color: var(--tab-bord); background: var(--tab-act); }
+.entry-card.selected { border-color: var(--tab-bord); background: var(--tab-act); }
+.entry-card-icon { font-size: 2rem; margin-bottom: 8px; }
+.entry-card-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.entry-card-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+
+/* Step system */
+.guide-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.guide-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.guide-subtitle { font-size: 0.82rem; color: var(--text3); }
+
+.steps { display: flex; flex-direction: column; gap: 10px; }
+
+.step { border-radius: 10px; border: 1px solid var(--border); overflow: hidden; transition: all 0.2s; }
+.step.done { border-color: var(--step-done-b); background: var(--step-done); }
+.step.active { border-color: var(--step-act-b); background: var(--step-act); }
+.step.locked { opacity: 0.45; }
+
+.step-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
+.step.done .step-num { background: var(--c-g); color: #000; }
+.step.active .step-num { background: var(--c-hi); color: #000; }
+.step.locked .step-num { background: var(--border2); color: var(--text3); }
+.step-title { font-size: 0.92rem; font-weight: 700; flex: 1; }
+.step-status { font-size: 0.75rem; color: var(--text3); }
+.step.done .step-status { color: var(--c-g); }
+.step.active .step-status { color: var(--c-hi); }
+
+.step-body { padding: 0 14px 14px; display: none; }
+.step.active .step-body { display: block; }
+
+/* Step content components */
+.explain-box { background: var(--bg3); border-radius: 8px; padding: 12px 14px; font-size: 0.85rem; color: var(--text2); line-height: 1.7; margin-bottom: 12px; border-left: 3px solid var(--c-hi); }
+.explain-box.beginner-only { display: none; }
+body.mode-beginner .explain-box.beginner-only { display: block; }
+
+.action-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.action-item { display: flex; align-items: flex-start; gap: 10px; background: var(--bg4); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; }
+.action-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.action-item .action-text { flex: 1; line-height: 1.5; }
+.action-item .action-text strong { color: var(--text); }
+.action-item .action-text .hint { font-size: 0.78rem; color: var(--text3); margin-top: 3px; display: block; }
+body.mode-beginner .action-item .hint { display: block !important; }
+
+.calc-result-box { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.crb-title { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
+.crb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; }
+.crb-item { background: var(--bg4); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; }
+.crb-item-label { font-size: 0.7rem; color: var(--text3); margin-bottom: 3px; }
+.crb-item-val { font-size: 1rem; font-weight: 800; }
+
+.warn-box { background: #1a1200; border: 1px solid #3a3000; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #ccaa44; margin-bottom: 10px; }
+.info-box { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #5acc5a; margin-bottom: 10px; }
+[data-theme="light"] .warn-box { background: #fff8e0; border-color: #ccaa44; color: #886600; }
+[data-theme="light"] .info-box { background: #e8f8e8; border-color: #88cc88; color: #226622; }
+
+.step-btn { padding: 9px 18px; border-radius: 8px; border: none; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.step-btn.primary { background: var(--tab-act); border: 1px solid var(--tab-bord); color: var(--tab-col); }
+.step-btn.primary:hover { filter: brightness(1.15); }
+.step-btn.done-btn { background: var(--step-done); border: 1px solid var(--step-done-b); color: var(--c-g); }
+.step-btn.done-btn:hover { filter: brightness(1.1); }
+
+/* Cable diagram */
+.cable-diagram { background: var(--bg4); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; font-family: monospace; font-size: 0.78rem; }
+.cable-diagram .cd-title { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif; }
+.cd-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--text2); }
+.cd-box { padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
+.cd-line { flex: 1; height: 2px; border-radius: 1px; }
+.cd-arrow { color: var(--text3); font-size: 0.7rem; }
+/* cable colors */
+.bg-blue   { background: #0d2040; color: #61b0ff; border: 1px solid #1a4a80; }
+.bg-purple { background: #1a0a2a; color: #cc88ff; border: 1px solid #5a2a8a; }
+.bg-green  { background: #0a1a0a; color: #4cdf9a; border: 1px solid #1a5a2a; }
+.bg-orange { background: #1a0a00; color: #ffaa44; border: 1px solid #5a3a00; }
+.bg-yellow { background: #1a1500; color: #eecc44; border: 1px solid #5a5000; }
+.bg-grey   { background: #1a1a1a; color: #aaa;    border: 1px solid #444; }
+.line-blue   { background: #1a4a80; }
+.line-purple { background: #5a2a8a; }
+.line-green  { background: #1a5a2a; }
+.line-orange { background: #5a3a00; }
+.line-yellow { background: #5a5000; }
+.line-grey   { background: #444; }
+
+/* Port speed selector */
+.speed-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.speed-opt { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg4); color: var(--text2); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.speed-opt:hover { border-color: var(--tab-bord); }
+.speed-opt.sel { background: var(--tab-act); border-color: var(--tab-bord); color: var(--tab-col); }
+
+/* tooltip */
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--border2); color: var(--text3); font-size: 0.65rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: help; margin-left: 4px; vertical-align: middle; }
+.tooltip-text { display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 12px; font-size: 0.78rem; color: var(--text2); width: 220px; z-index: 50; box-shadow: 0 4px 12px var(--shadow); line-height: 1.5; }
+.tooltip-wrap:hover .tooltip-text { display: block; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* footer */
+footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text4); flex-shrink: 0; }
+</style>
+</head>
+<body class="mode-beginner">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="back-btn" href="datacenter_helper.html">← Back to Dashboard</a>
+  <div class="sep"></div>
+  <h1>🧭 Setup Guide</h1>
+  <div class="sep"></div>
+  <div class="mode-badge beginner" id="modeBadge" onclick="toggleMode()">👶 Beginner mode</div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <div class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: INVENTORY & CUSTOMER -->
+  <div class="left-panel">
+
+    <!-- Mode selector -->
+    <div class="entry-mode-tabs">
+      <div class="entry-tab active" id="tab-customer" onclick="setEntryMode('customer')">👤 I have a customer</div>
+      <div class="entry-tab" id="tab-inventory" onclick="setEntryMode('inventory')">🗄️ I have gear</div>
+    </div>
+
+    <!-- Customer mode -->
+    <div id="mode-customer" class="panel-section-body">
+      <div class="customer-select-wrap">
+        <label style="font-size:0.78rem;color:var(--text3);font-weight:700;">Select your customer:</label>
+        <select id="customerPicker" onchange="onCustomerChange()">
+          <option value="">— Choose a customer —</option>
+        </select>
+        <div id="customerCard" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Inventory mode -->
+    <div id="mode-inventory" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-title" onclick="toggleSection('inv-switches')">
+          Switches <span id="inv-switches-arrow">▾</span>
+        </div>
+        <div class="panel-section-body" id="inv-switches">
+          <div class="inventory-row">
+            <span class="inv-label">16×RJ45 Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Basic switch. Each port handles up to 10 Gbps. Good for early game customers.</span></span></span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('sw16',-1)">−</button>
+              <input class="inv-val" id="sw16" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('sw16',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">4×SFP+ Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Small fiber switch. 25 Gbps per port. Good for uplinks between switches.</span></span></span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('sw4',-1)">−</button>
+              <input class="inv-val" id="sw4" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('sw4',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">4×QSFP+ 16×SFP+ <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Powerful mixed switch. 560 Gbps total. The backbone of any serious setup.</span></span></span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('sw4x16',-1)">−</button>
+              <input class="inv-val" id="sw4x16" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('sw4x16',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">32×QSFP+ Switch <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Maximum capacity switch. 1280 Gbps. Only needed for large customer groups.</span></span></span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('sw32',-1)">−</button>
+              <input class="inv-val" id="sw32" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('sw32',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title" onclick="toggleSection('inv-infra')">
+          Infrastructure <span id="inv-infra-arrow">▾</span>
+        </div>
+        <div class="panel-section-body" id="inv-infra">
+          <div class="inventory-row">
+            <span class="inv-label">Patch Panels</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('pp',-1)">−</button>
+              <input class="inv-val" id="pp" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('pp',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">Racks</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('racks',-1)">−</button>
+              <input class="inv-val" id="racks" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('racks',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title" onclick="toggleSection('inv-servers')">
+          Servers <span id="inv-servers-arrow">▾</span>
+        </div>
+        <div class="panel-section-body" id="inv-servers">
+          <div class="inventory-row">
+            <span class="inv-label">System X 3U</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('srvx3',-1)">−</button>
+              <input class="inv-val" id="srvx3" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('srvx3',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">System X 7U</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('srvx7',-1)">−</button>
+              <input class="inv-val" id="srvx7" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('srvx7',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">RISC 3U</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('srvr3',-1)">−</button>
+              <input class="inv-val" id="srvr3" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('srvr3',1)">+</button>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <span class="inv-label">RISC 7U</span>
+            <div class="inv-counter">
+              <button class="inv-btn" onclick="adj('srvr7',-1)">−</button>
+              <input class="inv-val" id="srvr7" type="number" value="0" min="0" onchange="onInventoryChange()">
+              <button class="inv-btn" onclick="adj('srvr7',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title" style="font-size:0.75rem;">Port speed available</div>
+        <div class="panel-section-body">
+          <div class="speed-selector">
+            <div class="speed-opt sel" onclick="setSpeed(10,this)">10 Gbps</div>
+            <div class="speed-opt" onclick="setSpeed(25,this)">25 Gbps</div>
+            <div class="speed-opt" onclick="setSpeed(40,this)">40 Gbps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">⚠️ Reset everything</button>
+  </div>
+
+  <!-- RIGHT: GUIDE CONTENT -->
+  <div class="right-panel" id="rightPanel">
+    <!-- Default state -->
+    <div style="text-align:center;padding:40px 20px;color:var(--text3);">
+      <div style="font-size:3rem;margin-bottom:12px;">🧭</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--text2);margin-bottom:8px;">Welcome to the Setup Guide</div>
+      <div style="font-size:0.88rem;line-height:1.7;">
+        Choose a starting point on the left:<br>
+        <strong style="color:var(--c-hi);">👤 I have a customer</strong> — pick your customer and get a step-by-step shopping & wiring guide.<br><br>
+        <strong style="color:var(--c-g);">🗄️ I have gear</strong> — tell us what you own and find out how to connect it.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>🎮 Data Center Helper · Setup Guide</span>
+  <span>Built by Claude (Anthropic) · Fan-made, not affiliated with Waseku</span>
+</footer>
+
+<script>
+// ===================== DATA =====================
+const CUSTOMERS = [
+  {n:1,  name:'Bermuda Triangle Backup', sw:'4 Port',  iops:40,   sx:40,  ri:0,   mf:0,    gpu:0,    ip:13,  rep:0},
+  {n:2,  name:'Dad Joke Database',       sw:'4 Port',  iops:80,   sx:80,  ri:0,   mf:0,    gpu:0,    ip:29,  rep:10},
+  {n:3,  name:'UFO Download Station',    sw:'4 Port',  iops:100,  sx:100, ri:0,   mf:0,    gpu:0,    ip:29,  rep:20},
+  {n:4,  name:'TaxHaven Holdings',       sw:'4 Port',  iops:120,  sx:120, ri:0,   mf:0,    gpu:0,    ip:29,  rep:30},
+  {n:5,  name:'FakeNews Daily',          sw:'4 Port',  iops:150,  sx:100, ri:50,  mf:0,    gpu:0,    ip:42,  rep:40},
+  {n:6,  name:'Pollution Plus',          sw:'4 Port',  iops:170,  sx:100, ri:70,  mf:0,    gpu:0,    ip:58,  rep:50},
+  {n:7,  name:'ClimateChange Industries',sw:'4 Port',  iops:190,  sx:100, ri:90,  mf:0,    gpu:0,    ip:58,  rep:60},
+  {n:8,  name:'Honest Politicians',      sw:'4 Port',  iops:220,  sx:100, ri:120, mf:0,    gpu:0,    ip:58,  rep:80},
+  {n:9,  name:'Vaporware Corp',          sw:'4 Port',  iops:240,  sx:100, ri:140, mf:0,    gpu:0,    ip:58,  rep:100},
+  {n:10, name:'Maybe Finance',           sw:'4 Port',  iops:260,  sx:100, ri:90,  mf:70,   gpu:0,    ip:87,  rep:130},
+  {n:11, name:'Organised Chaos',         sw:'4 Port',  iops:290,  sx:100, ri:90,  mf:100,  gpu:0,    ip:87,  rep:170},
+  {n:12, name:'Not Hackers',             sw:'4 Port',  iops:310,  sx:100, ri:90,  mf:120,  gpu:0,    ip:87,  rep:220},
+  {n:13, name:'CryptoMine Inc',          sw:'4 Port',  iops:340,  sx:100, ri:90,  mf:150,  gpu:0,    ip:87,  rep:280},
+  {n:14, name:'The Invisible Hand',      sw:'4 Port',  iops:370,  sx:100, ri:90,  mf:80,   gpu:100,  ip:116, rep:360},
+  {n:15, name:'AnonMask',               sw:'4 Port',  iops:400,  sx:100, ri:90,  mf:80,   gpu:130,  ip:116, rep:460},
+  {n:16, name:'Global Megacorp',         sw:'4+16',    iops:480,  sx:120, ri:120, mf:120,  gpu:120,  ip:252, rep:580},
+  {n:17, name:'Doomscroll Media',        sw:'4+16',    iops:600,  sx:150, ri:150, mf:150,  gpu:150,  ip:252, rep:720},
+  {n:18, name:'Subscription Hell',       sw:'4+16',    iops:720,  sx:180, ri:180, mf:180,  gpu:180,  ip:252, rep:880},
+  {n:19, name:'Greed is Good',           sw:'4+16',    iops:840,  sx:210, ri:210, mf:210,  gpu:210,  ip:252, rep:1060},
+  {n:20, name:'Too Big To Fail',         sw:'4+16',    iops:1000, sx:250, ri:250, mf:250,  gpu:250,  ip:500, rep:1060},
+  {n:21, name:'Mega International',      sw:'4+16',    iops:1100, sx:275, ri:275, mf:275,  gpu:275,  ip:500, rep:1060},
+  {n:22, name:'Oligarch Online',         sw:'4+16',    iops:1200, sx:300, ri:300, mf:300,  gpu:300,  ip:500, rep:1060},
+  {n:23, name:'Moon Launches',           sw:'4+16',    iops:1400, sx:360, ri:360, mf:360,  gpu:320,  ip:500, rep:1060},
+  {n:24, name:'Make Mie',               sw:'32 Port', iops:1490, sx:140, ri:670, mf:340,  gpu:340,  ip:532, rep:1320},
+  {n:25, name:'Aero Dynasty',           sw:'32 Port', iops:1590, sx:250, ri:350, mf:640,  gpu:350,  ip:564, rep:1560},
+  {n:26, name:'Standard',               sw:'32 Port', iops:1560, sx:200, ri:300, mf:400,  gpu:660,  ip:564, rep:1840},
+  {n:27, name:'Richards and Richards',   sw:'32 Port', iops:1600, sx:700, ri:300, mf:300,  gpu:300,  ip:628, rep:2180},
+  {n:28, name:'Dewey Chaeatm',           sw:'32 Port', iops:1800, sx:300, ri:900, mf:300,  gpu:300,  ip:503, rep:2580},
+  {n:29, name:'AeroSpace',              sw:'32 Port', iops:1820, sx:240, ri:240, mf:1040, gpu:300,  ip:500, rep:3050},
+  {n:30, name:'Bull and Bearly',         sw:'32 Port', iops:1700, sx:300, ri:300, mf:300,  gpu:800,  ip:628, rep:3600},
+  {n:31, name:'Waseku 🎮',              sw:'32 Port', iops:1820, sx:500, ri:440, mf:440,  gpu:440,  ip:500, rep:4250},
+  {n:32, name:'Sweatshop Effieciency',   sw:'32 Port', iops:1860, sx:360, ri:1000,mf:140,  gpu:360,  ip:532, rep:5020},
+  {n:33, name:'Pyramid Power',           sw:'32 Port', iops:1940, sx:240, ri:300, mf:1000, gpu:400,  ip:564, rep:5930},
+  {n:34, name:'EvilCorp 😈',            sw:'32 Port', iops:1980, sx:200, ri:200, mf:300,  gpu:1280, ip:500, rep:7000},
+];
+
+// ===================== STATE =====================
+let entryMode = 'customer';
+let expertMode = false;
+let maxPortSpeed = 10;
+let selectedCustomer = null;
+let stepsDone = new Set();
+
+// ===================== THEME / MODE =====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = html.dataset.theme === 'dark';
+  html.dataset.theme = dark ? 'light' : 'dark';
+  document.getElementById('themeBtn').textContent = dark ? '🌙 Dark' : '☀️ Light';
+}
+function toggleMode() {
+  expertMode = !expertMode;
+  document.body.classList.toggle('mode-beginner', !expertMode);
+  const b = document.getElementById('modeBadge');
+  b.textContent = expertMode ? '🧠 Expert mode' : '👶 Beginner mode';
+  b.className = 'mode-badge ' + (expertMode ? 'expert' : 'beginner');
+  if (selectedCustomer) renderCustomerGuide(selectedCustomer);
+  else if (entryMode === 'inventory') renderInventoryGuide();
+}
+
+// ===================== SECTIONS =====================
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? 'flex' : 'none';
+  if (arrow) arrow.textContent = hidden ? '▾' : '▸';
+}
+
+// ===================== ENTRY MODE =====================
+function setEntryMode(mode) {
+  entryMode = mode;
+  document.getElementById('tab-customer').classList.toggle('active', mode==='customer');
+  document.getElementById('tab-inventory').classList.toggle('active', mode==='inventory');
+  document.getElementById('mode-customer').style.display = mode==='customer' ? 'flex' : 'none';
+  document.getElementById('mode-inventory').style.display = mode==='inventory' ? 'block' : 'none';
+  if (mode === 'inventory') renderInventoryGuide();
+  else renderWelcome();
+}
+
+// ===================== SPEED =====================
+function setSpeed(val, el) {
+  maxPortSpeed = val;
+  document.querySelectorAll('.speed-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  renderInventoryGuide();
+}
+
+// ===================== INVENTORY ADJUSTMENTS =====================
+function adj(id, delta) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = Math.max(0, (parseInt(el.value)||0) + delta);
+  onInventoryChange();
+}
+function onInventoryChange() { if (entryMode === 'inventory') renderInventoryGuide(); }
+function getInv(id) { return parseInt(document.getElementById(id)?.value)||0; }
+
+// ===================== CUSTOMER PICKER =====================
+function buildCustomerPicker() {
+  const sel = document.getElementById('customerPicker');
+  CUSTOMERS.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.n;
+    opt.textContent = `#${c.n} ${c.name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function onCustomerChange() {
+  const n = parseInt(document.getElementById('customerPicker').value);
+  selectedCustomer = CUSTOMERS.find(c => c.n === n) || null;
+  const card = document.getElementById('customerCard');
+  if (!selectedCustomer) { card.style.display='none'; renderWelcome(); return; }
+
+  const types = ['sx','ri','mf','gpu'].filter(t => selectedCustomer[t] > 0);
+  const typeNames = {sx:'System X', ri:'RISC', mf:'Mainframe', gpu:'GPU'};
+  card.style.display = 'block';
+  card.innerHTML = `<div class="scc-name">${selectedCustomer.name}</div>
+    ${types.map(t=>`<div class="scc-row"><span>${typeNames[t]}</span><span>${(selectedCustomer[t]*1000).toLocaleString()} IOPS</span></div>`).join('')}
+    <div class="scc-row"><span>Switch type</span><span>${selectedCustomer.sw}</span></div>
+    <div class="scc-row"><span>IP addresses</span><span>${selectedCustomer.ip}</span></div>`;
+
+  stepsDone.clear();
+  renderCustomerGuide(selectedCustomer);
+}
+
+// ===================== OPTIMIZE SERVERS =====================
+function optimize(targetRaw, type) {
+  const i7=12000, i3=5000;
+  if (targetRaw <= 0) return {s7:0,s3:0,total:0,iops:0,ru:0};
+  let s7, s3;
+  if (targetRaw < i7) { s7=0; s3=Math.ceil(targetRaw/i3); }
+  else { s7=Math.floor(targetRaw/i7); const rem=targetRaw-s7*i7; s3=rem>0?Math.ceil(rem/i3):0; }
+  const total=s7+s3;
+  return {s7,s3,total,iops:s7*i7+s3*i3,ru:s7*7+s3*3};
+}
+
+// ===================== CUSTOMER GUIDE =====================
+function renderCustomerGuide(c) {
+  const types = ['sx','ri','mf','gpu'];
+  const typeNames = {sx:'System X',ri:'RISC',mf:'Mainframe',gpu:'GPU'};
+  const typeColors = {sx:'c-hi',ri:'c-g',mf:'c-p',gpu:'c-r'};
+  const activeTypes = types.filter(t => c[t] > 0);
+
+  // Calculate server needs
+  const needs = {};
+  let totalServers=0, totalRU=0, totalPorts=0;
+  activeTypes.forEach(t => {
+    const res = optimize(c[t]*1000, t);
+    needs[t] = res;
+    totalServers += res.total;
+    totalRU += res.ru;
+    totalPorts += res.total;
+  });
+
+  const needsHighSpeed = c.sw !== '4 Port';
+  const beg = !expertMode;
+
+  const panel = document.getElementById('rightPanel');
+  panel.innerHTML = `
+    <div class="guide-header">
+      <div>
+        <div class="guide-title">📋 Setup guide for: ${c.name}</div>
+        <div class="guide-subtitle">Follow these steps in order · check them off as you go</div>
+      </div>
+    </div>
+
+    <div class="steps" id="stepsContainer">
+
+      <!-- STEP 1: BUY SERVERS -->
+      <div class="step active" id="step-1">
+        <div class="step-header" onclick="toggleStep(1)">
+          <div class="step-num">1</div>
+          <div class="step-title">Buy the servers</div>
+          <div class="step-status">In progress</div>
+        </div>
+        <div class="step-body">
+          ${beg ? `<div class="explain-box">First things first — you need servers to actually process this customer's data. Different customers need different types. Here's exactly what to buy.</div>` : ''}
+          <div class="calc-result-box">
+            <div class="crb-title">What to buy</div>
+            <div class="crb-grid">
+              ${activeTypes.map(t=>`
+                <div class="crb-item">
+                  <div class="crb-item-label">${typeNames[t]}</div>
+                  <div class="crb-item-val ${typeColors[t]}">${needs[t].s7>0?needs[t].s7+'× 7U':''}${needs[t].s7>0&&needs[t].s3>0?' + ':''}${needs[t].s3>0?needs[t].s3+'× 3U':''}</div>
+                  <div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">${needs[t].iops.toLocaleString()} IOPS · ${needs[t].ru}U rack</div>
+                </div>`).join('')}
+              <div class="crb-item">
+                <div class="crb-item-label">Total servers</div>
+                <div class="crb-item-val c-o">${totalServers}</div>
+              </div>
+              <div class="crb-item">
+                <div class="crb-item-label">Total rack space</div>
+                <div class="crb-item-val c-o">${totalRU}U</div>
+              </div>
+            </div>
+          </div>
+          ${beg ? `<div class="info-box">💡 <strong>Why 7U first?</strong> A 7U server gives 12,000 IOPS in 7U of space. A 3U server gives 5,000 IOPS. So 7U servers are more space-efficient — we always fill with those first, then top up with 3U if needed.</div>` : ''}
+          <button class="step-btn done-btn" onclick="completeStep(1)">✓ Bought the servers — next step</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: BUY SWITCH + PATCH PANEL -->
+      <div class="step locked" id="step-2">
+        <div class="step-header" onclick="toggleStep(2)">
+          <div class="step-num">2</div>
+          <div class="step-title">Buy the network gear</div>
+          <div class="step-status">Waiting…</div>
+        </div>
+        <div class="step-body">
+          ${beg ? `<div class="explain-box">The customer connects to your data center through a switch. Think of it as the reception desk — all traffic from this customer goes through it. You also need a patch panel to keep cabling organised.</div>` : ''}
+          <div class="action-list">
+            <div class="action-item">
+              <div class="icon">🔌</div>
+              <div class="action-text">
+                <strong>1× ${c.sw === '4 Port' ? '4×SFP+ Switch' : c.sw === '4+16' ? '4×QSFP+ 16×SFP+ Switch' : '32×QSFP+ Switch'}</strong>
+                <span class="hint">This is the customer's switch. Their cable plugs into this.</span>
+              </div>
+            </div>
+            <div class="action-item">
+              <div class="icon">📌</div>
+              <div class="action-text">
+                <strong>1× Patch Panel</strong>
+                <span class="hint">Keeps your cabling tidy. All cables go through here before the switch.</span>
+              </div>
+            </div>
+            ${needsHighSpeed ? `<div class="action-item">
+              <div class="icon">💡</div>
+              <div class="action-text">
+                <strong>Fiber modules needed</strong> — this customer requires high-speed connections
+                <span class="hint">You'll need SFP28 (25 Gbps) or QSFP+ (40 Gbps) modules. Check your switch port types.</span>
+              </div>
+            </div>` : ''}
+          </div>
+          <button class="step-btn done-btn" onclick="completeStep(2)">✓ Bought — next step</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: PLACE IN RACK -->
+      <div class="step locked" id="step-3">
+        <div class="step-header" onclick="toggleStep(3)">
+          <div class="step-num">3</div>
+          <div class="step-title">Place everything in racks</div>
+          <div class="step-status">Waiting…</div>
+        </div>
+        <div class="step-body">
+          ${beg ? `<div class="explain-box">Now place your equipment in racks. You'll want two racks: one for the network gear (switch + patch panel) and one for the servers. Keep them separate — it stays organised as you grow.</div>` : ''}
+          <div class="action-list">
+            <div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Network rack</strong> — place patch panel at top, switch below it<span class="hint">Top = where cables come in. Bottom = switch that handles them.</span></div></div>
+            <div class="action-item"><div class="icon">🗄️</div><div class="action-text"><strong>Server rack</strong> — place all your servers here<span class="hint">Add a patch panel at the top of this rack too — it'll make cabling easier.</span></div></div>
+          </div>
+          <button class="step-btn done-btn" onclick="completeStep(3)">✓ Placed — next step</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: CABLE IT UP -->
+      <div class="step locked" id="step-4">
+        <div class="step-header" onclick="toggleStep(4)">
+          <div class="step-num">4</div>
+          <div class="step-title">Connect the cables</div>
+          <div class="step-status">Waiting…</div>
+        </div>
+        <div class="step-body">
+          ${beg ? `<div class="explain-box">This is the part that looks scary but follows a simple pattern. Data travels: <strong>Customer → Patch Panel → Switch → Servers</strong>. That's it. Every cable just connects one step to the next.</div>` : ''}
+
+          <div class="cable-diagram">
+            <div class="cd-title">Cable routing — follow this order</div>
+            <div class="cd-row">
+              <span class="cd-box bg-blue">Customer</span>
+              <div class="cd-line line-blue"></div>
+              <span class="cd-arrow">→</span>
+              <span class="cd-box bg-blue">Patch Panel</span>
+              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🔵 blue cable</span>
+            </div>
+            <div class="cd-row">
+              <span class="cd-box bg-blue">Patch Panel</span>
+              <div class="cd-line line-green"></div>
+              <span class="cd-arrow">→</span>
+              <span class="cd-box bg-green">Switch</span>
+              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟢 green cable</span>
+            </div>
+            <div class="cd-row">
+              <span class="cd-box bg-green">Switch</span>
+              <div class="cd-line line-orange"></div>
+              <span class="cd-arrow">→</span>
+              <span class="cd-box bg-orange">Server Patch Panel</span>
+              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟠 orange cable</span>
+            </div>
+            <div class="cd-row">
+              <span class="cd-box bg-orange">Server Patch Panel</span>
+              <div class="cd-line line-yellow"></div>
+              <span class="cd-arrow">→</span>
+              <span class="cd-box bg-yellow">Servers</span>
+              <span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟡 yellow cable</span>
+            </div>
+          </div>
+
+          <div class="action-list">
+            <div class="action-item"><div class="icon">1️⃣</div><div class="action-text"><strong>Customer cable → Patch Panel (top)</strong><span class="hint">The customer's main cable goes into the first free port on the patch panel.</span></div></div>
+            <div class="action-item"><div class="icon">2️⃣</div><div class="action-text"><strong>Patch Panel → Switch</strong><span class="hint">Connect each patch panel port to the corresponding switch port.</span></div></div>
+            <div class="action-item"><div class="icon">3️⃣</div><div class="action-text"><strong>Switch → Server Rack Patch Panel</strong><span class="hint">Run cables from the switch uplink ports to the patch panel in your server rack.</span></div></div>
+            <div class="action-item"><div class="icon">4️⃣</div><div class="action-text"><strong>Server Patch Panel → each Server</strong><span class="hint">One cable per server. Each server gets its own dedicated port.</span></div></div>
+          </div>
+
+          ${beg ? `<div class="warn-box">⚠️ <strong>Don't skip the patch panel!</strong> You could wire directly, but patch panels let you reorganise without re-cabling everything later.</div>` : ''}
+          <button class="step-btn done-btn" onclick="completeStep(4)">✓ Cabled up — next step</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: LACP (if needed) -->
+      ${c.iops > 100 ? `
+      <div class="step locked" id="step-5">
+        <div class="step-header" onclick="toggleStep(5)">
+          <div class="step-num">5</div>
+          <div class="step-title">Set up LACP if needed</div>
+          <div class="step-status">Waiting…</div>
+        </div>
+        <div class="step-body">
+          ${beg ? `<div class="explain-box">LACP (Link Aggregation Control Protocol) lets you bundle multiple cables together so the game treats them as one big pipe. If one cable can't carry enough traffic alone, you add more and group them.</div>` : ''}
+          <div class="calc-result-box">
+            <div class="crb-title">Do you need LACP?</div>
+            <div class="crb-grid">
+              <div class="crb-item"><div class="crb-item-label">Customer total IOPS</div><div class="crb-item-val c-o">${(c.iops*1000).toLocaleString()}</div></div>
+              <div class="crb-item"><div class="crb-item-label">Single port max</div><div class="crb-item-val c-hi">${maxPortSpeed} Gbps</div></div>
+              <div class="crb-item"><div class="crb-item-label">Servers needing ports</div><div class="crb-item-val c-g">${totalPorts}</div></div>
+            </div>
+          </div>
+          ${beg ? `<div class="info-box">💡 In-game: select multiple cables between the same two switches, then right-click → Group as LACP. The game combines their bandwidth automatically.</div>` : ''}
+          <button class="step-btn done-btn" onclick="completeStep(5)">✓ Done — finish</button>
+        </div>
+      </div>` : ''}
+
+      <!-- FINAL -->
+      <div class="step locked" id="step-final">
+        <div class="step-header">
+          <div class="step-num">🎉</div>
+          <div class="step-title">You're done!</div>
+          <div class="step-status"></div>
+        </div>
+        <div class="step-body">
+          <div class="info-box">
+            ✅ <strong>${c.name}</strong> is connected and ready to serve.<br><br>
+            ${totalServers} server${totalServers!==1?'s':''} · ${totalRU}U rack space · ${totalPorts} switch port${totalPorts!==1?'s':''}
+          </div>
+          <div class="action-list">
+            <div class="action-item"><div class="icon">💰</div><div class="action-text"><strong>Check the customer panel in-game</strong> — confirm their requirements are met and traffic is flowing.<span class="hint">Look for green indicators. Red means something isn't connected properly.</span></div></div>
+            <div class="action-item"><div class="icon">📈</div><div class="action-text"><strong>Ready for the next customer?</strong> Pick them from the list on the left and repeat!<span class="hint">Each customer gets their own switch. They all share the same servers.</span></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+// ===================== STEP CONTROL =====================
+function toggleStep(n) {
+  // only allow toggling active or done steps
+  const step = document.getElementById('step-'+n);
+  if (!step || step.classList.contains('locked')) return;
+}
+
+function completeStep(n) {
+  stepsDone.add(n);
+  const step = document.getElementById('step-'+n);
+  if (step) {
+    step.classList.remove('active');
+    step.classList.add('done');
+    step.querySelector('.step-status').textContent = '✓ Done';
+    step.querySelector('.step-body').style.display = 'none';
+  }
+
+  // unlock next step
+  const maxSteps = selectedCustomer?.iops > 100 ? 5 : 4;
+  const next = n + 1;
+  if (next <= maxSteps) {
+    const nextStep = document.getElementById('step-'+next);
+    if (nextStep) {
+      nextStep.classList.remove('locked');
+      nextStep.classList.add('active');
+      nextStep.querySelector('.step-status').textContent = 'In progress';
+      nextStep.querySelector('.step-body').style.display = 'block';
+      nextStep.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  } else {
+    // unlock final
+    const fin = document.getElementById('step-final');
+    if (fin) {
+      fin.classList.remove('locked');
+      fin.classList.add('active');
+      fin.querySelector('.step-body').style.display = 'block';
+      fin.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+}
+
+// ===================== INVENTORY GUIDE =====================
+function renderInventoryGuide() {
+  const sw16 = getInv('sw16'), sw4 = getInv('sw4'), sw4x16 = getInv('sw4x16'), sw32 = getInv('sw32');
+  const pp = getInv('pp'), racks = getInv('racks');
+  const srvx3 = getInv('srvx3'), srvx7 = getInv('srvx7'), srvr3 = getInv('srvr3'), srvr7 = getInv('srvr7');
+  const totalSwitches = sw16+sw4+sw4x16+sw32;
+  const totalServers = srvx3+srvx7+srvr3+srvr7;
+  const totalIops = srvx3*5000+srvx7*12000+srvr3*5000+srvr7*12000;
+  const beg = !expertMode;
+
+  if (totalSwitches === 0 && totalServers === 0) {
+    renderWelcome();
+    return;
+  }
+
+  // Advice logic
+  const tips = [];
+  const issues = [];
+
+  if (totalServers > 0 && pp === 0) issues.push({ icon:'⚠️', text:'No patch panels — add at least one per rack to keep cabling manageable.', fix:'Buy patch panels' });
+  if (totalServers > 0 && racks < 2) issues.push({ icon:'⚠️', text:'You need at least 2 racks — one for network gear, one for servers.', fix:'Buy more racks' });
+  if (sw16 > 0 && totalServers > 0) tips.push({ icon:'🔵', text:`You have ${sw16}× 16-port RJ45 switch${sw16>1?'es':''}. Connect customer cables → patch panel → this switch → server patch panel → servers.` });
+  if (sw4x16 > 0) tips.push({ icon:'🟢', text:`You have ${sw4x16}× 4×QSFP+ 16×SFP+ switch${sw4x16>1?'es':''}. This is a core/backbone switch — use it to connect your customer switches to your server infrastructure.` });
+  if (sw32 > 0) tips.push({ icon:'🟠', text:`You have ${sw32}× 32-port QSFP+ switch${sw32>1?'es':''}. This is a large customer group switch — ideal for grouping multiple customers into one uplink.` });
+  if (sw16 > 1) tips.push({ icon:'🔗', text:`Multiple switches? Connect them with a cross-link cable (one port each) so traffic can flow between them if one gets overloaded.` });
+  if (sw4x16 >= 2) tips.push({ icon:'💡', text:`With ${sw4x16} backbone switches, set up LACP between them to combine their uplink bandwidth (${sw4x16*160} Gbps combined QSFP+ throughput).` });
+
+  const maxCapacity = sw4x16 * 560 + sw32 * 1280 + sw16 * 160 + sw4 * 100;
+
+  const panel = document.getElementById('rightPanel');
+  panel.innerHTML = `
+    <div class="guide-header">
+      <div class="guide-title">🗄️ Your gear — here's what to do</div>
+      <div class="guide-subtitle">Based on what you've told us you own</div>
+    </div>
+
+    <div class="calc-result-box">
+      <div class="crb-title">Summary</div>
+      <div class="crb-grid">
+        <div class="crb-item"><div class="crb-item-label">Total switches</div><div class="crb-item-val c-hi">${totalSwitches}</div></div>
+        <div class="crb-item"><div class="crb-item-label">Total servers</div><div class="crb-item-val c-g">${totalServers}</div></div>
+        <div class="crb-item"><div class="crb-item-label">Server IOPS capacity</div><div class="crb-item-val c-o">${totalIops.toLocaleString()}</div></div>
+        <div class="crb-item"><div class="crb-item-label">Max network throughput</div><div class="crb-item-val c-p">${maxCapacity} Gbps</div></div>
+      </div>
+    </div>
+
+    ${issues.length ? `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--c-r);text-transform:uppercase;letter-spacing:1px;">⚠️ Issues to fix first</div>
+      ${issues.map(i=>`<div class="warn-box">${i.icon} ${i.text}</div>`).join('')}
+    </div>` : ''}
+
+    ${tips.length ? `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--c-g);text-transform:uppercase;letter-spacing:1px;">💡 How to connect this</div>
+      ${tips.map(t=>`<div class="action-item"><div class="icon">${t.icon}</div><div class="action-text">${t.text}</div></div>`).join('')}
+    </div>` : ''}
+
+    <div class="cable-diagram">
+      <div class="cd-title">General wiring principle</div>
+      <div class="cd-row"><span class="cd-box bg-blue">Customer</span><div class="cd-line line-blue"></div><span class="cd-arrow">→</span><span class="cd-box bg-blue">Patch Panel</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🔵 blue</span></div>
+      <div class="cd-row"><span class="cd-box bg-blue">Patch Panel</span><div class="cd-line line-green"></div><span class="cd-arrow">→</span><span class="cd-box bg-green">Customer Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟢 green</span></div>
+      ${sw4x16>0||sw32>0 ? `<div class="cd-row"><span class="cd-box bg-green">Customer Switch</span><div class="cd-line line-orange"></div><span class="cd-arrow">→</span><span class="cd-box bg-orange">Core Switch</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟠 orange</span></div>` : ''}
+      <div class="cd-row"><span class="cd-box bg-orange">${sw4x16>0||sw32>0?'Core Switch':'Customer Switch'}</span><div class="cd-line line-yellow"></div><span class="cd-arrow">→</span><span class="cd-box bg-yellow">Server Patch Panel → Servers</span><span style="font-size:0.7rem;color:var(--text3);margin-left:6px;">🟡 yellow</span></div>
+    </div>
+    `;
+}
+
+// ===================== WELCOME =====================
+function renderWelcome() {
+  document.getElementById('rightPanel').innerHTML = `
+    <div style="text-align:center;padding:40px 20px;color:var(--text3);">
+      <div style="font-size:3rem;margin-bottom:12px;">🧭</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--text2);margin-bottom:8px;">Welcome to the Setup Guide</div>
+      <div style="font-size:0.88rem;line-height:1.7;">
+        Choose a starting point on the left:<br><br>
+        <strong style="color:var(--c-hi);">👤 I have a customer</strong><br>
+        Pick your customer → get a step-by-step guide for exactly what to buy and how to wire it.<br><br>
+        <strong style="color:var(--c-g);">🗄️ I have gear</strong><br>
+        Tell us what you own → find out how to connect it and what's missing.
+      </div>
+    </div>`;
+}
+
+function resetAll() {
+  selectedCustomer = null;
+  stepsDone.clear();
+  document.getElementById('customerPicker').value = '';
+  document.getElementById('customerCard').style.display = 'none';
+  ['sw16','sw4','sw4x16','sw32','pp','racks','srvx3','srvx7','srvr3','srvr7'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value=0;
+  });
+  renderWelcome();
+}
+
+// ===================== INIT =====================
+buildCustomerPicker();
+</script>
+</body>
+</html>
